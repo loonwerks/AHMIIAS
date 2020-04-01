@@ -1,0 +1,38 @@
+package Human_IAS_Team
+public
+	with Base_Types;
+	
+	--Consider moving to a data types file as this model becomes more complex.
+	data H2I
+	end H2I;
+	
+	data I2H
+	end I2H;
+	
+	system Human
+		features
+			Input : in data port I2H;
+			Output : out data port H2I;
+	end Human;
+	
+	system IAS
+		features
+			Input : in data port H2I;
+			Output : out data port I2H;
+	end IAS;
+	
+	system Top
+		
+	end Top;
+
+	system implementation Top.impl
+		subcomponents
+			Human: system Human;
+			IAS: system IAS;
+		connections
+			Top_impl_new_connection: feature Human.Output -> IAS.Input;
+			Top_impl_new_connection2: feature IAS.Output -> Human.Input;
+	end Top.impl;
+	
+	
+end Human_IAS_Team;

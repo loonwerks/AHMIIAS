@@ -1,0 +1,84 @@
+package Human_IAS_Team
+public
+	with Base_Types;
+	
+	--Consider moving to a data types file as this model becomes more complex.
+	data H2I
+	end H2I;
+	
+	data implementation H2I.impl
+		subcomponents
+			new_route : data Base_Types::Boolean;
+			change_route : data Base_Types::Boolean;
+	end H2I.impl;
+	
+	data I2H
+	end I2H;
+	
+	data implementation I2H.impl
+		subcomponents
+			route_safe : data Base_Types::Boolean;
+			changed_route : data Base_Types::Boolean;
+	end I2H.impl;
+	
+	system Human
+		features
+			Input : in event data port I2H.impl;
+			Output : out event data port H2I.impl;
+		annex agree {**
+			--Alternatively, I could use the form in the comment below in the expression below that.
+			--eq initial_H2I : H2I.impl = H2I.impl {new_route = false; change_route = false}; 
+			--eq prev_Output : H2I.impl = prev(Output, H2I.impl {new_route = false; change_route = false});
+	
+			guarantee "Command change route if and only if the IAS says it's safe" :
+				if (prev(prev(Output.new_route,false),false) and prev(Input.route_safe, false))
+				 then Output.change_route 
+				 else not Output.change_route; 
+		**};
+	end Human;
+	
+	system IAS
+		features
+			Input : in event data port H2I.impl;
+			Output : out event data port I2H.impl;
+		annex agree {**
+			guarantee "Change route if the human says so": 
+				--1st version (violated one of the top-level lemmas)
+				--if prev(Input.change_route, false) then Output.changed_route else not Output.changed_route;
+				if prev(Input.change_route, false) then Output.changed_route else not Output.changed_route;
+		**};
+	end IAS;
+	
+	system Top
+		annex agree {**
+			guarantee "Placeholder gaurantee to get AGREE to run": true;
+		**};
+	end Top;
+
+	system implementation Top.impl
+		subcomponents
+			Human: system Human;
+			IAS: system IAS;
+		connections
+			Top_impl_new_connection: feature Human.Output -> IAS.Input;
+			Top_impl_new_connection2: feature IAS.Output -> Human.Input;
+		annex agree {**
+			--------------------------------------------
+			-- OBSERVERS (We want these to be invalid.)
+			lemma "Observer: Route changed":
+				not IAS.Output.changed_route;
+			--------------------------------------------
+			
+			--------------------------------------------
+			-- LEMMAS (These should be true based on the guarantees of the subcomponents.)
+			--------------------------------------------
+			lemma "Human commands change route only if IAS says it's safe": 
+				Human.Output.change_route => prev(IAS.Output.route_safe, false);
+			lemma "Changed route is a safe route":
+				IAS.Output.changed_route => prev(prev(IAS.Output.route_safe, false),false);
+			
+		**};
+	end Top.impl;
+	
+	
+end Human_IAS_Team;

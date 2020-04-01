@@ -1,0 +1,5 @@
+*.aadlbin-gen
+**/aadlbin-gen
+**/instances
+*.aaxl2
+*.aadlbin
