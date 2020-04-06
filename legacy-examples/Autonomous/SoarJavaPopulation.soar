@@ -1,0 +1,586 @@
+sp {drone*propose*initialize
+    (state <s> ^superstate nil -^name <n*1>)
+    -->
+    (<s> ^operator <o> +)
+    (<o> ^name initialize-drone)
+}
+
+sp {drone*apply*initialize
+    (state <s> ^operator <o*1>)
+    (<o*1> ^name initialize-drone)
+    -->
+    (<s> ^name droneFlight ^wait-flag 1)
+}
+
+# No operators to choose from, perform no-op
+sp {proposeWait
+    (state <s> ^name droneFlight ^wait-flag <w> -^startContingency)
+    -->
+    (<s> ^operator <o> + <)
+    (<o> ^name Processing)
+}
+
+sp {applyWait
+    (state <s> ^name droneFlight ^operator <o> ^wait-flag <w>)
+    (<o> ^name Processing)
+    -->
+    (<s> ^wait-flag (- <w> 1))
+    (<s> ^wait-flag <w> -)
+}
+
+sp {drone*propose*takeOver
+    "Proposes soar agent taking over the aircraft if connection has been lost"
+    (state <s> ^name droneFlight ^io.input-link.flightdata <fd> -^commands)
+    (<fd> ^takeOver yes)
+    -->
+    (<s> ^operator <o> +)
+    (<o> ^name takeOver)
+    (write (crlf) |Proposing turning on AI|)
+}
+
+sp {drone*apply*takeOver
+    "Issues first command when takeover is active"
+    (state <s> ^name droneFlight ^io.input-link.flightdata <fd>  ^io.output-link <out> ^operator <o>)
+    (<fd> ^takeOver yes)
+    (<o> ^name takeOver)
+    -->
+    (<out> ^command <com>)
+    (<com> ^dref sim/cockpit/autopilot/autopilot_state
+           ^setValue 16386
+           ^name setAIOn)
+    (<s> ^commands aiIsOn)
+    (write (crlf) |Adding AI_ON!|)
+}
+
+sp {drone*propose*operator*queryPreviousDecision
+    "Proposes soar agent searches for the closest previous decision within a 1 minute flight"
+    (state <s> ^name droneFlight ^io.output-link <out> ^io.input-link.flightdata <fd> ^acknowledgedCommands setAIOn)
+    (<fd> ^takeOver yes)
+    -->
+    (<s> ^operator <o> +)
+    (<o> ^name searchPreviousDecisions)
+    (write (crlf) | Proposing to look for previous decision!|)
+}
+
+sp {drone*apply*operator*queryPreviousDecision
+    "Creates command on output to tell Java to search and return a close previous decision"
+    (state <s> ^name droneFlight ^io.output-link <out> ^io.input-link.flightdata <fd> ^operator <o>)
+    (<fd> ^takeOver yes)
+    (<o> ^name searchPreviousDecisions)
+    -->
+    (<out> ^command <com>)
+    (<com> ^dref null
+           ^setValue null
+           ^name searchDecisions)
+    (<s> ^acknowledgedCommands setAIOn -)
+    (write (crlf) | Adding Search Previous Decisions Command!|)
+}
+
+sp {drone*propose*usePreviousDecision
+    "Propose using the previous decision that was provided"
+    (state <s> ^name droneFlight ^io.input-link.flightdata <fd> ^acknowledgedCommands searchDecisions ^previousDecisionCommand <com> ^previousDecisionValue <val>)
+    (<fd> ^takeOver yes)
+    -->
+    (<s> ^operator <o> +)
+    (<o> ^name applyPreviousDecision)
+    (write (crlf) |Got the previous decision|)
+}
+
+sp {drone*apply*throwAwayPreviousDecision
+    "Disregard the previous null decision"
+    (state <s> ^name droneFlight ^operator <o> ^previousDecisionCommand null ^previousDecisionValue <val>)
+    (<o> ^name applyPreviousDecision)
+    -->
+    (<s> ^acknowledgedCommands searchDecisions -)
+    (<s> ^previousDecisionCommand null - ^previousDecisionValue <val> -)
+    (<s> ^startContingency yes)
+    (write (crlf) |Ignoring null decision |)
+}
+
+sp {drone*apply*usePreviousDecisionTimer
+    "Apply the previous timer decision"
+    (state <s> ^name droneFlight ^operator <o> ^previousDecisionCommand timer ^previousDecisionValue <val>)
+    (<o> ^name applyPreviousDecision)
+    -->
+    (<s> ^addressedProblem previousDecision ^maxTimers <val> ^startNewTimer yes)
+    (<s> ^acknowledgedCommands searchDecisions -)
+    (<s> ^previousDecisionCommand null - ^previousDecisionValue <val> -)
+    (write (crlf) |Starting saved timer command with max timers:  | <val> )
+}
+
+sp {drone*propose*operator*C2-Lost-Link-Start-fully
+    "In lightly populated area, could start just a minute timer and turn around since will pass over or enter a populated area in one minute"
+    (state <s> ^name droneFlight ^startContingency yes -^contingencyComplete C2-Start ^io.input-link.flightdata <fd>)
+    (<fd> ^takeOver yes ^populated fully)
+    -->
+    (<s> ^operator <o> +)
+    (<o> ^name C2-Start
+         ^timerLength 1)
+    (write (crlf) |PROPOSE C2!|)
+}
+
+sp {drone*propose*operator*C2-Lost-Link-Start-lightly
+    "In lightly populated area, could start just a minute timer and turn around since will pass over or enter a populated area in one minute"
+    (state <s> ^name droneFlight ^startContingency yes -^contingencyComplete C2-Start ^io.input-link.flightdata <fd>)
+    (<fd> ^takeOver yes ^populated lightly)
+    -->
+    (<s> ^operator <o> +)
+    (<o> ^name C2-Start
+         ^timerLength 1)
+    (write (crlf) |PROPOSE C2!|)
+}
+
+sp {drone*propose*operator*C3-Lost-Link-Start-lightly
+    "In lightly populated area, could start 8 minute timer and after that turn around since I won't be in a populated area for a while"
+    (state <s> ^name droneFlight ^startContingency yes -^contingencyComplete C3-Start ^io.input-link.flightdata <fd>)
+    (<fd> ^takeOver yes ^populated lightly)
+    -->
+    (<s> ^operator <o> +)
+    (<o> ^name C3-Start
+         ^timerLength 8)
+    (write (crlf) |PROPOSE C3!|)
+}
+
+sp {drone*propose*operator*C3-Lost-Link-Start-fully
+    "In lightly populated area, could start 8 minute timer and after that turn around since I won't be in a populated area for a while"
+    (state <s> ^name droneFlight ^startContingency yes -^contingencyComplete C3-Start ^io.input-link.flightdata <fd>)
+    (<fd> ^takeOver yes ^populated fully)
+    -->
+    (<s> ^operator <o> +)
+    (<o> ^name C3-Start
+         ^timerLength 8)
+    (write (crlf) |PROPOSE C3!|)
+}
+
+sp {drone*apply*operator*StartTimerLostLinkFirst
+    "Return to base via shortest path after so many minutes following shortest path"
+    (state <s> ^name droneFlight ^operator <o> ^io.input-link.flightdata <fd> ^startContingency yes -^maxTimers -^addressedProblem)
+    (<o> ^name <n>
+         ^timerLength <tl>)
+    (<fd> ^takeOver yes)
+   -->
+    (<s> ^addressedProblem <n> ^maxTimers <tl> ^startNewTimer yes)
+    (<s> ^startContingency yes -)
+    (write (crlf) |FOUND_0 | <n>)
+}
+
+sp {drone*apply*operator*StartTimerLostLinkLater
+    "Return to base via shortest path after so many minutes following shortest path. Deletes old maxTimers value if its there"
+    (state <s> ^name droneFlight ^operator <o> ^io.input-link.flightdata <fd> ^startContingency yes ^maxTimers <mT> ^addressedProblem <ap>)
+    (<o> ^name <n>
+         ^timerLength <tl>)
+    (<fd> ^takeOver yes)
+   -->
+    (<s> ^addressedProblem <n> ^addressedProblem <ap> - ^maxTimers <tl> ^maxTimers <mT> - ^startNewTimer yes)
+    (<s> ^startContingency yes -)
+    (write (crlf) |FOUND_1 | <n>)
+}
+
+sp {drone*propose*operator*C4-Lost-Link-Start
+    "In non-populated area, continue flying pre-programmed course.  Return to mission altitude/altitude floor after 1 minute"
+    (state <s> ^name droneFlight ^startContingency yes -^contingencyComplete C4-Start ^io.input-link.flightdata <fd>)
+    (<fd> ^takeOver yes ^populated null)
+    -->
+    (<s> ^operator <o> +)
+    (<o> ^name C4-Start)
+    (write (crlf) |PROPOSE C4!|)
+}
+
+sp {drone*apply*operator*C4-Lost-Link-Start
+    "Maintain Pre-Programmed Course, Return to mission altitude/altitude floor after 1 minute"
+    (state <s> ^name droneFlight ^io.input-link.flightdata <fd> ^startContingency yes -^addressedProblem ^operator <o>)
+    (<fd> ^takeOver yes ^currentTime <current-Time>)
+    (<o> ^name C4-Start)
+    -->
+    (<s> ^addressedProblem C4-Start ^c4Timer <t> ^startNewTimer yes)
+    (<s> ^startContingency yes -)
+    (<t> ^targetTime (+ <current-Time> 60))
+    (write (crlf) |Starting C4 Timer!|)
+}
+
+sp {drone*propose*removeC4DoneTimer
+    "Listens for C4's timer being completed"
+    (state <s> ^name droneFlight ^c4Timer <t>)
+    (<t> ^targetTime <t1>)
+    (<s> ^io.input-link.flightdata <fd>)
+    (<fd> ^currentTime {<time> >= <t1>})
+    -->
+    (<s> ^operator <o>)
+    (<o> ^name stopC4Timer)
+    (write (crlf) |Found C4 timer done.|)
+}
+
+sp {drone*apply*removeC4DoneTimer
+    "Removes C4 timer and sends command to return to altitude floor"
+    (state <s> ^name droneFlight ^io.output-link <out> ^io.input-link.flightdata <fd> ^operator <o> ^c4Timer <t>)
+    (<fd> ^takeOver yes)
+    (<o> ^name stopC4Timer)
+    -->
+    (<s> ^c4Timer <t> -)
+    (<out> ^command <com>)
+    (<com> ^dref null
+           ^setValue 500
+           ^name returnToAltitudeFloor)
+    (write (crlf) |C4 Timer done. Sending command to return to altitude floor|)
+}
+
+sp {drone*apply*initializeCurrentTimers
+    "Restarts current timer"
+    :o-support
+    (state <s> ^name droneFlight ^maxTimers <mt> -^currentTimers)
+    -->
+    (<s> ^currentTimers 0)
+}
+
+sp {drone*apply*commandToStartTimer
+    "Adds command to start a new timer"
+    :o-support
+    (state <s> ^name droneFlight ^startNewTimer yes ^maxTimers <mT> ^currentTimers {<cT> < <mT>})
+    -->
+    (<s> ^sentCommand queryPop ^startNewTimer yes - ^currentTimers (+ 1 <cT>) ^currentTimers <cT> -)
+    (write (crlf) |Querying population!|)
+}
+
+sp {drone*apply*outOfTimeMarkContingency
+    "We are out of time so we need to pick a new contingency scenario and mark the current one as complete"
+    :o-support
+    (state <s> ^name droneFlight ^startNewTimer yes ^maxTimers <mT> ^currentTimers {<cT> >= <mT>} ^addressedProblem <ap>)
+    -->
+    (<s> ^contingencyComplete <ap>
+         ^startContingency yes)
+    (write (crlf) |Marked as complete: | <ap>)
+}
+
+sp {drone*propose*turnAround
+    "Current timer count == max count so propose to turn around"
+    (state <s> ^name droneFlight ^maxTimers <mT> ^currentTimers {<cT> >= <mT>} ^startContingency yes)
+    -->
+    (<s> ^operator <o> +)
+    (<o> ^name turnAround)
+    (write (crlf) |Propose turning around!|)
+}
+
+sp {drone*apply*turnAround
+    "Apply turn around and return to base"
+    (state <s> ^name droneFlight ^operator <o> ^startContingency yes)
+    (<o> ^name turnAround)
+    -->
+    (<s> ^startContingency yes -
+         ^sentCommand reverse
+         ^startNewTimer yes -)
+    (write (crlf) |Applying turn around!|)
+}
+
+sp {drone*apply*updateOut*queryForTimer
+    "Creates command on output to check if the plane will be over a populated area in the next minute"
+    :o-support
+    (state <s> ^name droneFlight ^io.output-link <out> ^io.input-link.flightdata <fd> ^sentCommand queryPop)
+    (<fd> ^takeOver yes)
+    -->
+    (<out> ^command <com>)
+    (<com> ^dref null
+           ^setValue calculateWillBeInPopulatedArea
+           ^name timerChecker)
+    (<s> ^sentCommand queryPop -)
+    (write (crlf) | Adding Check Timer Command!|)
+}
+
+sp {drone*propose*startTimer-lightlyPopulatedArea
+   "Propose starting a new one minute timer"
+   (state <s> ^name droneFlight ^io.input-link.flightdata <fd> ^willBeInPopulatedArea lightly)
+   (<fd> ^takeOver yes ^currentTime <current-Time>)
+   -->
+   (<s> ^operator <o> +)
+   (<o> ^targetTime (+ <current-Time> 60))
+   (write (crlf) |Suggesting starting one minute timer!|)
+}
+
+sp {drone*propose*startTimer-nullPopulatedArea
+   "Propose starting a new one minute timer"
+   (state <s> ^name droneFlight ^io.input-link.flightdata <fd> ^willBeInPopulatedArea null)
+   (<fd> ^takeOver yes ^currentTime <current-Time>)
+   -->
+   (<s> ^operator <o> +)
+   (<o> ^targetTime (+ <current-Time> 60))
+   (write (crlf) |Suggesting starting one minute timer!|)
+}
+
+sp {drone*apply*startTimer-lightlyPopulatedArea
+    "Start a new one minute timer"
+    (state <s> ^name droneFlight ^operator <o> ^io.input-link.flightdata <fd> ^willBeInPopulatedArea lightly)
+    (<fd> ^takeOver yes)
+    (<o> ^targetTime <target-Time>)
+    -->
+    (<s> ^timer <t> ^flewOverPopulatedArea no)
+    (<s> ^willBeInPopulatedArea lightly -)
+    (<t> ^targetTime <target-Time>)
+    (write (crlf) |Starting one minute timer!|)
+}
+
+sp {drone*apply*startTimer-nullPopulatedArea
+    "Start a new one minute timer"
+    (state <s> ^name droneFlight ^operator <o> ^io.input-link.flightdata <fd> ^willBeInPopulatedArea null)
+    (<fd> ^takeOver yes)
+    (<o> ^targetTime <target-Time>)
+    -->
+    (<s> ^timer <t> ^flewOverPopulatedArea no)
+    (<s> ^willBeInPopulatedArea null -)
+    (<t> ^targetTime <target-Time>)
+    (write (crlf) |Starting one minute timer!|)
+}
+
+sp {drone*propose*didFlyOverPopulatedArea
+    "Propose flew over populated area despite not thinking there would be one"
+    (state <s> ^name droneFlight ^timer <t> ^flewOverPopulatedArea no ^io.input-link.flightdata <fd>)
+    (<fd> ^takeOver yes ^populated fully)
+    -->
+    (<s> ^operator <o> +)
+    (<o> ^name turnAroundEmergency)
+    (write (crlf) |Caught flying over populated area!|)
+}
+
+sp {drone*apply*removeTimerAfterFlyingOverPopulatedArea
+    "Deletes the timer since we are reversing early"
+    (state <s> ^name droneFlight ^operator <o> ^timer <t>)
+    (<o> ^name turnAroundEmergency)
+    -->
+    (<s> ^timer <t> -)
+    (write (crlf) |Deleting timer to reverse early!|)
+}
+
+sp {drone*apply*removeWillBeInPopulatedAreaFully
+    "Found will be in populated area in a minute, remove the fully"
+    (state <s> ^name droneFlight ^operator <o> ^willBeInPopulatedArea fully)
+    (<o> ^name turnAroundEmergency)
+    -->
+    (<s> ^willBeInPopulatedArea fully -)
+    (write (crlf) |Removing will be in populated area as fully!|)
+}
+
+sp {drone*propose*returnToBase*populated
+    "Propose return to base because we will be will be in a populated area in a minute"
+    (state <s> ^name droneFlight ^io.input-link.flightdata <fd> ^willBeInPopulatedArea fully)
+    (<fd> ^takeOver yes)
+    -->
+    (<s> ^operator <o> +)
+    (<o> ^name turnAroundEmergency)
+    (write (crlf) |Populated in a minute!|)
+}
+
+sp {drone*apply*returnToBase*emergency
+   "Execute turn and retrace way points to home since we made the correct decision"
+   (state <s> ^name droneFlight ^io.input-link.flightdata <fd> ^operator <o>)
+   (<fd> ^takeOver yes)
+   (<o> ^name turnAroundEmergency)
+   -->
+   (<s> ^sentCommand reverse)
+   (<s> ^flewOverPopulatedArea no -)
+   (write (crlf) |Return To Base because projected to be in populated!|)
+}
+
+sp {drone*apply*timer-done-execute
+    "Removes timers as done if the current time meets or exceeds their target time"
+    :o-support
+    (state <s> ^name droneFlight ^timer <t> ^io.input-link.flightdata <fd>)
+    (<t> ^targetTime <target-time>)
+    (<fd> ^currentTime {<time> >= <target-time>})
+    -->
+    (<s> ^timer <t> - ^startNewTimer yes)
+    (<s> ^flewOverPopulatedArea no -)
+    (write (crlf) |Timer finished!|)
+}
+
+sp {drone*apply*updateOut*reverseWaypoints
+    "Creates command on output for sending to XPlane to overwrite the way points to return to home"
+    :o-support
+    (state <s> ^name droneFlight ^io.output-link <out> ^io.input-link.flightdata <fd> ^sentCommand reverse)
+    (<fd> ^takeOver yes)
+    -->
+    (<out> ^command <com>)
+    (<com> ^dref null
+           ^setValue reverse
+           ^name reverseWaypoints)
+    (<s> ^sentCommand reverse -)
+    (write (crlf) |Adding Reverse Command!|)
+}
+
+sp {drone*removeOutputCommand
+    "Removes output command"
+    :o-support
+    (state <s> ^name droneFlight ^io.output-link <out> ^io.input-link.flightdata <fd>)
+    (<fd> ^removeCommand <rc>)
+    (<out> ^command <rc>)
+    (<rc> ^name {<> timerChecker <> searchDecisions <> setAIOn <> reverseWaypoints <n>})
+    -->
+    (<out> ^command <rc> -)
+    (<s> ^acknowledgedCommands <n>)
+    (write (crlf) |Removing Output Command!  | <n> )
+}
+
+sp {drone*propose*acknowledgeReverseAndSaveDecision
+   "Catch reverse command return"
+   (state <s> ^name droneFlight ^io.output-link <out> ^io.input-link.flightdata <fd> ^currentTimers <cT>)
+   (<fd> ^removeCommand <rc>)
+   (<out> ^command <rc>)
+   (<rc> ^name reverseWaypoints)
+   -->
+   (<s> ^operator <o> +)
+   (<o> ^name saveDecision ^value <cT> ^removeCommand <rc>)
+   (write (crlf) |Caught reverse return! Proposing saving decision.|)
+}
+
+sp {drone*apply*acknowledgeReverseAndSaveDecision
+    "After reverse command has been served, send saved decision to be cataloged"
+    (state <s> ^name droneFlight ^io.output-link <out> ^io.input-link.flightdata <fd> ^currentTimers <cT> ^maxTimers <mT> ^operator <o> ^addressedProblem <ap>)
+    (<o> ^name saveDecision ^value <v> ^removeCommand <rc>)
+    -->
+    (<out> ^command <rc> -)
+    (<out> ^command <com>)
+    (<com> ^dref <ap>
+            ^setValue <v>
+            ^name saveDecision)
+    (<s> ^maxTimers <mT> - ^currentTimers <cT> - ^addressedProblem <ap> -)
+    (write (crlf) |Removing reverse command!  Sending saved decision! |)
+}
+
+sp {drone*markAiOn
+    "Removes timer start command and creates local willBeInPopulatedArea wme"
+    :o-support
+    (state <s> ^name droneFlight ^io.output-link <out> ^io.input-link.flightdata <fd>)
+    (<fd> ^removeCommand <rc>)
+    (<out> ^command <rc>)
+    (<rc> ^name setAIOn)
+    -->
+    (<out> ^command <rc> -)
+    (<s> ^acknowledgedCommands setAIOn)
+    (write (crlf) |Removing setAIOn command!|)
+}
+
+sp {drone*markInPopulatedArea
+    "Removes timer start command and creates local willBeInPopulatedArea wme"
+    :o-support
+    (state <s> ^name droneFlight ^io.output-link <out> ^io.input-link.flightdata <fd>)
+    (<fd> ^removeCommand <rc>
+          ^willBeInPopulatedArea <wPA>)
+    (<out> ^command <rc>)
+    (<rc> ^name timerChecker)
+    -->
+    (<out> ^command <rc> -)
+    (<s> ^willBeInPopulatedArea <wPA>)
+    (<s> ^acknowledgedCommands timerChecker)
+    (write (crlf) |Removing timerChecker command!|)
+    (write (crlf) |Calculated WillBeInPopulatedArea as : | <wPA>)
+}
+
+sp {drone*markPreviousDecision
+    "Removes timer start command and creates local decision choice wme.  The return decision will either be the closest decision or C2 as the default"
+    :o-support
+    (state <s> ^name droneFlight ^io.output-link <out> ^io.input-link.flightdata <fd>)
+    (<fd> ^removeCommand <rc> ^previousDecisionCommand <com> ^previousDecisionValue <val>)
+    (<out> ^command <rc>)
+    (<rc> ^name searchDecisions)
+    -->
+    (<out> ^command <rc> -)
+    (<s> ^acknowledgedCommands searchDecisions)
+    (<s> ^previousDecisionCommand <com> ^previousDecisionValue <val>)
+    (write (crlf) |Received the closest decision or default C2!|)
+}
+
+sp {drone*propose*operator*C6-Lost-Link-Start-lightly
+    "In lightly populated area, should start a 2 minute timer and then turn around"
+    (state <s> ^name droneFlight ^startContingency yes -^contingencyComplete C6-Start ^io.input-link.flightdata <fd>)
+    (<fd> ^takeOver yes ^populated lightly)
+    -->
+    (<s> ^operator <o> +)
+    (<o> ^name C6-Start
+         ^timerLength 2)
+    (write (crlf) |PROPOSE C6!|)
+}
+
+sp {drone*propose*operator*C6-Lost-Link-Start-fully
+    "In lightly populated area, should start a 2 minute timer and then turn around"
+    (state <s> ^name droneFlight ^startContingency yes -^contingencyComplete C6-Start ^io.input-link.flightdata <fd>)
+    (<fd> ^takeOver yes ^populated fully)
+    -->
+    (<s> ^operator <o> +)
+    (<o> ^name C6-Start
+         ^timerLength 2)
+    (write (crlf) |PROPOSE C6!|)
+}
+
+sp {drone*propose*operator*C7-Lost-Link-Start-lightly
+    "In lightly populated area, should start a 4 minute timer and then turn around"
+    (state <s> ^name droneFlight ^startContingency yes -^contingencyComplete C7-Start ^io.input-link.flightdata <fd>)
+    (<fd> ^takeOver yes ^populated lightly)
+    -->
+    (<s> ^operator <o> +)
+    (<o> ^name C7-Start
+         ^timerLength 4)
+    (write (crlf) |PROPOSE C7!|)
+}
+
+sp {drone*propose*operator*C7-Lost-Link-Start-fully
+    "In lightly populated area, should start a 4 minute timer and then turn around"
+    (state <s> ^name droneFlight ^startContingency yes -^contingencyComplete C7-Start ^io.input-link.flightdata <fd>)
+    (<fd> ^takeOver yes ^populated fully)
+    -->
+    (<s> ^operator <o> +)
+    (<o> ^name C7-Start
+         ^timerLength 4)
+    (write (crlf) |PROPOSE C7!|)
+}
+
+sp {chunk-1*d1471*tie*1
+    :chunk
+    (state <s1> ^operator <o1> +)
+    (<o1> ^timerLength 4)
+    (<s1> ^operator { <o2> <> <o1> } +)
+    (<o2> ^timerLength 2)
+    -->
+    (<s1> ^operator <o2> > <o1>)
+}
+sp {chunk-2*d1471*tie*2
+    :chunk
+    (state <s1> ^operator <o1> +)
+    (<o1> ^timerLength 4)
+    (<s1> ^operator { <o2> <> <o1> } +)
+    (<o2> ^timerLength 1)
+    -->
+    (<s1> ^operator <o2> > <o1>)
+}
+sp {chunk-3*d1471*tie*3
+    :chunk
+    (state <s1> ^operator <o1> +)
+    (<o1> ^timerLength 2)
+    (<s1> ^operator { <o2> <> <o1> } +)
+    (<o2> ^timerLength 1)
+    -->
+    (<s1> ^operator <o2> > <o1>)
+}
+sp {chunk-4*d1471*tie*4
+    :chunk
+    (state <s1> ^operator <o1> +)
+    (<o1> ^timerLength 8)
+    (<s1> ^operator { <o2> <> <o1> } +)
+    (<o2> ^timerLength 4)
+    -->
+    (<s1> ^operator <o2> > <o1>)
+}
+sp {chunk-5*d1471*tie*5
+    :chunk
+    (state <s1> ^operator <o1> +)
+    (<o1> ^timerLength 8)
+    (<s1> ^operator { <o2> <> <o1> } +)
+    (<o2> ^timerLength 2)
+    -->
+    (<s1> ^operator <o2> > <o1>)
+}
+sp {chunk-6*d1471*tie*6
+    :chunk
+    (state <s1> ^operator <o1> +)
+    (<o1> ^timerLength 8)
+    (<s1> ^operator { <o2> <> <o1> } +)
+    (<o2> ^timerLength 1)
+    -->
+    (<s1> ^operator <o2> > <o1>)
+}
