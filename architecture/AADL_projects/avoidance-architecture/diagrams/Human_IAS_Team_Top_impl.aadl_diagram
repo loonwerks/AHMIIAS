@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="ASCII"?>
+<diagram:Diagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:diagram="http://osate.org/diagram" formatVersion="7">
+  <element uuid="2aaf013d-cc6d-4d1a-a14f-438a25b80705" manual="true">
+    <element uuid="e25d54c8-df93-45dc-a606-4bf49acc6dcc">
+      <element uuid="21e47ef3-5bc9-44da-94ea-2976b86dfb01">
+        <bo>
+          <seg>tag</seg>
+          <seg>unidirectional</seg>
+        </bo>
+        <contentFilters/>
+      </element>
+      <bo>
+        <seg>connection</seg>
+        <seg>top_impl_new_connection</seg>
+      </bo>
+      <contentFilters/>
+    </element>
+    <element uuid="54c63138-e70d-4666-bc84-1cd51402b1e7">
+      <element uuid="9bb9020e-54de-4798-b9eb-a114e789b94d">
+        <bo>
+          <seg>tag</seg>
+          <seg>unidirectional</seg>
+        </bo>
+        <contentFilters/>
+      </element>
+      <bo>
+        <seg>connection</seg>
+        <seg>top_impl_new_connection2</seg>
+      </bo>
+      <contentFilters/>
+    </element>
+    <element uuid="ff3695fe-eaa5-41f1-a522-b88b676f141f">
+      <element uuid="01ae8282-06dd-4391-8f1a-764d68bf30a7" dockArea="left">
+        <bo>
+          <seg>feature</seg>
+          <seg>input</seg>
+        </bo>
+        <position y="60.0"/>
+        <contentFilters/>
+      </element>
+      <element uuid="23a635b5-ea83-4870-a6c4-c3eae57ea306" dockArea="left">
+        <bo>
+          <seg>feature</seg>
+          <seg>output</seg>
+        </bo>
+        <position y="10.0"/>
+        <contentFilters/>
+      </element>
+      <bo>
+        <seg>subcomponent</seg>
+        <seg>human</seg>
+      </bo>
+      <position x="234.0" y="38.0"/>
+      <size width="225.0" height="110.0"/>
+      <contentFilters>
+        <filter>features</filter>
+        <filter>internalFeatures</filter>
+        <filter>processorFeatures</filter>
+        <filter>connections</filter>
+        <filter>flowSpecifications</filter>
+      </contentFilters>
+    </element>
+    <element uuid="d29b47c4-d268-44be-b3d1-ad21bf859e7b">
+      <element uuid="642b9a35-eb6e-432c-9421-5623765d772e" dockArea="right">
+        <bo>
+          <seg>feature</seg>
+          <seg>input</seg>
+        </bo>
+        <position x="152.0" y="10.0"/>
+        <contentFilters/>
+      </element>
+      <element uuid="9730d6ed-8af9-4087-b618-1ba829b2ae34" dockArea="right">
+        <bo>
+          <seg>feature</seg>
+          <seg>output</seg>
+        </bo>
+        <position x="142.0" y="60.0"/>
+        <contentFilters/>
+      </element>
+      <bo>
+        <seg>subcomponent</seg>
+        <seg>ias</seg>
+      </bo>
+      <position x="12.0" y="38.0"/>
+      <size width="202.0" height="110.0"/>
+      <contentFilters>
+        <filter>features</filter>
+        <filter>internalFeatures</filter>
+        <filter>processorFeatures</filter>
+        <filter>connections</filter>
+        <filter>flowSpecifications</filter>
+      </contentFilters>
+    </element>
+    <bo>
+      <seg>classifier</seg>
+      <seg>top.impl</seg>
+    </bo>
+    <position x="12.0" y="12.0"/>
+    <size width="471.0" height="160.0"/>
+    <contentFilters>
+      <filter>features</filter>
+      <filter>internalFeatures</filter>
+      <filter>processorFeatures</filter>
+      <filter>connections</filter>
+      <filter>flowSpecifications</filter>
+      <filter>subcomponents</filter>
+    </contentFilters>
+  </element>
+  <config type="structure" connectionPrimaryLabelsVisible="false">
+    <enabledAadlProperties/>
+    <context>
+      <seg>classifier</seg>
+      <seg>human_ias_team::top.impl</seg>
+    </context>
+  </config>
+</diagram:Diagram>

@@ -65,9 +65,9 @@ public
 		annex agree {**
 			--------------------------------------------
 			-- OBSERVERS (We want these to be invalid.)
+			--------------------------------------------
 			lemma "Observer: Route changed":
 				not IAS.Output.changed_route;
-			--------------------------------------------
 			
 			--------------------------------------------
 			-- LEMMAS (These should be true based on the guarantees of the subcomponents.)

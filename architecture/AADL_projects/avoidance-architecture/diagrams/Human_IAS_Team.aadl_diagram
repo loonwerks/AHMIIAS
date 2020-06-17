@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="ASCII"?>
+<diagram:Diagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:diagram="http://osate.org/diagram" formatVersion="7">
+  <element uuid="e53cd3d8-4714-4f98-b7d9-4074c44d03d9" manual="true">
+    <element uuid="167ca7e7-8a04-4b01-a8f8-71f652884b56">
+      <bo>
+        <seg>classifier</seg>
+        <seg>h2i</seg>
+      </bo>
+      <position x="280.0" y="148.0"/>
+      <size width="75.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="a2f550fc-1113-4065-a0b9-11953ba58b8a">
+      <element uuid="ae8e66a8-a3c5-4507-b436-191e99eed5c7">
+        <bo>
+          <seg>realization</seg>
+        </bo>
+        <bendpoints>
+          <point x="276.0" y="177.5"/>
+          <point x="288.0" y="177.5"/>
+        </bendpoints>
+        <contentFilters/>
+      </element>
+      <bo>
+        <seg>classifier</seg>
+        <seg>h2i.impl</seg>
+      </bo>
+      <position x="148.0" y="148.0"/>
+      <size width="112.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="bce82a3c-679d-49cd-96c9-f20ce590f2d6">
+      <bo>
+        <seg>classifier</seg>
+        <seg>human</seg>
+      </bo>
+      <position x="250.0" y="38.0"/>
+      <size width="105.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="a89bb790-eecb-4ec5-8fa9-571b77106aa1">
+      <bo>
+        <seg>classifier</seg>
+        <seg>i2h</seg>
+      </bo>
+      <position x="280.0" y="93.0"/>
+      <size width="75.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="856b07fb-482c-4626-8415-e08710160a6c">
+      <element uuid="c70ee5fa-a61a-4d1a-8ff9-c847f8ae6e52">
+        <bo>
+          <seg>realization</seg>
+        </bo>
+        <bendpoints>
+          <point x="276.0" y="122.5"/>
+          <point x="288.0" y="122.5"/>
+        </bendpoints>
+        <contentFilters/>
+      </element>
+      <bo>
+        <seg>classifier</seg>
+        <seg>i2h.impl</seg>
+      </bo>
+      <position x="148.0" y="93.0"/>
+      <size width="112.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="2c28321a-8d99-4b2f-8819-c0ef22000a45">
+      <bo>
+        <seg>classifier</seg>
+        <seg>ias</seg>
+      </bo>
+      <position x="148.0" y="38.0"/>
+      <size width="82.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="42f97f4c-ed24-4cb4-8643-2f7066b15001">
+      <bo>
+        <seg>classifier</seg>
+        <seg>top</seg>
+      </bo>
+      <position x="283.0" y="203.0"/>
+      <size width="83.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="23421161-b412-4acf-b8fa-cc2ed8576ff6">
+      <element uuid="95fcad6f-c85c-4997-afe3-6cfb2f33765b">
+        <bo>
+          <seg>realization</seg>
+        </bo>
+        <bendpoints>
+          <point x="279.0" y="232.5"/>
+          <point x="291.0" y="232.5"/>
+        </bendpoints>
+        <contentFilters/>
+      </element>
+      <bo>
+        <seg>classifier</seg>
+        <seg>top.impl</seg>
+      </bo>
+      <position x="148.0" y="203.0"/>
+      <size width="115.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <bo>
+      <seg>package</seg>
+      <seg>human_ias_team</seg>
+    </bo>
+    <position x="12.0" y="12.0"/>
+    <size width="378.0" height="250.0"/>
+    <contentFilters>
+      <filter>classifiers</filter>
+    </contentFilters>
+  </element>
+  <config type="package" connectionPrimaryLabelsVisible="false">
+    <enabledAadlProperties/>
+    <context>
+      <seg>package</seg>
+      <seg>human_ias_team</seg>
+    </context>
+  </config>
+</diagram:Diagram>
