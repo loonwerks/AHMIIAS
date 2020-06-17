@@ -2,38 +2,144 @@ package Human_IAS_Team
 public
 	with Base_Types;
 	
-	--Consider moving to a data types file as this model becomes more complex.
+	-------------------------------------
+	-- Data Types
+	-------------------------------------
+	
 	data H2I
 	end H2I;
+	
+	data implementation H2I.impl
+		subcomponents
+			Ack_Sensor1_Unreliable: data Base_Types::Boolean;
+			Ack_Sensor2_Unreliable: data Base_Types::Boolean;
+			Ack_Sensor3_Unreliable: data Base_Types::Boolean;
+	end H2I.impl;
 	
 	data I2H
 	end I2H;
 	
-	data S2I
-	end S2I;
+	data implementation I2H.impl
+		subcomponents
+			Sensor1_Reliable: data Base_Types::Boolean;
+			Sensor2_Reliable: data Base_Types::Boolean;
+			Sensor3_Reliable: data Base_Types::Boolean;
+	end I2H.impl;
 	
-	data S2H
-	end S2H;
+	data Position
+	end Position;
+	
+	data implementation Position.impl
+		subcomponents
+			X: data Base_Types::Float;
+			Y: data Base_Types::Float;
+			Z: data Base_Types::Float;							
+	end Position.impl;
+
+	-------------------------------------
+	-- Human
+	-------------------------------------
 	
 	system Human
 		features
-			Input : in data port I2H;
-			InputFromSensor : in data port S2H;
-			Output : out data port H2I;
+			InputFromIAS : in data port I2H.impl;
+			InputFromSensor1 : in data port Position.impl;
+			InputFromSensor2 : in data port Position.impl;
+			InputFromSensor3 : in data port Position.impl;
+			Output : out data port H2I.impl;
+		annex agree {**
+			guarantee "Acknowledge receipt of message that Sensor1 is unreliable":
+				prev(not InputFromIAS.Sensor1_Reliable, false) <=> Output.Ack_Sensor1_Unreliable;
+			
+			guarantee "Acknowledge receipt of message that Sensor2 is unreliable":
+				prev(not InputFromIAS.Sensor2_Reliable, false) <=> Output.Ack_Sensor2_Unreliable;
+				
+			guarantee "Acknowledge receipt of message that Sensor3 is unreliable":
+				prev(not InputFromIAS.Sensor3_Reliable, false) <=> Output.Ack_Sensor3_Unreliable;
+		**};
 	end Human;
+	
+	-------------------------------------
+	-- IAS
+	-------------------------------------
 	
 	system IAS
 		features
-			Input : in data port H2I;
-			InputFromSensor : in data port S2I;
-			Output : out data port I2H;
+			InputFromHuman : in data port H2I.impl;
+			InputFromSensor1 : in data port Position.impl;
+			InputFromSensor2 : in data port Position.impl;
+			InputFromSensor3 : in data port Position.impl;
+			Output : out data port I2H.impl;
+
+		annex agree {**
+			node abs(val: real) returns (out: real);
+			let
+				out = if val >= 0.0 then val else val*-1.0;
+			tel;
+			
+			node vals_within_threshold_of_each_other(val1: real, val2: real, threshold: real) returns (out: bool);
+			let
+				out = (abs(val1-val2) < threshold); 
+			tel;
+			
+			node all_xyz_vals_within_threshold_of_each_other(pos1: Position.impl, pos2: Position.impl, threshold: real) returns (out: bool);
+			let
+				out = (		vals_within_threshold_of_each_other(pos1.X, pos2.X, threshold)
+						and vals_within_threshold_of_each_other(pos1.Y, pos2.Y, threshold)
+						and vals_within_threshold_of_each_other(pos1.Z, pos2.Z, threshold));
+			tel;
+			
+			node Sensor_Status(Sensor1_Data : Position.impl, Sensor2_Data : Position.impl, Sensor3_Data : Position.impl, Threshold: real) returns (Sensor1_Reliable: bool, Sensor2_Reliable: bool, Sensor3_Reliable: bool);
+			
+			var 
+				Sensor_1_2_Agreement : bool;
+				Sensor_1_3_Agreement : bool;
+				Sensor_2_3_Agreement : bool;
+			let
+				Sensor_1_2_Agreement = all_xyz_vals_within_threshold_of_each_other(Sensor1_Data, Sensor2_Data, Threshold);
+				Sensor_1_3_Agreement = all_xyz_vals_within_threshold_of_each_other(Sensor1_Data, Sensor3_Data, Threshold);
+				Sensor_2_3_Agreement = all_xyz_vals_within_threshold_of_each_other(Sensor2_Data, Sensor3_Data, Threshold);
+				
+				--A sensor is considered reliable if all XYZ values are within the threhold of one of the other position sensors.				
+	  			Sensor1_Reliable = Sensor_1_2_Agreement or Sensor_1_3_Agreement;
+	  			Sensor2_Reliable = Sensor_1_2_Agreement or Sensor_2_3_Agreement;
+	  			Sensor3_Reliable = Sensor_1_3_Agreement or Sensor_2_3_Agreement;
+			tel; 
+			
+			const THRESHOLD : real = 1.0;
+			
+			eq Sensor1_Reliable: bool, Sensor2_Reliable: bool, Sensor3_Reliable: bool = Sensor_Status(InputFromSensor1, InputFromSensor2, InputFromSensor3, THRESHOLD);
+				
+			guarantee "Sensor sensor status to pilot":
+					(Output.Sensor1_Reliable = Sensor1_Reliable)
+				and (Output.Sensor2_Reliable = Sensor2_Reliable)
+				and (Output.Sensor3_Reliable = Sensor3_Reliable);
+				
+		**};
 	end IAS;
 	
-	system Sensor
+	-------------------------------------
+	-- Sensors
+	-------------------------------------
+		
+	system Sensor1
 		features
-			Output2IAS : out data port S2I;
-			Output2Human : out data port S2H;
-	end Sensor;
+			Output : out data port Position.impl;
+	end Sensor1;
+	
+	system Sensor2
+		features
+			Output : out data port Position.impl;
+	end Sensor2;
+	
+	system Sensor3
+		features
+			Output : out data port Position.impl;
+	end Sensor3;
+	
+	-------------------------------------
+	-- Human-Machine Team
+	-------------------------------------
 	
 	system Top
 		annex agree {**
@@ -45,12 +151,35 @@ public
 		subcomponents
 			Human: system Human;
 			IAS: system IAS;
-			Sensor: system Sensor;
+			Sensor1: system Sensor1;
+			Sensor2: system Sensor2;
+			Sensor3: system Sensor3;
 		connections
-			Top_impl_new_connection: feature Human.Output -> IAS.Input;
-			Top_impl_new_connection2: feature IAS.Output -> Human.Input;
-			Top_impl_new_connection3: feature Sensor.Output2Human -> Human.InputFromSensor;
-			Top_impl_new_connection4: feature Sensor.Output2IAS -> IAS.InputFromSensor;
+			Top_impl_new_connection: feature IAS.Output -> Human.InputFromIAS;
+			Top_impl_new_connection2: feature Sensor1.Output -> IAS.InputFromSensor1;
+			Top_impl_new_connection3: feature Sensor2.Output -> IAS.InputFromSensor2;
+			Top_impl_new_connection4: feature Sensor3.Output -> IAS.InputFromSensor3;
+			Top_impl_new_connection5: feature Human.Output -> IAS.InputFromHuman;
+			Top_impl_new_connection6: feature Sensor1.Output -> Human.InputFromSensor1;
+			Top_impl_new_connection7: feature Sensor2.Output -> Human.InputFromSensor2;
+			Top_impl_new_connection8: feature Sensor3.Output -> Human.InputFromSensor3;
+		annex agree{**
+
+			--------------------------------------------
+			-- OBSERVERS (We want these to be invalid.)
+			--------------------------------------------
+			lemma "Observer: Pilot acknowledges Sensor 1 unreliable":
+				not Human.Output.Ack_Sensor1_Unreliable;
+				
+			lemma "Observer: IAS flags Sensor 1 unreliable":
+				IAS.Output.Sensor1_Reliable;
+				
+			lemma "Observer: All sensors reliable":
+				not (	IAS.Output.Sensor1_Reliable
+					and IAS.Output.Sensor2_Reliable
+					and IAS.Output.Sensor3_Reliable);
+							
+		**};
 	end Top.impl;
 	
 	

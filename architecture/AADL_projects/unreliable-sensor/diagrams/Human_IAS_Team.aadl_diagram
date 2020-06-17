@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="ASCII"?>
+<diagram:Diagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:diagram="http://osate.org/diagram" formatVersion="7">
+  <element uuid="a9c6d946-30c9-42da-8b27-4f4b9130ce57" manual="true">
+    <element uuid="0b5df2c5-84fd-489e-885f-e3b0a3dd3fa5">
+      <bo>
+        <seg>classifier</seg>
+        <seg>h2i</seg>
+      </bo>
+      <position x="243.0" y="38.0"/>
+      <size width="75.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="c684ae8b-c1fb-4e26-afed-b8aae73da42e">
+      <bo>
+        <seg>classifier</seg>
+        <seg>human</seg>
+      </bo>
+      <position x="148.0" y="93.0"/>
+      <size width="105.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="ec83d033-653d-489d-9240-df3e9006ddb5">
+      <bo>
+        <seg>classifier</seg>
+        <seg>i2h</seg>
+      </bo>
+      <position x="148.0" y="38.0"/>
+      <size width="75.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="93694be8-0a69-4eb6-91c2-222706360498">
+      <bo>
+        <seg>classifier</seg>
+        <seg>ias</seg>
+      </bo>
+      <position x="338.0" y="38.0"/>
+      <size width="82.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="6142611c-bc48-44b1-b37a-8ddb8dbbbccd">
+      <bo>
+        <seg>classifier</seg>
+        <seg>position</seg>
+      </bo>
+      <position x="311.0" y="258.0"/>
+      <size width="106.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="520ba3bc-3abf-4bc5-b922-d464d8b0b0ba">
+      <element uuid="925652b1-2a6f-4a19-aa50-25150bb695d3">
+        <bo>
+          <seg>realization</seg>
+        </bo>
+        <bendpoints>
+          <point x="307.0" y="287.5"/>
+          <point x="319.0" y="287.5"/>
+        </bendpoints>
+        <contentFilters/>
+      </element>
+      <bo>
+        <seg>classifier</seg>
+        <seg>position.impl</seg>
+      </bo>
+      <position x="148.0" y="258.0"/>
+      <size width="143.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="74981f99-04f1-4db2-8ec3-03d687da6337">
+      <bo>
+        <seg>classifier</seg>
+        <seg>sensor1</seg>
+      </bo>
+      <position x="273.0" y="93.0"/>
+      <size width="111.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="9b8b5309-2163-4e18-9ba6-6035f2c02c1f">
+      <bo>
+        <seg>classifier</seg>
+        <seg>sensor2</seg>
+      </bo>
+      <position x="148.0" y="148.0"/>
+      <size width="111.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="faa5b2dc-129e-4aaa-bacc-5d9263c957cc">
+      <bo>
+        <seg>classifier</seg>
+        <seg>sensor3</seg>
+      </bo>
+      <position x="279.0" y="148.0"/>
+      <size width="111.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="432dc89a-dc9d-4b04-9492-695b523f3be6">
+      <bo>
+        <seg>classifier</seg>
+        <seg>top</seg>
+      </bo>
+      <position x="283.0" y="203.0"/>
+      <size width="83.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="2840eeb8-67c6-4607-b6d2-d81dbfdc98ba">
+      <element uuid="cbb56519-8f07-437c-a6e7-3d819efe5b57">
+        <bo>
+          <seg>realization</seg>
+        </bo>
+        <bendpoints>
+          <point x="279.0" y="232.5"/>
+          <point x="291.0" y="232.5"/>
+        </bendpoints>
+        <contentFilters/>
+      </element>
+      <bo>
+        <seg>classifier</seg>
+        <seg>top.impl</seg>
+      </bo>
+      <position x="148.0" y="203.0"/>
+      <size width="115.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <bo>
+      <seg>package</seg>
+      <seg>human_ias_team</seg>
+    </bo>
+    <position x="12.0" y="12.0"/>
+    <size width="432.0" height="305.0"/>
+    <contentFilters>
+      <filter>classifiers</filter>
+    </contentFilters>
+  </element>
+  <config type="package" connectionPrimaryLabelsVisible="false">
+    <enabledAadlProperties/>
+    <context>
+      <seg>package</seg>
+      <seg>human_ias_team</seg>
+    </context>
+  </config>
+</diagram:Diagram>
