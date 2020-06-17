@@ -1,0 +1,57 @@
+package Human_IAS_Team
+public
+	with Base_Types;
+	
+	--Consider moving to a data types file as this model becomes more complex.
+	data H2I
+	end H2I;
+	
+	data I2H
+	end I2H;
+	
+	data S2I
+	end S2I;
+	
+	data S2H
+	end S2H;
+	
+	system Human
+		features
+			Input : in data port I2H;
+			InputFromSensor : in data port S2H;
+			Output : out data port H2I;
+	end Human;
+	
+	system IAS
+		features
+			Input : in data port H2I;
+			InputFromSensor : in data port S2I;
+			Output : out data port I2H;
+	end IAS;
+	
+	system Sensor
+		features
+			Output2IAS : out data port S2I;
+			Output2Human : out data port S2H;
+	end Sensor;
+	
+	system Top
+		annex agree {**
+			guarantee "Placeholder gaurantee to get AGREE to run": true;
+		**};
+	end Top;
+
+	system implementation Top.impl
+		subcomponents
+			Human: system Human;
+			IAS: system IAS;
+			Sensor: system Sensor;
+		connections
+			Top_impl_new_connection: feature Human.Output -> IAS.Input;
+			Top_impl_new_connection2: feature IAS.Output -> Human.Input;
+			Top_impl_new_connection3: feature Sensor.Output2Human -> Human.InputFromSensor;
+			Top_impl_new_connection4: feature Sensor.Output2IAS -> IAS.InputFromSensor;
+	end Top.impl;
+	
+	
+end Human_IAS_Team;
