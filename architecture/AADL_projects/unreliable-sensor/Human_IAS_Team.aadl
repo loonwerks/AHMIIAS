@@ -53,9 +53,9 @@ public
 	system Human
 		features
 			InputFromIAS : in data port I2H.impl;
-			InputFromSensor1 : in data port Position.impl;
-			InputFromSensor2 : in data port Position.impl;
-			InputFromSensor3 : in data port Position.impl;
+			InputFromSensor1 : in data port Sensor_Data.impl;
+			InputFromSensor2 : in data port Sensor_Data.impl;
+			InputFromSensor3 : in data port Sensor_Data.impl;
 			Output : out data port H2I.impl;
 		annex agree {**
 			guarantee "Acknowledge receipt of message that Sensor1 is unreliable":
@@ -76,9 +76,9 @@ public
 	system IAS
 		features
 			InputFromHuman : in data port H2I.impl;
-			InputFromSensor1 : in data port Position.impl;
-			InputFromSensor2 : in data port Position.impl;
-			InputFromSensor3 : in data port Position.impl;
+			InputFromSensor1 : in data port Sensor_Data.impl;
+			InputFromSensor2 : in data port Sensor_Data.impl;
+			InputFromSensor3 : in data port Sensor_Data.impl;
 			Output : out data port I2H.impl;
 
 		annex agree {**
@@ -99,21 +99,24 @@ public
 						and vals_within_threshold_of_each_other(pos1.Z, pos2.Z, threshold));
 			tel;
 			
-			node Sensor_Status(Sensor1_Data : Position.impl, Sensor2_Data : Position.impl, Sensor3_Data : Position.impl, Threshold: real) returns (Sensor1_Reliable: bool, Sensor2_Reliable: bool, Sensor3_Reliable: bool);
+			node Sensor_Status(Sensor1_Data : Sensor_Data.impl, Sensor2_Data : Sensor_Data.impl, Sensor3_Data : Sensor_Data.impl, Threshold: real) returns (Sensor1_Reliable: bool, Sensor2_Reliable: bool, Sensor3_Reliable: bool);
 			
 			var 
 				Sensor_1_2_Agreement : bool;
 				Sensor_1_3_Agreement : bool;
 				Sensor_2_3_Agreement : bool;
 			let
-				Sensor_1_2_Agreement = all_xyz_vals_within_threshold_of_each_other(Sensor1_Data, Sensor2_Data, Threshold);
-				Sensor_1_3_Agreement = all_xyz_vals_within_threshold_of_each_other(Sensor1_Data, Sensor3_Data, Threshold);
-				Sensor_2_3_Agreement = all_xyz_vals_within_threshold_of_each_other(Sensor2_Data, Sensor3_Data, Threshold);
+				Sensor_1_2_Agreement = all_xyz_vals_within_threshold_of_each_other(Sensor1_Data.Position, Sensor2_Data.Position, Threshold);
+				Sensor_1_3_Agreement = all_xyz_vals_within_threshold_of_each_other(Sensor1_Data.Position, Sensor3_Data.Position, Threshold);
+				Sensor_2_3_Agreement = all_xyz_vals_within_threshold_of_each_other(Sensor2_Data.Position, Sensor3_Data.Position, Threshold);
 				
-				--A sensor is considered reliable if all XYZ values are within the threhold of one of the other position sensors.				
-	  			Sensor1_Reliable = Sensor_1_2_Agreement or Sensor_1_3_Agreement;
-	  			Sensor2_Reliable = Sensor_1_2_Agreement or Sensor_2_3_Agreement;
-	  			Sensor3_Reliable = Sensor_1_3_Agreement or Sensor_2_3_Agreement;
+				--A sensor is considered reliable if it is NOT detecting an internal failure and if all XYZ values are within the threhold of one of the other position sensors.
+				--Question: What if the one it is close to has a failure? At least that other sensor will be flagged as unreliable...
+				--If two sensors have failures will we simply trust the remaining sensor?
+				--Do we even want to model sensor failures in this scenario?				
+	  			Sensor1_Reliable = (not Sensor1_Data.Failure) and (Sensor_1_2_Agreement or Sensor_1_3_Agreement);
+	  			Sensor2_Reliable = (not Sensor2_Data.Failure) and (Sensor_1_2_Agreement or Sensor_2_3_Agreement);
+	  			Sensor3_Reliable = (not Sensor3_Data.Failure) and (Sensor_1_3_Agreement or Sensor_2_3_Agreement);
 			tel; 
 			
 			const THRESHOLD : real = 1.0;
@@ -127,17 +130,16 @@ public
 			
 			--The desired behavior here is probably much more complex. 
 			--We probably want to average the good sensors.
-			--If no sensor is reliable, we may wish to increase the threshold or throw out the furthest outlier.	
+			--If no sensor is reliable, we may wish to increase the threshold or throw out the furthest outlier.
+			--Instead of completely specifying the behavior here, it would be better to simply guarantee that the output position is within the threshold of the reliable sensors, and leave it to the IAS to perform the position computation.	
 			guarantee "Position to pilot":
 				Output.Position = 	if Sensor1_Reliable then 
-										InputFromSensor1
+										InputFromSensor1.Position
 								 	else
 								 		if Sensor2_Reliable then
-								 			InputFromSensor2
+								 			InputFromSensor2.Position
 								 		else
-								 			InputFromSensor3;
-								 				
-				
+								 			InputFromSensor3.Position;								 								
 		**};
 	end IAS;
 	
