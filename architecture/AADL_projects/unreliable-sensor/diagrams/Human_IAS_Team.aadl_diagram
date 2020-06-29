@@ -12,6 +12,23 @@
         <filter>generalizations</filter>
       </contentFilters>
     </element>
+    <element uuid="a393e1c5-222f-42ec-937a-bba56883863d">
+      <element uuid="436c8eed-7862-48c1-affc-1ad734a1f033">
+        <bo>
+          <seg>realization</seg>
+        </bo>
+        <contentFilters/>
+      </element>
+      <bo>
+        <seg>classifier</seg>
+        <seg>h2i.impl</seg>
+      </bo>
+      <position/>
+      <size width="112.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
     <element uuid="c684ae8b-c1fb-4e26-afed-b8aae73da42e">
       <bo>
         <seg>classifier</seg>
@@ -30,6 +47,23 @@
       </bo>
       <position x="148.0" y="38.0"/>
       <size width="75.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="64a51ec3-5f10-4c90-9b92-5e4ee48c2801">
+      <element uuid="b7f31ba6-7d13-4555-8996-e500974d2abf">
+        <bo>
+          <seg>realization</seg>
+        </bo>
+        <contentFilters/>
+      </element>
+      <bo>
+        <seg>classifier</seg>
+        <seg>i2h.impl</seg>
+      </bo>
+      <position/>
+      <size width="112.0" height="35.0"/>
       <contentFilters>
         <filter>generalizations</filter>
       </contentFilters>
@@ -62,8 +96,8 @@
           <seg>realization</seg>
         </bo>
         <bendpoints>
-          <point x="307.0" y="287.5"/>
-          <point x="319.0" y="287.5"/>
+          <point x="307.0" y="288.0"/>
+          <point x="319.0" y="288.0"/>
         </bendpoints>
         <contentFilters/>
       </element>
@@ -110,6 +144,34 @@
         <filter>generalizations</filter>
       </contentFilters>
     </element>
+    <element uuid="11e856d2-20b1-495d-a2be-b4d38bfec964">
+      <bo>
+        <seg>classifier</seg>
+        <seg>sensor_data</seg>
+      </bo>
+      <position/>
+      <size width="135.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="18181c76-2e07-4d90-b6b3-e624a17c3240">
+      <element uuid="d00ef01d-7e30-4d0e-9a38-50187aa01dab">
+        <bo>
+          <seg>realization</seg>
+        </bo>
+        <contentFilters/>
+      </element>
+      <bo>
+        <seg>classifier</seg>
+        <seg>sensor_data.impl</seg>
+      </bo>
+      <position/>
+      <size width="174.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
     <element uuid="432dc89a-dc9d-4b04-9492-695b523f3be6">
       <bo>
         <seg>classifier</seg>
@@ -127,8 +189,8 @@
           <seg>realization</seg>
         </bo>
         <bendpoints>
-          <point x="279.0" y="232.5"/>
-          <point x="291.0" y="232.5"/>
+          <point x="279.0" y="233.0"/>
+          <point x="291.0" y="233.0"/>
         </bendpoints>
         <contentFilters/>
       </element>
