@@ -91,23 +91,22 @@ public
 				out = (abs(val1-val2) < threshold); 
 			tel;
 			
-			node all_xyz_vals_within_threshold_of_each_other(pos1: Position.impl, pos2: Position.impl, threshold: real) returns (out: bool);
+			node all_xyz_vals_within_threshold_of_each_other(pos1: Position.impl, pos2: Position.impl, Horizontal_Threshold : real, Vertical_Threshold : real) returns (out: bool);
 			let
-				out = (		vals_within_threshold_of_each_other(pos1.X, pos2.X, threshold)
-						and vals_within_threshold_of_each_other(pos1.Y, pos2.Y, threshold)
-						and vals_within_threshold_of_each_other(pos1.Z, pos2.Z, threshold));
+				out = (		vals_within_threshold_of_each_other(pos1.X, pos2.X, Horizontal_Threshold)
+						and vals_within_threshold_of_each_other(pos1.Y, pos2.Y, Horizontal_Threshold)
+						and vals_within_threshold_of_each_other(pos1.Z, pos2.Z, Vertical_Threshold));
 			tel;
 			
-			node Sensor_Status(Sensor1_Data : Sensor_Data.impl, Sensor2_Data : Sensor_Data.impl, Sensor3_Data : Sensor_Data.impl, Threshold: real) returns (Sensor1_Reliable: bool, Sensor2_Reliable: bool, Sensor3_Reliable: bool);
-			
+			node Sensor_Status(Sensor1_Data : Sensor_Data.impl, Sensor2_Data : Sensor_Data.impl, Sensor3_Data : Sensor_Data.impl, Horizontal_Threshold : real, Vertical_Threshold : real) returns (Sensor1_Reliable: bool, Sensor2_Reliable: bool, Sensor3_Reliable: bool);
 			var 
 				Sensor_1_2_Agreement : bool;
 				Sensor_1_3_Agreement : bool;
 				Sensor_2_3_Agreement : bool;
 			let
-				Sensor_1_2_Agreement = all_xyz_vals_within_threshold_of_each_other(Sensor1_Data.Position, Sensor2_Data.Position, Threshold);
-				Sensor_1_3_Agreement = all_xyz_vals_within_threshold_of_each_other(Sensor1_Data.Position, Sensor3_Data.Position, Threshold);
-				Sensor_2_3_Agreement = all_xyz_vals_within_threshold_of_each_other(Sensor2_Data.Position, Sensor3_Data.Position, Threshold);
+				Sensor_1_2_Agreement = all_xyz_vals_within_threshold_of_each_other(Sensor1_Data.Position, Sensor2_Data.Position, Horizontal_Threshold, Vertical_Threshold);
+				Sensor_1_3_Agreement = all_xyz_vals_within_threshold_of_each_other(Sensor1_Data.Position, Sensor3_Data.Position, Horizontal_Threshold, Vertical_Threshold);
+				Sensor_2_3_Agreement = all_xyz_vals_within_threshold_of_each_other(Sensor2_Data.Position, Sensor3_Data.Position, Horizontal_Threshold, Vertical_Threshold);
 				
 				--A sensor is considered reliable if all XYZ values are within the threhold of one of the other position sensors.
 	  			Sensor1_Reliable = Sensor_1_2_Agreement or Sensor_1_3_Agreement;
@@ -115,9 +114,22 @@ public
 	  			Sensor3_Reliable = Sensor_1_3_Agreement or Sensor_2_3_Agreement;
 			tel; 
 			
-			const THRESHOLD : real = 3.0;
+			eq previous_z_position : real = prev(Output.Position.Z, 0.0);
 			
-			eq Sensor1_Reliable: bool, Sensor2_Reliable: bool, Sensor3_Reliable: bool = Sensor_Status(InputFromSensor1, InputFromSensor2, InputFromSensor3, THRESHOLD);
+			eq Horizontal_Threshold : real = 	if previous_z_position < 50.0 then 
+													2.0/50.0*previous_z_position + 3.0
+												else if previous_z_position < 200.0 then
+													35.0/150.0*(previous_z_position-50.0) + 5.0
+												else if previous_z_position < 1000.0 then
+													40.0/800.0*(previous_z_position - 200.0)+ 40.0
+												else if previous_z_position < 3000.0 then
+													70.0/2000.0*(previous_z_position - 1000.0)+ 80.0
+												else
+													150.0;
+						
+			eq Vertical_Threshold : real = 1.0;
+				
+			eq Sensor1_Reliable: bool, Sensor2_Reliable: bool, Sensor3_Reliable: bool = Sensor_Status(InputFromSensor1, InputFromSensor2, InputFromSensor3, Horizontal_Threshold, Vertical_Threshold);
 				
 			guarantee "Sensor sensor status to pilot":
 					(Output.Sensor1_Reliable = Sensor1_Reliable)
@@ -127,9 +139,9 @@ public
 			--Rather than specify how to compute the position using the good sensors, we simply require that the output position be within the threshold of all the positions measured by the good sensors.
 			--Q: Is this the right guarantee, or should it be relaxed a bit? Imagine 3 good xpos sensors. Sensor 1: 2.0, Sensor 2: 5.0, Sensor 3: 8.0. Would 4.0 be a reasonable output? It's more than a 3.0 m threshold from Sensor 3.
 			guarantee "Position to pilot is within the threshold from all good sensors":
-					(Sensor1_Reliable => all_xyz_vals_within_threshold_of_each_other(Output.Position, InputFromSensor1.Position, THRESHOLD))
-				and (Sensor2_Reliable => all_xyz_vals_within_threshold_of_each_other(Output.Position, InputFromSensor2.Position, THRESHOLD))
-				and (Sensor3_Reliable => all_xyz_vals_within_threshold_of_each_other(Output.Position, InputFromSensor3.Position, THRESHOLD));
+					(Sensor1_Reliable => all_xyz_vals_within_threshold_of_each_other(Output.Position, InputFromSensor1.Position, Horizontal_Threshold, Vertical_Threshold))
+				and (Sensor2_Reliable => all_xyz_vals_within_threshold_of_each_other(Output.Position, InputFromSensor2.Position, Horizontal_Threshold, Vertical_Threshold))
+				and (Sensor3_Reliable => all_xyz_vals_within_threshold_of_each_other(Output.Position, InputFromSensor3.Position, Horizontal_Threshold, Vertical_Threshold));
 						 								
 		**};
 
