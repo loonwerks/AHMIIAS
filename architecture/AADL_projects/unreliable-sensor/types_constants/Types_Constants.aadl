@@ -1,0 +1,48 @@
+package Types_Constants
+public
+	with Base_Types;
+
+	-------------------------------------
+	-- Data Types
+	-------------------------------------
+
+	data H2I
+	end H2I;
+	
+	data implementation H2I.impl
+		subcomponents
+			Ack_Sensor1_Unreliable: data Base_Types::Boolean;
+			Ack_Sensor2_Unreliable: data Base_Types::Boolean;
+			Ack_Sensor3_Unreliable: data Base_Types::Boolean;
+	end H2I.impl;
+	
+	data I2H
+	end I2H;
+	
+	data implementation I2H.impl
+		subcomponents
+			Sensor1_Reliable: 	data Base_Types::Boolean;
+			Sensor2_Reliable: 	data Base_Types::Boolean;
+			Sensor3_Reliable: 	data Base_Types::Boolean;
+			Position: 			data Position.impl;
+	end I2H.impl;
+	
+	data Position
+	end Position;
+	
+	data implementation Position.impl
+		subcomponents
+			X: data Base_Types::Float;
+			Y: data Base_Types::Float;
+			Z: data Base_Types::Float;							
+	end Position.impl;
+
+	data Sensor_Data
+	end Sensor_Data;
+	
+	data implementation Sensor_Data.impl
+		subcomponents
+			Position: data Position.impl;
+	end Sensor_Data.impl;
+	
+end Types_Constants;
