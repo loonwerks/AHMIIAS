@@ -113,20 +113,49 @@ public
 	  			Sensor2_Reliable = Sensor_1_2_Agreement or Sensor_2_3_Agreement;
 	  			Sensor3_Reliable = Sensor_1_3_Agreement or Sensor_2_3_Agreement;
 			tel; 
-			
+								
 			eq previous_z_position : real = prev(Output.Position.Z, 0.0);
+			
+			const TAKEOFF_LANDING_MIN_AGL : real = 		0.0;
+			--Takeoff/Landing AGL Range
+			const TAKEOFF_LANDING_MAX_AGL : real = 		50.0;
+			--Approach/Departure Low Altitude AGL Range
+			const A_D_LOW_ALTITUDE_MAX_AGL : real = 	250.0;
+			--Approach/Departure High Altitude AGL Range
+			const A_D_HIGH_ALTITUDE_MAX_AGL : real = 	1000.0;
+			--En route AGL Range
+			const EN_ROUTE_MAX_AGL : real = 			3000.0;  
+			
+			const TAKEOFF_LANDING_MIN_HAL : real = 		3.0;
+			--Takeoff/Landing HAL Range
+			const TAKEOFF_LANDING_MAX_HAL : real = 		5.0;
+			--Approach/Departure Low Altitude HAL Range
+			const A_D_LOW_ALTITUDE_MAX_HAL : real = 	40.0;
+			--Approach/Departure High Altitude HAL Range
+			const A_D_HIGH_ALTITUDE_MAX_HAL : real = 	80.0;
+			--En route HAL Range
+			const EN_ROUTE_MAX_HAL : real = 			150.0;  
+			
+			--Notes:
+			--1) When ranges are shown (such as 1-5) for HAL and time to alert, this indicates a limit scaled linearly across the AGL range for that phase with the tightest requirement specified for the minimum AGL and the loosest for the maximum AGL for that phase 
+			--2) AGL ranges are notional and may depend on the height and proximity of obstacles in the takeoff and landing area			
 			 
-			eq Horizontal_Threshold : real = 	if previous_z_position < 50.0 then 
-													2.0/50.0*previous_z_position + 3.0
-												else if previous_z_position < 250.0 then
-													35.0/200.0*(previous_z_position-50.0) + 5.0
-												else if previous_z_position < 1000.0 then
-													40.0/750.0*(previous_z_position - 250.0)+ 40.0
-												else if previous_z_position < 3000.0 then
-													70.0/2000.0*(previous_z_position - 1000.0)+ 80.0
+			--Compute Horizontal_Threshold using y = mx+b and values in the table
+												--Takeoff/Landing
+			eq Horizontal_Threshold : real = 	if previous_z_position 		< TAKEOFF_LANDING_MAX_AGL then 
+													(TAKEOFF_LANDING_MAX_HAL 	- TAKEOFF_LANDING_MIN_HAL)	/(TAKEOFF_LANDING_MAX_AGL 	- TAKEOFF_LANDING_MIN_AGL)	*previous_z_position + TAKEOFF_LANDING_MIN_HAL
+												---Approach/Departure Low Altitude
+												else if previous_z_position < A_D_LOW_ALTITUDE_MAX_AGL then 
+													(A_D_LOW_ALTITUDE_MAX_HAL 	- TAKEOFF_LANDING_MAX_HAL)	/(A_D_LOW_ALTITUDE_MAX_AGL 	- TAKEOFF_LANDING_MAX_AGL)	*previous_z_position + TAKEOFF_LANDING_MAX_HAL
+												--Approach/Departure High Altitude
+												else if previous_z_position < A_D_HIGH_ALTITUDE_MAX_AGL then 
+													(A_D_HIGH_ALTITUDE_MAX_HAL 	- A_D_LOW_ALTITUDE_MAX_HAL)	/(A_D_HIGH_ALTITUDE_MAX_AGL - A_D_LOW_ALTITUDE_MAX_AGL)	*previous_z_position + A_D_LOW_ALTITUDE_MAX_HAL
+												--En route 
+												else if previous_z_position < EN_ROUTE_MAX_AGL then 
+													(EN_ROUTE_MAX_HAL 			- A_D_HIGH_ALTITUDE_MAX_HAL)/(EN_ROUTE_MAX_AGL 			- A_D_HIGH_ALTITUDE_MAX_AGL)*previous_z_position + A_D_HIGH_ALTITUDE_MAX_HAL
 												else
-													150.0;
-						
+													EN_ROUTE_MAX_HAL;
+			
 			eq Vertical_Threshold : real = 1.0;
 				
 			eq Sensor1_Reliable: bool, Sensor2_Reliable: bool, Sensor3_Reliable: bool = Sensor_Status(InputFromSensor1, InputFromSensor2, InputFromSensor3, Horizontal_Threshold, Vertical_Threshold);
