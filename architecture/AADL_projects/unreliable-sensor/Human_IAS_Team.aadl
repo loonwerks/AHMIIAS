@@ -115,13 +115,13 @@ public
 			tel; 
 			
 			eq previous_z_position : real = prev(Output.Position.Z, 0.0);
-			
+			 
 			eq Horizontal_Threshold : real = 	if previous_z_position < 50.0 then 
 													2.0/50.0*previous_z_position + 3.0
-												else if previous_z_position < 200.0 then
-													35.0/150.0*(previous_z_position-50.0) + 5.0
+												else if previous_z_position < 250.0 then
+													35.0/200.0*(previous_z_position-50.0) + 5.0
 												else if previous_z_position < 1000.0 then
-													40.0/800.0*(previous_z_position - 200.0)+ 40.0
+													40.0/750.0*(previous_z_position - 250.0)+ 40.0
 												else if previous_z_position < 3000.0 then
 													70.0/2000.0*(previous_z_position - 1000.0)+ 80.0
 												else
