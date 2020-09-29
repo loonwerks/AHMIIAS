@@ -56,6 +56,7 @@ public
 			
 			--Rather than specify how to compute the position using the good sensors, we simply require that the output position be within the threshold of all the positions measured by the good sensors.
 			--Q: Is this the right guarantee, or should it be relaxed a bit? Imagine 3 good xpos sensors. Sensor 1: 2.0, Sensor 2: 5.0, Sensor 3: 8.0. Would 4.0 be a reasonable output? It's more than a 3.0 m threshold from Sensor 3.
+			--Q: What should this guarantee be now that the operator can disagree with the IAS assessment?
 			guarantee "Position to operator is within the threshold from all good sensors":
 					(Sensor1_Reliable => Unreliable_Sensor_Lib::all_xyz_vals_within_threshold_of_each_other(
 						Output.Position, InputFromSensor1.Position, Horizontal_Threshold, Vertical_Threshold
