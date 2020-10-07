@@ -4,6 +4,13 @@ public
 	with Data_Model;
 
 	-------------------------------------
+	-- Constants
+	-------------------------------------
+	annex agree {**
+		const NIL : int = 0;	
+	**};
+
+	-------------------------------------
 	-- Data Types
 	-------------------------------------
 
@@ -28,10 +35,11 @@ public
 	
 	data implementation I2H.impl
 		subcomponents
-			Sensor1_Reliable: 	data Base_Types::Boolean;
-			Sensor2_Reliable: 	data Base_Types::Boolean;
-			Sensor3_Reliable: 	data Base_Types::Boolean;
-			Position: 			data Position.impl;
+			Sensor1_Reliable: 			data Base_Types::Boolean;
+			Sensor2_Reliable: 			data Base_Types::Boolean;
+			Sensor3_Reliable: 			data Base_Types::Boolean;
+			Active_Sensor:				data Base_Types::Integer;
+			Recommended_Sensor:	data Base_Types::Integer;
 	end I2H.impl;
 	
 	data Position
