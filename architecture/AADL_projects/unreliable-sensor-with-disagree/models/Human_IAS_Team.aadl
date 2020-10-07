@@ -81,14 +81,14 @@ public
 			guarantee "Recommended active sensor in range":
 					Output.Recommended_Sensor >= 0 and Output.Recommended_Sensor <= 3;
 			
-			guarantee "Recommended active sensor is a reliable sensor":
-						Output.Recommended_Sensor = 1 => Sensor1_Reliable
-					and Output.Recommended_Sensor = 2 => Sensor2_Reliable
-					and Output.Recommended_Sensor = 3 => Sensor3_Reliable;
+			guarantee "Recommended sensor is a reliable sensor":
+						(Output.Recommended_Sensor = 1 => Sensor1_Reliable)
+					and (Output.Recommended_Sensor = 2 => Sensor2_Reliable)
+					and (Output.Recommended_Sensor = 3 => Sensor3_Reliable);
 			
 			--Should we instead pick one of the three on some other criteria?
 			guarantee "Recommended sensor is NIL if all sensors are unreliable":
-					Output.Recommended_Sensor = NIL <=> not Sensor1_Reliable and not Sensor2_Reliable and not Sensor3_Reliable;
+					Output.Recommended_Sensor = NIL <=> (not Sensor1_Reliable and not Sensor2_Reliable and not Sensor3_Reliable);
 			
 			guarantee "The active sensor should stay the same unless the operator agrees that it is unreliable and there is another reliable sensor available.":
 					Output.Active_Sensor = 	if (previous_recommended_sensor = NIL) then
@@ -101,7 +101,8 @@ public
 																previous_recommended_sensor
 														   else
 														   		previous_active_sensor;
-						
+			
+			--guarantee "The recommended sensor"			
 			
 			--Rather than specify how to compute the position using the good sensors, we simply require that the output position be within the threshold of all the positions measured by the good sensors.
 			--Q: Is this the right guarantee, or should it be relaxed a bit? Imagine 3 good xpos sensors. Sensor 1: 2.0, Sensor 2: 5.0, Sensor 3: 8.0. Would 4.0 be a reasonable output? It's more than a 3.0 m threshold from Sensor 3.
@@ -222,7 +223,7 @@ public
 						(		(previous_active_sensor = 1 and IAS.Output.Sensor1_Reliable)
 							or 	(previous_active_sensor = 2 and IAS.Output.Sensor2_Reliable)
 							or 	(previous_active_sensor = 3 and IAS.Output.Sensor3_Reliable))
-						=> IAS.Output.Recommended_Sensor = previous_active_sensor;
+						=> (IAS.Output.Recommended_Sensor = previous_active_sensor);
 			
 			lemma "If the pilot agrees that the active sensor is unreliable, the active sensor is the previously recommended sensor, unless the previously recommended sensor was NIL":
 				previous_recommended_sensor != NIL =>
