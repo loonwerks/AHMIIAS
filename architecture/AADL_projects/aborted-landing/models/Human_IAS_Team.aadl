@@ -37,10 +37,10 @@ public
 			-----------------------
 			
 			guarantee "Command initiate landing only if aircraft is in the flight phase (may be enforced by display)":
-				Output.Initiate_Landing => InputFromIAS.Phase = enum(Phase_Type, In_Flight);
+				Output.Initiate_Landing => prev((InputFromIAS.Phase = enum(Phase_Type, In_Flight)), false);
 			
 			guarantee "Command abort landing only if aircraft is in the landing phase (may be enforced by display)":
-				Output.Abort_Landing => InputFromIAS.Phase = enum(Phase_Type, Landing); 
+				Output.Abort_Landing => prev((InputFromIAS.Phase = enum(Phase_Type, Landing)), false); 
 				
 			guarantee "Choose a landing option when they are ready":
 				prev(InputFromIAS.Landing_Options_Ready, false) => (   (Output.Landing_Option_Selection = InputFromIAS.Landing_Options.Option1)
@@ -175,9 +175,7 @@ public
 	     	
 	     	guarantee "T_Flight_to_Ground_effect" : 	T_Flight_to_Ground	=> (Output.Phase = enum(Phase_Type, On_Ground));
 	     	
-	     	guarantee "T_Landing_to_Flight_effect" :	T_Landing_to_Flight => ((Output.Phase = enum(Phase_Type, In_Flight))   																			and Output.Landing_Options_Ready
-	     																			and Output.Landing_Options_Ready
-	     	);
+	     	guarantee "T_Landing_to_Flight_effect" :	T_Landing_to_Flight => (Output.Phase = enum(Phase_Type, In_Flight));
 	     	
 	     	guarantee "T_Landing_to_Ground_effect" : 	T_Landing_to_Ground => (Output.Phase = enum(Phase_Type, On_Ground));
 	     	
@@ -189,6 +187,9 @@ public
 					not (Output.Landing_Options.Option1 = Output.Landing_Options.Option2)
 				and not (Output.Landing_Options.Option1 = Output.Landing_Options.Option3)		 								
 				and not (Output.Landing_Options.Option2 = Output.Landing_Options.Option3);
+				
+			guarantee "Present landing options if and only if the landing is aborted":
+				T_Landing_to_Flight = Output.Landing_Options_Ready;
 				
 			guarantee "Destination changes if and only if the pilot selects a landing option":
 				true -> (Output.Destination = if pre(Output.Landing_Options_Ready) then InputFromHuman.Landing_Option_Selection else pre(Output.Destination)); 
@@ -277,16 +278,18 @@ public
 													IAS.Output.Active_Sensor = prev(IAS.Output.Active_Sensor,1);
 													
 			--Check that all states are reachable
-			lemma "False indicates On_Ground reachable" : not (IAS.Output.Phase = enum(Phase_type, On_Ground));
-			lemma "False indicates In_Flight reachable" : not (IAS.Output.Phase = enum(Phase_type, In_Flight));
-			lemma "False indicates Landing reachable" : not (IAS.Output.Phase = enum(Phase_type, Landing));
+			lemma "Observer: On_Ground reachable" : not (IAS.Output.Phase = enum(Phase_type, On_Ground));
+			lemma "Observer: In_Flight reachable" : not (IAS.Output.Phase = enum(Phase_type, In_Flight));
+			lemma "Observer: Landing reachable" : not (IAS.Output.Phase = enum(Phase_type, Landing));
 			
 			--Check that all state transitions are reachable
-			lemma "False indicates that T_Ground_to_Flight is reachable" : not IAS.T_Ground_to_Flight;
-			lemma "False indicates that T_Flight_to_Landing is reachable" : not IAS.T_Flight_to_Landing;
-			lemma "False indicates that T_Landing_to_Ground is reachable" : not IAS.T_Landing_to_Ground;
-			lemma "False indicates that T_Landing_to_Flight is reachable" : not IAS.T_Landing_to_Flight;
-			lemma "False indicates that T_Flight_to_Ground is reachable" : not IAS.T_Flight_to_Ground;
+			lemma "Observer: T_Ground_to_Flight is reachable" : not IAS.T_Ground_to_Flight;
+			lemma "Observer: T_Flight_to_Landing is reachable" : not IAS.T_Flight_to_Landing;
+			lemma "Observer: T_Landing_to_Ground is reachable" : not IAS.T_Landing_to_Ground;
+			lemma "Observer: T_Landing_to_Flight is reachable" : not IAS.T_Landing_to_Flight;
+			lemma "Observer: T_Flight_to_Ground is reachable" : not IAS.T_Flight_to_Ground;
+			
+			lemma "Observer: Destination changes" : true -> (IAS.Output.Destination = pre(IAS.Output.Destination)); 
 			
 			------------------------------------------------------------------------------
 			-- LEMMAS (These should be true based on the guarantees of the subcomponents.)
