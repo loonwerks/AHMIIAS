@@ -43,10 +43,10 @@ public
 				Output.Abort_Landing => prev((InputFromIAS.Phase = enum(Phase_Type, Landing)), false); 
 				
 			guarantee "Choose a landing option when they are ready":
-				prev(InputFromIAS.Landing_Options_Ready, false) => (   (Output.Landing_Option_Selection = InputFromIAS.Landing_Options.Option1)
-																	or (Output.Landing_Option_Selection = InputFromIAS.Landing_Options.Option2)
-																	or (Output.Landing_Option_Selection = InputFromIAS.Landing_Options.Option3)
-				); 
+				true -> (pre(InputFromIAS.Landing_Options_Ready) => (   (Output.Landing_Option_Selection = pre(InputFromIAS.Landing_Options.Option1))
+																	or (Output.Landing_Option_Selection = pre(InputFromIAS.Landing_Options.Option2))
+																	or (Output.Landing_Option_Selection = pre(InputFromIAS.Landing_Options.Option3))
+				)); 
 						
 		**};
 	end Human;
