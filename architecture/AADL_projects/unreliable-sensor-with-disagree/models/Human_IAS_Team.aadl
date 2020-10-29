@@ -223,13 +223,25 @@ public
 					=>
 					IAS.Output.Active_Sensor = previous_active_sensor;
 					
-			lemma "If an unreliable sensor is the active sensor, it must be the case that either the pilot disagreed with the IAS assessment or the sensor just became unreliable on this timestep or there was no reliable sensor available on the previous timestep":
+			lemma "If an unreliable sensor is the active sensor, it must be the case that either 
+				the pilot disagreed with the IAS assessment 
+				or the sensor just became unreliable on this timestep 
+				or there was no reliable sensor available on the previous timestep":
 							((IAS.Output.Active_Sensor = 1) and not IAS.Output.Sensor1_Reliable) 
-								=> ((Human.Output.Sensor1_Unreliable_Response = enum(Response, Disagree)) or prev(IAS.Output.Sensor1_Reliable, true) or not prev(reliable_sensor_available, true))
+								=>  (	(Human.Output.Sensor1_Unreliable_Response = enum(Response, Disagree)) 
+									or 	prev(IAS.Output.Sensor1_Reliable, true) 
+									or not prev(reliable_sensor_available, true)
+									)
 						and ((IAS.Output.Active_Sensor = 2) and not IAS.Output.Sensor2_Reliable) 
-								=> ((Human.Output.Sensor2_Unreliable_Response = enum(Response, Disagree)) or prev(IAS.Output.Sensor2_Reliable, true) or not prev(reliable_sensor_available, true))
+								=>  (	(Human.Output.Sensor2_Unreliable_Response = enum(Response, Disagree)) 
+									or 	prev(IAS.Output.Sensor2_Reliable, true) 
+									or 	not prev(reliable_sensor_available, true)
+									)
 						and ((IAS.Output.Active_Sensor = 3) and not IAS.Output.Sensor3_Reliable) 
-								=> ((Human.Output.Sensor3_Unreliable_Response = enum(Response, Disagree)) or prev(IAS.Output.Sensor3_Reliable, true) or not prev(reliable_sensor_available, true));
+								=>  (	(Human.Output.Sensor3_Unreliable_Response = enum(Response, Disagree)) 
+									or 	prev(IAS.Output.Sensor3_Reliable, true) 
+									or not prev(reliable_sensor_available, true)
+								);
 								
 			lemma "Active sensor in range":
 					IAS.Output.Active_Sensor >= 1 and IAS.Output.Active_Sensor <= 3;

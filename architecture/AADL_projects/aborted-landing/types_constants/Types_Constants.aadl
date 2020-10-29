@@ -1,0 +1,86 @@
+package Types_Constants
+public
+	with Base_Types;
+	with Data_Model;
+
+	-------------------------------------
+	-- Constants
+	-------------------------------------
+	annex agree {**
+		const NIL : int = 0;	
+	**};
+
+	-------------------------------------
+	-- Data Types
+	-------------------------------------
+
+	data Response
+		properties
+			Data_Model::Data_Representation => Enum;
+			Data_Model::Enumerators => ("Agree", "Disagree", "Neutral");
+	end Response;
+	
+	data Phase_Type
+		properties
+			Data_Model::Data_Representation => Enum;
+			Data_Model::Enumerators => ("On_Ground", "In_Flight", "Landing");
+	end Phase_Type;
+	
+	data H2I
+	end H2I;
+	
+	data implementation H2I.impl
+		subcomponents
+			Sensor1_Unreliable_Response: 	data Response;
+			Sensor2_Unreliable_Response: 	data Response;
+			Sensor3_Unreliable_Response: 	data Response;	
+			Initiate_Landing:				data Base_Types::Boolean;
+			Abort_Landing:					data Base_Types::Boolean;
+			Landing_Option_Selection:		data Base_Types::Integer;	
+	end H2I.impl;
+	
+	data I2H
+	end I2H;
+	
+	data implementation I2H.impl
+		subcomponents
+			Sensor1_Reliable: 			data Base_Types::Boolean;
+			Sensor2_Reliable: 			data Base_Types::Boolean;
+			Sensor3_Reliable: 			data Base_Types::Boolean;
+			Active_Sensor:				data Base_Types::Integer;
+			Recommended_Sensor:			data Base_Types::Integer;
+			Phase:						data Phase_Type;
+			Destination:				data Base_Types::Integer;
+			Landing_Options_Ready: 		data Base_Types::Boolean;
+			Landing_Options:			data Landing_Options.impl;			
+	end I2H.impl;
+	
+	data Landing_Options		
+	end Landing_Options;
+	
+	data implementation Landing_Options.impl
+		subcomponents
+			Option1: data Base_Types::Integer;
+			Option2: data Base_Types::Integer;
+			Option3: data Base_Types::Integer;
+	end Landing_Options.impl;
+	
+	data Position
+	end Position;
+	
+	data implementation Position.impl
+		subcomponents
+			X: data Base_Types::Float;
+			Y: data Base_Types::Float;
+			Z: data Base_Types::Float;							
+	end Position.impl;
+
+	data Sensor_Data
+	end Sensor_Data;
+	
+	data implementation Sensor_Data.impl
+		subcomponents
+			Position: data Position.impl;
+	end Sensor_Data.impl;
+	
+end Types_Constants;

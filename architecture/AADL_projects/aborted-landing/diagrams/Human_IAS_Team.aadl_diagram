@@ -1,47 +1,47 @@
 <?xml version="1.0" encoding="ASCII"?>
 <diagram:Diagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:diagram="http://osate.org/diagram" formatVersion="7">
-  <element uuid="a9c6d946-30c9-42da-8b27-4f4b9130ce57" manual="true">
-    <element uuid="c684ae8b-c1fb-4e26-afed-b8aae73da42e" manual="true">
+  <element uuid="5882617d-1127-4445-9b3b-3872985f1474" manual="true">
+    <element uuid="33ce76d5-12c9-4529-ae13-835f2e6a8976" manual="true">
       <bo>
         <seg>classifier</seg>
         <seg>human</seg>
       </bo>
-      <position x="148.0" y="93.0"/>
+      <position x="250.0" y="38.0"/>
       <size width="105.0" height="35.0"/>
     </element>
-    <element uuid="93694be8-0a69-4eb6-91c2-222706360498" manual="true">
+    <element uuid="d8db2e27-efe9-41ff-aefb-fda88b3500b5" manual="true">
       <bo>
         <seg>classifier</seg>
         <seg>ias</seg>
       </bo>
-      <position x="338.0" y="38.0"/>
+      <position x="148.0" y="38.0"/>
       <size width="82.0" height="35.0"/>
     </element>
-    <element uuid="74981f99-04f1-4db2-8ec3-03d687da6337" manual="true">
+    <element uuid="030cc5d3-2577-4b43-bda1-6db2df04fdb1" manual="true">
       <bo>
         <seg>classifier</seg>
         <seg>sensor1</seg>
       </bo>
-      <position x="273.0" y="93.0"/>
+      <position x="148.0" y="93.0"/>
       <size width="111.0" height="35.0"/>
     </element>
-    <element uuid="9b8b5309-2163-4e18-9ba6-6035f2c02c1f" manual="true">
+    <element uuid="6d516898-a975-4c0d-ab51-c25a9345cc08" manual="true">
       <bo>
         <seg>classifier</seg>
         <seg>sensor2</seg>
       </bo>
-      <position x="148.0" y="148.0"/>
+      <position x="279.0" y="93.0"/>
       <size width="111.0" height="35.0"/>
     </element>
-    <element uuid="faa5b2dc-129e-4aaa-bacc-5d9263c957cc" manual="true">
+    <element uuid="5f759737-425e-4261-b7ce-87eab09071b0" manual="true">
       <bo>
         <seg>classifier</seg>
         <seg>sensor3</seg>
       </bo>
-      <position x="279.0" y="148.0"/>
+      <position x="148.0" y="148.0"/>
       <size width="111.0" height="35.0"/>
     </element>
-    <element uuid="432dc89a-dc9d-4b04-9492-695b523f3be6" manual="true">
+    <element uuid="14cd6704-211a-4cfb-89bb-b1a2f49c3b46" manual="true">
       <bo>
         <seg>classifier</seg>
         <seg>top</seg>
@@ -49,14 +49,14 @@
       <position x="283.0" y="203.0"/>
       <size width="83.0" height="35.0"/>
     </element>
-    <element uuid="2840eeb8-67c6-4607-b6d2-d81dbfdc98ba" manual="true">
-      <element uuid="cbb56519-8f07-437c-a6e7-3d819efe5b57" manual="true">
+    <element uuid="2116ca2a-ea87-45c7-a448-8024b16a5ad2" manual="true">
+      <element uuid="70b5b18d-127f-4548-b65c-71fdbf67d4f6" manual="true">
         <bo>
           <seg>realization</seg>
         </bo>
         <bendpoints>
-          <point x="279.0" y="233.0"/>
-          <point x="291.0" y="233.0"/>
+          <point x="279.0" y="232.5"/>
+          <point x="291.0" y="232.5"/>
         </bendpoints>
       </element>
       <bo>
@@ -66,12 +66,20 @@
       <position x="148.0" y="203.0"/>
       <size width="115.0" height="35.0"/>
     </element>
+    <element uuid="eef0386f-60e5-44bf-8c2d-38f01a50ab03" manual="true">
+      <bo>
+        <seg>classifier</seg>
+        <seg>wow_sensor</seg>
+      </bo>
+      <position x="279.0" y="148.0"/>
+      <size width="147.0" height="35.0"/>
+    </element>
     <bo>
       <seg>package</seg>
       <seg>human_ias_team</seg>
     </bo>
     <position x="12.0" y="12.0"/>
-    <size width="432.0" height="305.0"/>
+    <size width="438.0" height="250.0"/>
   </element>
   <config type="package" connectionPrimaryLabelsVisible="false">
     <enabledAadlProperties/>
