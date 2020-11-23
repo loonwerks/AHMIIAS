@@ -1,0 +1,339 @@
+waitsnc --on
+watch 0
+rl --set learning on
+indifferent-selection --epsilon-greedy
+
+
+#########################
+### Observe the input values
+sp {monitor*input-values
+    (state <s> ^io.input-link.{ <att> << x1 x2 >> } <v>)
+-->
+    (write (crlf) |Input | <att> | has value | <v>)
+    }
+
+#######################
+### Keep track of the delta between the input values
+
+sp {top-state*elaborate*value-delta
+    (state <s> ^io.input-link <il>)
+    (<il> ^x1 <x1>
+          ^x2 <x2>)
+-->
+    (<s> ^delta (abs (- <x1> <x2>)))
+    }
+
+sp {monitor*delta
+    (state <s> ^delta <v>)
+-->
+    (write (crlf) |Current value delta is | <v>)
+    }
+
+#####################
+### Keep track of the "safety condition" if the delta gets too big
+
+### If delta is greater than this value we will always warn
+sp {top-state*elaborate*safety-delta
+    (state <s> ^superstate nil)
+-->
+    (<s> ^safety-delta 3.0)
+    }
+
+sp {top-state*elaborate*safety-condition
+    (state <s> ^delta > <v>
+               ^safety-delta <v>)
+-->
+    (write (crlf) |Current delta is above safety threshold of | <v>)
+    (<s> ^safety-condition true)
+    }
+
+sp {top-state*monitor*safety-condition*false
+    (state <s> ^delta <= <v>
+               ^safety-delta <v>)
+-->
+    (write (crlf) |Current delta is NOT above safety threshold of | <v>)
+    }
+
+######################
+### Keep track of the normal condition if the delta is small enough
+
+### If delta is less than this value we will never warn
+sp {top-state*elaborate*normal-delta
+    (state <s> ^superstate nil)
+-->
+    (<s> ^normal-delta 1.0)
+    }
+
+sp {top-state*elaborate*normal-condition
+    (state <s> ^delta < <v>
+               ^normal-delta <v>)
+-->
+    (write (crlf) |Current delta is below normal operational threshold of | <v>)
+    (<s> ^normal-condition true)
+    }
+
+sp {top-state*monitor*normal-condition*false
+    (state <s> ^delta >= <v>
+               ^normal-delta <v>)
+-->
+    (write (crlf) |Current delta is NOT below normal operational threshold of | <v>)
+    }
+
+########################
+### Any time the delta value changes, record the change and set the ^delta-changed true flag
+### This flag will tell us that we have to decide whether to warn the user
+
+sp {record-changed-delta*propose*init
+    (state <s> ^delta <v>
+              -^old-delta
+              -^delta-changed true)
+-->
+    (<s> ^operator <o> + =)
+    (<o> ^name record-changed-delta)
+    }
+
+sp {record-changed-delta*propose*change
+    (state <s> ^delta <v>
+              -^old-delta <v>
+              -^delta-changed true)
+-->
+    (<s> ^operator <o> + =)
+    (<o> ^name record-changed-delta)
+    }
+
+sp {record-changed-delta*apply*remove-old-delta
+    (state <s> ^operator.name record-changed-delta
+               ^delta <> <v>
+               ^old-delta <v>
+              -^delta-changed true)
+-->
+    (write (crlf) |Removing old-delta value of | <v>)
+    (<s> ^old-delta <v> -)
+    }
+
+sp {record-changed-delta*apply*new-old-delta
+    (state <s> ^operator.name record-changed-delta
+               ^delta <v>
+              -^old-delta
+              -^delta-changed true)
+-->
+    (write (crlf) |Recording new old-delta value of | <v> | and delta-changed flag |)
+    (<s> ^old-delta <v>
+         ^delta-changed true)
+    }
+
+############################
+### If the ^delta-changed true flag is set, then we need to (re-)decide whether to issue a warning.
+### when we issue the warning, we also remove the ^delta-changed true flag so we do not issue
+### another warning until the delta value changes again
+
+### To start, always propose the warn and do-not-warn operators
+### The warn operator will issue a warning and wait for the user to accept (or not) the warning
+### and then it will remove the ^delta-changed true flag
+###
+### The do-not-warn operator will simply remove the flag
+
+sp {warn*propose
+    (state <s> ^delta-changed true)
+-->
+    (<s> ^operator <o> +)
+    (<o> ^name warn)
+    }
+
+sp {do-not-warn*propose
+    (state <s> ^delta-changed true)
+-->
+    (<s> ^operator <o> +)
+    (<o> ^name do-not-warn)
+    }
+
+####################
+### Implementaton of the warn operator
+### Issue the warning, record the warning-accepted response, then clear the delta-changed flag
+
+sp {warn*apply*message
+    (state <s> ^operator.name warn)
+-->
+    (write (crlf) |Choosing to issue a warning|)
+    }
+
+### Clear out any information from a previous warning we have given
+sp {warn*apply*warning-accepted*remove
+    (state <s> ^warning-accepted <x>
+               ^operator <o>)
+    (<o> ^name warn
+        -^warning-issued true)
+-->
+    (<s> ^warning-accepted <x> -)
+    }
+
+### We need the :o-support flag on this operator because Soar wants ^warning-accepted to get o-support
+### but ^warning-issued to get i-support, and that causes Soar to go haywire
+sp {warn*apply*issue-warning
+    :o-support
+    (state <s> -^warning-accepted
+                ^delta <v>
+                ^operator <o>)
+    (<o> ^name warn
+        -^warning-issued true
+        -^forced true)
+-->
+    (<s> ^warning-accepted (warn-and-receive-response <v>))
+    (<o> ^warning-issued true)
+    }
+
+### If this is a "forced" warning we do not want to ask if the user approves,
+### so we pop up a slightly different dialog
+sp {warn*apply*issue-warning*forced
+    :o-support
+    (state <s> -^warning-accepted
+                ^delta <v>
+                ^operator <o>)
+    (<o> ^name warn
+        -^warning-issued true
+         ^forced true)
+-->
+    (<s> ^warning-accepted (warn-and-receive-response <v> forced))
+    (<o> ^warning-issued true)
+    }
+
+sp {warn*apply*delta-changed*remove
+    (state <s> ^delta-changed true
+               ^operator <o>)
+    (<o> ^name warn
+         ^warning-issued true)
+-->
+    (<s> ^delta-changed true -)
+    }
+    
+####################
+### Implementaton of the do-not-warn operator
+### Clear any previous warning-accepted resonse, then clear the delta-changed flag
+
+sp {do-not-warn*apply*message
+    (state <s> ^operator.name do-not-warn)
+-->
+    (write (crlf) |Choosing NOT to issue a warning|)
+    }
+
+sp {do-not-warn*apply*warning-accepted*remove
+    (state <s> ^warning-accepted <x>
+               ^operator <o>)
+    (<o> ^name do-not-warn)
+-->
+    (<s> ^warning-accepted <x> -)
+    }
+
+sp {do-not-warn*apply*delta-changed*remove
+    (state <s> ^delta-changed true
+              -^warning-accepted
+               ^operator <o>)
+    (<o> ^name do-not-warn)
+-->
+    (<s> ^delta-changed true -)
+    }
+
+    
+###############################
+### Selection logic
+    
+### Always choose to warn in the safety condition
+sp {warn*best*safety-condition
+    (state <s> ^operator <o> +
+               ^safety-condition true)
+    (<o> ^name warn)
+-->
+    (<s> ^operator <o> >)
+    (<o> ^forced true)
+    }
+
+### Always choose NOT to warn in the normal condition
+sp {do-not-warn*best*normal-condition
+    (state <s> ^operator <o> +
+               ^normal-condition true)
+    (<o> ^name do-not-warn)
+-->
+    (<s> ^operator <o> >)
+    }
+
+
+################################
+### Learning conditions
+
+### if neither they ^normal-condition nor the ^safety-condition flags are set, then we want to
+### learn the user's preferred thresholds for when to warn.
+### For this simple case, we will have one rule for warning a delta less than 2 and another
+### rule for warning a delta greater than or equal to two
+### We will learn preference values for these rules based on user feedback
+
+sp {warn*select*less-than-two
+    (state <s> -^safety-condition true
+               -^normal-condition true
+                ^delta < 2.0
+                ^operator <o> +)
+    (<o> ^name warn)
+-->
+    (<s> ^operator <o> = 0.0)
+    }
+
+sp {warn*select*greater-than-two
+    (state <s> -^safety-condition true
+               -^normal-condition true
+                ^delta >= 2.0
+                ^operator <o> +)
+    (<o> ^name warn)
+-->
+    (<s> ^operator <o> = 0.0)
+    }
+
+sp {do-not-warn*select*less-than-two
+    (state <s> -^safety-condition true
+               -^normal-condition true
+                ^delta < 2.0
+                ^operator <o> +)
+    (<o> ^name do-not-warn)
+-->
+    (<s> ^operator <o> = 0.0)
+    }
+
+sp {do-not-warn*select*greater-than-two
+    (state <s> -^safety-condition true
+               -^normal-condition true
+                ^delta >= 2.0
+                ^operator <o> +)
+    (<o> ^name do-not-warn)
+-->
+    (<s> ^operator <o> = 0.0)
+    }
+
+######################
+### Learning rewards
+
+### Finally, we set reward values on the reward-link, depending on whether the user accepted our
+### warning or not.  For this simple example, we will give a reward of 1.0 if the user accepts
+### the warning and a reward of -1.0 if the user rejects the warning.
+
+### Note that we do not get any user feedback if we choose NOT to warn.  So for this example, we
+### only get reward signals when we have chosen to warn.
+
+sp {reward-link*elaborate*reward*accepted-warning
+    (state <s> ^reward-link <rl>
+               ^warning-accepted true)
+-->
+    (write (crlf) |User accepted warning. Reward value is 1.0|)
+    (<rl> ^reward <rr>)
+    (<rr> ^value 1.0)
+    }
+
+sp {reward-link*elaborate*reward*rejected-warning
+    (state <s> ^reward-link <rl>
+               ^warning-accepted false)
+-->
+    (write (crlf) |User rejected warning. Reward value is -1.0|)
+    (<rl> ^reward <rr>)
+    (<rr> ^value -1.0)
+    }
+
+
+
+    

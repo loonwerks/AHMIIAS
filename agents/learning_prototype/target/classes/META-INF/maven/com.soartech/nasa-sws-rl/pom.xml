@@ -1,0 +1,47 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.soartech</groupId>
+  <artifactId>nasa-sws-rl</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <name>NASA SWS RL</name>
+  <description>Example RL code for the NASA SWS project</description>
+  
+<properties>
+  <maven.compiler.source>11</maven.compiler.source>
+  <maven.compiler.target>11</maven.compiler.target>
+</properties>
+
+  <dependencies>
+ 	<dependency>
+		<groupId>com.soartech</groupId>
+		<artifactId>jsoar-core</artifactId>
+		<version>4.0.3-SNAPSHOT</version>
+	</dependency>
+
+	<dependency>
+		<groupId>com.soartech</groupId>
+		<artifactId>jsoar-debugger</artifactId>
+		<version>4.0.3-SNAPSHOT</version>
+	</dependency>
+
+	<dependency>
+		<groupId>com.soartech</groupId>
+		<artifactId>jsoar-tcl</artifactId>
+		<version>4.0.3-SNAPSHOT</version>
+	</dependency>
+	<dependency>
+	    <groupId>org.slf4j</groupId>
+	    <artifactId>slf4j-simple</artifactId>
+	    <version>1.7.30</version>
+	</dependency>
+  </dependencies>
+  
+  <build>
+  	<resources>
+		<resource>
+			<directory>src/main/soar</directory>
+		</resource>
+  	</resources>
+  </build>
+  
+</project>
