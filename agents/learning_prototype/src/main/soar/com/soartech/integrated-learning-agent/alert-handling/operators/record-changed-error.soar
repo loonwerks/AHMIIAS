@@ -1,0 +1,34 @@
+##!
+# @file
+#
+# @created rjones 20210121
+
+echo "\nLoading record-changed-error.soar"
+
+sp {record-changed-error*apply*remove-old-value
+    (state <s> ^operator <o>)
+    (<o> ^name record-changed-error
+         ^error-info <ei>
+         ^value <> <v>)
+    (<ei> ^error <e>
+          ^old-value <v>
+         -^value-changed true)
+-->
+    (write (crlf) |Removing old-error value of | <v> | for | <e>)
+    (<ei> ^value <v> -)
+    }
+
+sp {record-changed-error*apply*new-old-value
+    (state <s> ^operator <o>)
+    (<o> ^name record-changed-error
+         ^error-info <ei>
+         ^value <v>)
+    (<ei> ^error <e>
+         -^old-value
+         -^value-changed true)
+-->
+    (write (crlf) |Recording new old-value of | <v> | and value-changed flag for | <e>)
+    (<ei> ^old-value <v>
+          ^value-changed true)
+    }
+

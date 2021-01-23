@@ -25,7 +25,6 @@ public class RunAgent {
     private DoubleInput x1Input, x2Input;
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
 		new RunAgent();
 	}
 	
@@ -48,7 +47,6 @@ public class RunAgent {
         try {
 			setupAgent();
 		} catch (SoarException | InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
         agent.runForever();
@@ -64,7 +62,7 @@ public class RunAgent {
 		
 		agent.openDebuggerAndWait();
 		
-		SoarCommands.source(agent.getInterpreter(), cl.getResource("com/soartech/simple/load.soar"));
+		SoarCommands.source(agent.getInterpreter(), cl.getResource("com/soartech/integrated-learning-agent/load.soar"));
 	}
 	
 	private void createCallbacks() {

@@ -1,0 +1,19 @@
+##!
+# @file
+#
+# @created rjones 20210121
+
+echo "\nLoading landing-finished.soar"
+
+sp {apply*landing-finished
+    (state <s> ^operator.name landing-finished
+               ^io.output-link <out>
+               ^landing phase-four)
+    (<out> ^throttle <tho>)
+-->
+    (<out> ^throttle <tho> - 0.23 +)
+    #(<out> ^rotor-pos 0.99)
+    (<s> ^landing phase-four - landed +)
+    (write (crlf) |Finished Landing|)
+}
+

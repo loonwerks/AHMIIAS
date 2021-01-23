@@ -1,0 +1,26 @@
+##!
+# @file: 
+#
+# @created rjones 20210118
+
+echo "\nLoading operators/load.soar"
+
+source "initialize.soar"
+
+source "takeoff.soar"
+
+source "transition.soar"
+
+source "start-landing.soar"
+
+source "landing-phase-two.soar"
+
+source "landing-phase-three.soar"
+
+source "landing-phase-four.soar"
+
+source "landing-finished.soar"
+
+source "abort-landing.soar"
+
+source "transition-after-abort.soar"

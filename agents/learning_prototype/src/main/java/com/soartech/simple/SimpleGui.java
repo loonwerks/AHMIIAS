@@ -13,6 +13,10 @@ import org.jsoar.kernel.SoarException;
 
 public class SimpleGui extends JFrame {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private JButton launch, send;
 	private JLabel labelX1, labelX2;
 	private JTextField entryX1, entryX2;
@@ -54,7 +58,6 @@ public class SimpleGui extends JFrame {
 			try {
 				master.setupAgent();
 			} catch (SoarException | InterruptedException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}	
 		}
