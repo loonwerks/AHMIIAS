@@ -1,0 +1,24 @@
+##!
+# @file
+#
+# @created rjones 20210118
+
+echo "\nLoading initialize.soar"
+
+sp {apply*initialize
+    (state <s> ^operator.name initialize
+               ^io.output-link <out>)
+-->
+    (<s> ^name takeoff)
+    (<s> ^flight-mode vertical)
+    (<s> ^sensor-unreliable no)
+    (<s> ^faulty-sensor none)
+    (<s> ^landing no)
+    (<s> ^notified-pilot no)
+    (<out> ^target-altitude 5000)
+    (<out> ^throttle 0)
+    (<out> ^autoflaps off)
+    (<out> ^air-brake 0.0)
+    (write (crlf) |Agent initialized.|)
+}
+

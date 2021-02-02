@@ -1,0 +1,28 @@
+##!
+# @file
+#
+# @created rjones 20210121
+
+echo "\nLoading abort-landing.soar"
+
+sp {apply*abort-landing
+    (state <s> ^operator.name abort-landing
+               ^io.output-link <out>
+               ^landing <l>
+               ^flight-mode <fm>)
+    (<out> ^VTOLMode <vtol>
+           ^throttle <tho>
+           ^autoflaps <afo>
+           ^air-brake <abo>)
+    #(<out> ^target-speed <ts>)
+-->
+    (<s> ^landing <l> - abort +)
+    (<s> ^flight-mode <fm> - vertical +)
+    #(<out> ^target-speed <ts> -)
+    (<out> ^VTOLMode <vtol> - vertical +)
+    (<out> ^throttle <tho> - 0.9 +)
+    (<out> ^autoflaps <afo> - off +)
+    (<out> ^air-brake <abo> - 0.0 +)
+    (write (crlf) |Aborting Landing|)
+}
+

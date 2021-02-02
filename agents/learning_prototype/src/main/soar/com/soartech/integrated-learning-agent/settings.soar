@@ -1,0 +1,9 @@
+##!
+# @file
+#
+# @created rjones 20210118
+
+echo "\nLoading settings.soar"
+
+waitsnc --on
+

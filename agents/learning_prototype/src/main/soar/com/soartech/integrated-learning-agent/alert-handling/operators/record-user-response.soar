@@ -1,0 +1,21 @@
+##!
+# @file
+#
+# @created rjones 20210122
+
+echo "\nLoading record-user-response.soar"
+
+sp {record-user-response*apply
+    (state <s> ^operator <o>
+               ^warning-issued <e>
+               ^io.output-link <out>)
+    (<o> ^name record-user-response
+         ^error-info <ei>
+         ^user-response <x>)
+    (<ei> ^error <e>
+         -^warning-accepted)
+-->
+    (<ei> ^warning-accepted <x>)
+    (<s> ^warning-issued <e> -)
+    (<out> ^clear-sensor-alert-response yes)
+    }

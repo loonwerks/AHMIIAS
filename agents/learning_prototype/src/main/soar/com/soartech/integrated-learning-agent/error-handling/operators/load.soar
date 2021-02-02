@@ -1,0 +1,12 @@
+##!
+# @file: 
+#
+# @created rjones 20210118
+
+echo "\nLoading operators/load.soar"
+
+source "sensor-error-over-limit.soar"
+
+source "pilot-agrees.soar"
+
+source "pilot-disagrees.soar"

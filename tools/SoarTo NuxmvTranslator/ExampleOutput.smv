@@ -1,0 +1,132 @@
+MODULE main
+
+VAR state_superstate : {nil};
+VAR state_operator_name : {initialize1,nil,takeoff};
+VAR state_name : {takeoff,nil};
+VAR state_flight-mode : {vertical,nil};
+VAR state_io_throttle : float;
+VAR state_sensor-unreliable : {no,nil};
+VAR state_landing : {no,nil};
+VAR state_io_target-altitude : integer;
+VAR state_io_autoflaps : {off,nil};
+VAR state_io_air-brake : integer;
+
+
+ASSIGN
+    init (state_operator_name) := nil;
+    init (state_name) := nil;
+    init (state_flight-mode) := nil;
+    init (state_io_throttle) := 0.0;
+    init (state_sensor-unreliable) := nil;
+    init (state_landing) := nil;
+    init (state_io_target-altitude) := 0;
+    init (state_io_autoflaps) := nil;
+    init (state_io_air-brake) := 0;
+
+VAR soarAgent : soarRules(state_superstate, state_operator_name, state_name, state_flight-mode, state_io_throttle, state_sensor-unreliable, state_landing, state_io_target-altitude, state_io_autoflaps, state_io_air-brake);
+
+
+MODULE soarRules(state_superstate, state_operator_name, state_name, state_flight-mode, state_io_throttle, state_sensor-unreliable, state_landing, state_io_target-altitude, state_io_autoflaps, state_io_air-brake)
+
+VAR state:{start, run};
+ASSIGN
+        init (state) := start;
+        next (state) := 
+            case
+        --propose*initialize (state_superstate)
+        state = start & (state_superstate=nil) : run;
+        --apply*initialize (state_operator_name)
+        state = start & (state_operator_name=initialize1) : run;
+        --propose*takeoff (state_name, state_flight-mode, state_io_throttle)
+        state = start & (state_name=takeoff & state_flight-mode=vertical & state_io_throttle<0.9) : run;
+        --apply*takeoff (state_operator_name)
+        state = start & (state_operator_name=takeoff) : run;
+        state = run : start;
+            TRUE : state;
+            esac;
+TRANS
+        next (state_operator_name) =
+            case
+        --propose*initialize (state_superstate)
+        (state = run & state_superstate=nil): initialize1;
+        --propose*takeoff (state_name, state_flight-mode, state_io_throttle)
+        (state = run & state_name=takeoff & state_flight-mode=vertical & state_io_throttle<0.9): takeoff;
+            TRUE : state_operator_name;
+            esac;
+
+
+TRANS
+        next (state_name) =
+            case
+        --apply*initialize (state_operator_name)
+        (state = run & state_operator_name=initialize1): takeoff;
+            TRUE : state_name;
+            esac;
+
+
+TRANS
+        next (state_flight-mode) =
+            case
+        --apply*initialize (state_operator_name)
+        (state = run & state_operator_name=initialize1): vertical;
+            TRUE : state_flight-mode;
+            esac;
+
+
+TRANS
+        next (state_io_throttle) =
+            case
+        --apply*initialize (state_operator_name)
+        (state = run & state_operator_name=initialize1): 0.0;
+        --apply*takeoff (state_operator_name)
+        (state = run & state_operator_name=takeoff): state_io_throttle+0.1;
+            TRUE : state_io_throttle;
+            esac;
+
+
+TRANS
+        next (state_sensor-unreliable) =
+            case
+        --apply*initialize (state_operator_name)
+        (state = run & state_operator_name=initialize1): no;
+            TRUE : state_sensor-unreliable;
+            esac;
+
+
+TRANS
+        next (state_landing) =
+            case
+        --apply*initialize (state_operator_name)
+        (state = run & state_operator_name=initialize1): no;
+            TRUE : state_landing;
+            esac;
+
+
+TRANS
+        next (state_io_target-altitude) =
+            case
+        --apply*initialize (state_operator_name)
+        (state = run & state_operator_name=initialize1): 5000;
+            TRUE : state_io_target-altitude;
+            esac;
+
+
+TRANS
+        next (state_io_autoflaps) =
+            case
+        --apply*initialize (state_operator_name)
+        (state = run & state_operator_name=initialize1): off;
+            TRUE : state_io_autoflaps;
+            esac;
+
+
+TRANS
+        next (state_io_air-brake) =
+            case
+        --apply*initialize (state_operator_name)
+        (state = run & state_operator_name=initialize1): 0;
+            TRUE : state_io_air-brake;
+            esac;
+
+
+
