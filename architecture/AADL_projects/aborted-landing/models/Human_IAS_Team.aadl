@@ -24,13 +24,22 @@ public
 			-----------------------
 				
 			guarantee "Respond to message that Sensor1 is unreliable":
-				prev(not InputFromIAS.Sensor1_Reliable, false) <=> ((Output.Sensor1_Unreliable_Response = enum(Response, Agree)) or (Output.Sensor1_Unreliable_Response = enum(Response, Disagree))); 
+				prev(not InputFromIAS.Sensor1_Reliable, false) <=> 
+					((Output.Sensor1_Unreliable_Response = enum(Response, Agree)) 
+						or (Output.Sensor1_Unreliable_Response = enum(Response, Disagree))
+					); 
 			
 			guarantee "Respond to message that Sensor2 is unreliable":
-				prev(not InputFromIAS.Sensor2_Reliable, false) <=> ((Output.Sensor2_Unreliable_Response = enum(Response, Agree)) or (Output.Sensor2_Unreliable_Response = enum(Response, Disagree)));
+				prev(not InputFromIAS.Sensor2_Reliable, false) <=> 
+					((Output.Sensor2_Unreliable_Response = enum(Response, Agree)) 
+						or (Output.Sensor2_Unreliable_Response = enum(Response, Disagree))
+					);
 			
 			guarantee "Respond to message that Sensor3 is unreliable":
-				prev(not InputFromIAS.Sensor3_Reliable, false) <=> ((Output.Sensor3_Unreliable_Response = enum(Response, Agree)) or (Output.Sensor3_Unreliable_Response = enum(Response, Disagree)));					
+				prev(not InputFromIAS.Sensor3_Reliable, false) <=> 
+					((Output.Sensor3_Unreliable_Response = enum(Response, Agree)) 
+						or (Output.Sensor3_Unreliable_Response = enum(Response, Disagree))
+					);					
 
 			-----------------------
 			--GUARANTEES RELATED TO THE ABORTED LANDING SCENARIO
@@ -43,10 +52,12 @@ public
 				Output.Abort_Landing => prev((InputFromIAS.Phase = enum(Phase_Type, Landing)), false); 
 				
 			guarantee "Choose a landing option when they are ready":
-				true -> (pre(InputFromIAS.Landing_Options_Ready) => (   (Output.Landing_Option_Selection = pre(InputFromIAS.Landing_Options.Option1))
-																	or (Output.Landing_Option_Selection = pre(InputFromIAS.Landing_Options.Option2))
-																	or (Output.Landing_Option_Selection = pre(InputFromIAS.Landing_Options.Option3))
-				)); 
+				true -> (pre(InputFromIAS.Landing_Options_Ready) => 
+							(   (Output.Landing_Option_Selection = pre(InputFromIAS.Landing_Options.Option1))
+							or  (Output.Landing_Option_Selection = pre(InputFromIAS.Landing_Options.Option2))
+							or  (Output.Landing_Option_Selection = pre(InputFromIAS.Landing_Options.Option3))
+							)
+						); 
 						
 		**};
 	end Human;
@@ -111,17 +122,18 @@ public
 					)
 						=> (Output.Recommended_Sensor = previous_active_sensor);
 			
-			guarantee "The active sensor should stay the same unless the operator agrees that it is unreliable and there is another reliable sensor available.":
-					Output.Active_Sensor = 	if (previous_recommended_sensor = NIL) then
-												previous_active_sensor
-											else if (previous_active_sensor = 1 and InputFromHuman.Sensor1_Unreliable_Response = enum(Response, Agree)) then
-													previous_recommended_sensor
-												 else if (previous_active_sensor = 2 and InputFromHuman.Sensor2_Unreliable_Response = enum(Response, Agree)) then
-														previous_recommended_sensor
-													  else if (previous_active_sensor = 3 and InputFromHuman.Sensor3_Unreliable_Response = enum(Response, Agree)) then
-																previous_recommended_sensor
-														   else
-														   		previous_active_sensor;
+			guarantee "The active sensor should stay the same unless the operator agrees that it is unreliable 
+						and there is another reliable sensor available.":
+				Output.Active_Sensor = 	
+					if (previous_recommended_sensor = NIL) 
+						then previous_active_sensor
+					else if (previous_active_sensor = 1 and InputFromHuman.Sensor1_Unreliable_Response = enum(Response, Agree)) 
+							then previous_recommended_sensor
+						 else if (previous_active_sensor = 2 and InputFromHuman.Sensor2_Unreliable_Response = enum(Response, Agree)) 
+						 		then previous_recommended_sensor
+							  else if (previous_active_sensor = 3 and InputFromHuman.Sensor3_Unreliable_Response = enum(Response, Agree)) 
+							  			then previous_recommended_sensor
+								   else	previous_active_sensor;
 
 			-----------------------
 			--FLIGHT PHASE STATE MACHINE
@@ -192,7 +204,11 @@ public
 				T_Landing_to_Flight = Output.Landing_Options_Ready;
 				
 			guarantee "Destination changes if and only if the pilot selects a landing option":
-				true -> (Output.Destination = if pre(Output.Landing_Options_Ready) then InputFromHuman.Landing_Option_Selection else pre(Output.Destination)); 
+				true -> (Output.Destination = if pre(Output.Landing_Options_Ready) then 
+												InputFromHuman.Landing_Option_Selection 
+											  else 
+											  	pre(Output.Destination)
+				); 
 			
 			
 		**};
@@ -308,51 +324,63 @@ public
 			lemma "We can't have just Sensor 3 reliable":
 													not (not IAS.Output.Sensor1_Reliable and not IAS.Output.Sensor2_Reliable and 	 IAS.Output.Sensor3_Reliable);
 			
-			lemma "Unless the active sensor becomes unreliable, the recommended sensor is the current active sensor":
-															(		(previous_active_sensor = 1 and IAS.Output.Sensor1_Reliable)
-																or 	(previous_active_sensor = 2 and IAS.Output.Sensor2_Reliable)
-																or 	(previous_active_sensor = 3 and IAS.Output.Sensor3_Reliable))
-															=> (IAS.Output.Recommended_Sensor = previous_active_sensor);
+			lemma "Unless the active sensor becomes unreliable, 
+					the recommended sensor is the current active sensor":
+					(		(previous_active_sensor = 1 and IAS.Output.Sensor1_Reliable)
+						or 	(previous_active_sensor = 2 and IAS.Output.Sensor2_Reliable)
+						or 	(previous_active_sensor = 3 and IAS.Output.Sensor3_Reliable))
+					=> (IAS.Output.Recommended_Sensor = previous_active_sensor);
 			
-			lemma "If the operator agrees that the active sensor is unreliable, the new active sensor is the previously recommended sensor, unless the previously recommended sensor was NIL":
-													previous_recommended_sensor != NIL =>
-														(	((previous_active_sensor = 1 and Human.Output.Sensor1_Unreliable_Response = enum(Response, Agree)) => 
-															IAS.Output.Active_Sensor = previous_recommended_sensor
-															)
-														and ((previous_active_sensor = 2 and Human.Output.Sensor2_Unreliable_Response = enum(Response, Agree)) => 
-															IAS.Output.Active_Sensor = previous_recommended_sensor
-															)
-														and ((previous_active_sensor = 3 and Human.Output.Sensor3_Unreliable_Response = enum(Response, Agree)) => 
-															IAS.Output.Active_Sensor = previous_recommended_sensor
-															)
-														);
+			lemma "If the operator agrees that the active sensor is unreliable, 
+					the new active sensor is the previously recommended sensor, 
+					unless the previously recommended sensor was NIL":
+					previous_recommended_sensor != NIL =>
+						(	((previous_active_sensor = 1 and Human.Output.Sensor1_Unreliable_Response = enum(Response, Agree)) => 
+							IAS.Output.Active_Sensor = previous_recommended_sensor
+							)
+						and ((previous_active_sensor = 2 and Human.Output.Sensor2_Unreliable_Response = enum(Response, Agree)) => 
+							IAS.Output.Active_Sensor = previous_recommended_sensor
+							)
+						and ((previous_active_sensor = 3 and Human.Output.Sensor3_Unreliable_Response = enum(Response, Agree)) => 
+							IAS.Output.Active_Sensor = previous_recommended_sensor
+							)
+						);
 			lemma "If the operator disagrees that the active sensor is unreliable, then the active sensor should not change.":
-														(	(previous_active_sensor = 1 and Human.Output.Sensor1_Unreliable_Response = enum(Response, Disagree))
-														or  (previous_active_sensor = 2 and Human.Output.Sensor2_Unreliable_Response = enum(Response, Disagree))
-														or 	(previous_active_sensor = 3 and Human.Output.Sensor3_Unreliable_Response = enum(Response, Disagree))
-														) 
-														=>
-														IAS.Output.Active_Sensor = previous_active_sensor;
+					(	(previous_active_sensor = 1 and Human.Output.Sensor1_Unreliable_Response = enum(Response, Disagree))
+					or  (previous_active_sensor = 2 and Human.Output.Sensor2_Unreliable_Response = enum(Response, Disagree))
+					or 	(previous_active_sensor = 3 and Human.Output.Sensor3_Unreliable_Response = enum(Response, Disagree))
+					) 
+					=>
+					IAS.Output.Active_Sensor = previous_active_sensor;
 			
 			lemma "If an unreliable sensor is the active sensor, it must be the case that either 
-													the pilot disagreed with the IAS assessment 
-													or the sensor just became unreliable on this timestep 
-													or there was no reliable sensor available on the previous timestep":
-																((IAS.Output.Active_Sensor = 1) and not IAS.Output.Sensor1_Reliable) 
-																	=>  (	(Human.Output.Sensor1_Unreliable_Response = enum(Response, Disagree)) 
-																		or 	prev(IAS.Output.Sensor1_Reliable, true) 
-																		or not prev(reliable_sensor_available, true)
-																		)
-															and ((IAS.Output.Active_Sensor = 2) and not IAS.Output.Sensor2_Reliable) 
-																	=>  (	(Human.Output.Sensor2_Unreliable_Response = enum(Response, Disagree)) 
-																		or 	prev(IAS.Output.Sensor2_Reliable, true) 
-																		or 	not prev(reliable_sensor_available, true)
-																		)
-															and ((IAS.Output.Active_Sensor = 3) and not IAS.Output.Sensor3_Reliable) 
-																	=>  (	(Human.Output.Sensor3_Unreliable_Response = enum(Response, Disagree)) 
-																		or 	prev(IAS.Output.Sensor3_Reliable, true) 
-																		or not prev(reliable_sensor_available, true)
-																	);
+					the pilot disagreed with the IAS assessment 
+					or the sensor just became unreliable on this timestep 
+					or there was no reliable sensor available on the previous timestep":
+						((IAS.Output.Active_Sensor = 1) and not IAS.Output.Sensor1_Reliable) 
+							=>  (	(Human.Output.Sensor1_Unreliable_Response = enum(Response, Disagree)) 
+								or 	prev(IAS.Output.Sensor1_Reliable, true) 
+								or not prev(reliable_sensor_available, true)
+								)
+					and ((IAS.Output.Active_Sensor = 2) and not IAS.Output.Sensor2_Reliable) 
+							=>  (	(Human.Output.Sensor2_Unreliable_Response = enum(Response, Disagree)) 
+								or 	prev(IAS.Output.Sensor2_Reliable, true) 
+								or 	not prev(reliable_sensor_available, true)
+								)
+					and ((IAS.Output.Active_Sensor = 3) and not IAS.Output.Sensor3_Reliable) 
+							=>  (	(Human.Output.Sensor3_Unreliable_Response = enum(Response, Disagree)) 
+								or 	prev(IAS.Output.Sensor3_Reliable, true) 
+								or not prev(reliable_sensor_available, true)
+							);
+			
+			lemma "If Sensor 1 is both the active sensor and unreliable, it must be the case that either
+				the pilot disagreed with the IAS assessment 
+				or the sensor just became unreliable on this timestep 
+				or there was no reliable sensor available on the previous timestep":
+						((IAS.Output.Active_Sensor = 1) and not IAS.Output.Sensor1_Reliable) 
+							=>  (	(Human.Output.Sensor1_Unreliable_Response = enum(Response, Disagree)) 
+								or 	prev(IAS.Output.Sensor1_Reliable, true) 
+								or not prev(reliable_sensor_available, true));
 			
 			lemma "Active sensor in range":
 														IAS.Output.Active_Sensor >= 1 and IAS.Output.Active_Sensor <= 3;

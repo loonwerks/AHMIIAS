@@ -73,10 +73,11 @@
         <seg>top_impl_new_connection5</seg>
       </bo>
       <bendpoints>
-        <point x="1154.0" y="142.0"/>
-        <point x="1154.0" y="27.0"/>
-        <point x="79.0" y="27.0"/>
-        <point x="79.0" y="152.0"/>
+        <point x="962.0" y="102.0"/>
+        <point x="962.0" y="10.0"/>
+        <point x="504.0" y="10.0"/>
+        <point x="50.0" y="10.0"/>
+        <point x="50.0" y="112.0"/>
       </bendpoints>
     </element>
     <element uuid="b43b6504-6b4a-4aee-8098-4e1cad06d126" manual="true">
@@ -133,7 +134,7 @@
           <seg>feature</seg>
           <seg>inputfromias</seg>
         </bo>
-        <position y="30.0"/>
+        <position y="50.0"/>
       </element>
       <element uuid="baed9527-ef6b-4a86-80da-421dda78981f" manual="true" dockArea="left">
         <bo>
@@ -168,14 +169,14 @@
           <seg>feature</seg>
           <seg>output</seg>
         </bo>
-        <position x="262.0" y="30.0"/>
+        <position x="131.0" y="30.0"/>
       </element>
       <bo>
         <seg>subcomponent</seg>
         <seg>human</seg>
       </bo>
-      <position x="770.0" y="110.0"/>
-      <size width="322.0" height="433.0"/>
+      <position x="712.0" y="70.0"/>
+      <size width="191.0" height="433.0"/>
     </element>
     <element uuid="64bf47d4-c9a1-4428-b8d5-b92abc50fb4c" manual="true">
       <element uuid="47fb7366-0ee8-4a35-8c5b-8255bf5169dc" manual="true" dockArea="left">
@@ -190,42 +191,42 @@
           <seg>feature</seg>
           <seg>inputfromsensor1</seg>
         </bo>
-        <position x="96.0" y="92.0"/>
+        <position x="66.0" y="100.0"/>
       </element>
       <element uuid="80497be2-6885-4194-8b85-81058d635a14" manual="true" dockArea="right">
         <bo>
           <seg>feature</seg>
           <seg>inputfromsensor2</seg>
         </bo>
-        <position x="96.0" y="182.0"/>
+        <position x="66.0" y="182.0"/>
       </element>
       <element uuid="5e27877e-c9cb-4a90-956f-57412b2acddb" manual="true" dockArea="right">
         <bo>
           <seg>feature</seg>
           <seg>inputfromsensor3</seg>
         </bo>
-        <position x="96.0" y="262.0"/>
+        <position x="66.0" y="262.0"/>
       </element>
       <element uuid="c4224838-8d16-4478-a1d7-e1eb7f4e834a" manual="true" dockArea="right">
         <bo>
           <seg>feature</seg>
           <seg>inputfromwowsensor</seg>
         </bo>
-        <position x="65.0" y="352.0"/>
+        <position x="35.0" y="352.0"/>
       </element>
       <element uuid="3377b898-30f2-418a-b14c-972eafcb7305" manual="true" dockArea="right">
         <bo>
           <seg>feature</seg>
           <seg>output</seg>
         </bo>
-        <position x="171.0" y="32.0"/>
+        <position x="141.0" y="50.0"/>
       </element>
       <bo>
         <seg>subcomponent</seg>
         <seg>ias</seg>
       </bo>
-      <position x="70.0" y="110.0"/>
-      <size width="231.0" height="423.0"/>
+      <position x="42.0" y="70.0"/>
+      <size width="201.0" height="423.0"/>
     </element>
     <element uuid="833cad66-8d53-4b4d-b582-e56e7f51abbf" manual="true">
       <element uuid="45a73033-b520-4729-b956-58eadcffcfaa" manual="true" dockArea="top">
@@ -239,7 +240,7 @@
         <seg>subcomponent</seg>
         <seg>sensor1</seg>
       </bo>
-      <position x="388.0" y="260.0"/>
+      <position x="330.0" y="220.0"/>
       <size width="231.0" height="60.0"/>
     </element>
     <element uuid="929ea24e-2d0a-4a0f-aceb-d3d262f3505b" manual="true">
@@ -254,7 +255,7 @@
         <seg>subcomponent</seg>
         <seg>sensor2</seg>
       </bo>
-      <position x="394.0" y="344.0"/>
+      <position x="336.0" y="304.0"/>
       <size width="231.0" height="60.0"/>
     </element>
     <element uuid="b53ac1d4-c040-43e5-8f09-d15c12dd154c" manual="true">
@@ -269,7 +270,7 @@
         <seg>subcomponent</seg>
         <seg>sensor3</seg>
       </bo>
-      <position x="412.0" y="432.0"/>
+      <position x="354.0" y="392.0"/>
       <size width="231.0" height="60.0"/>
     </element>
     <element uuid="a8a3c118-73b5-4e1a-ae1e-159f622ac13d" manual="true">
@@ -284,7 +285,7 @@
         <seg>subcomponent</seg>
         <seg>wow_sensor</seg>
       </bo>
-      <position x="370.0" y="520.0"/>
+      <position x="312.0" y="480.0"/>
       <size width="267.0" height="60.0"/>
     </element>
     <bo>
@@ -292,7 +293,7 @@
       <seg>top.impl</seg>
     </bo>
     <position x="30.0" y="-30.0"/>
-    <size width="1164.0" height="651.0"/>
+    <size width="951.0" height="561.0"/>
   </element>
   <config type="structure" connectionPrimaryLabelsVisible="false">
     <enabledAadlProperties/>
