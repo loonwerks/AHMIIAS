@@ -63,178 +63,146 @@ ASSIGN
 
 VAR soarAgent : soarRules(state_superstate,state_name,state_operator_name,state_flight-mode,state_io_throttle,state_io_altitude,state_io_airspeed,state_sensor-unreliable,state_io_gps-lidar-error,state_io_gps-imu-error,state_io_lidar-imu-error,state_io_pilot_decision,state_faulty-sensor,state_io_initiate-landing,state_landing,state_io_distance-to-target,state_io_abort-landing,state_io_pilot-selected-landing-zone,state_notified-pilot,state_io_target-altitude,state_io_autoflaps,state_io_air-brake,state_io_VTOLMode,state_io_GPSUnreliable,state_io_LIDARUnreliable,state_io_IMUUnreliable,state_io_sensor-to-use,state_io_target-speed);
 
-VAR inputModuleRule : inputModule(state_io_altitude, state_io_initiate-landing, state_io_throttle, state_io_abort-landing, state_operator_name, state_landing, state_io_pilot-selected-landing-zone, state_io_pilot_decision, state_io_lidar-imu-error, state_io_gps-imu-error, state_io_gps-lidar-error, state_io_airspeed, state_io_distance-to-target);
-
 -- ********************************************************************************************************
 -- Property Verification
 -- ********************************************************************************************************
+
+-- The Unreliable Sensor Scenario
+
+-- -- Detect Transition while takeoff
+-- LTLSPEC F (state_operator_name = takeoff) -- generates counterexample
+-- LTLSPEC F (state_operator_name = transition); -- generates counterexample
+-- LTLSPEC F (state_io_throttle >= 0.9 & state_io_throttle < 1.0) -- proves in 24 steps
+-- LTLSPEC F (state_flight-mode = horizontal); -- generates counterexample
+-- LTLSPEC F (state_io_throttle > 1.0) -- does not prove, generates a counterexample
+
+-- -- Safety Property
+-- INVARSPEC (state_io_throttle > 1.2 -> state_flight-mode = horizontal) -- generates counterexample
+-- LTLSPEC F(X state_io_throttle < 1.00 -> state_flight-mode = horizontal) -- generates counterexample
+-- LTLSPEC F(X state_io_throttle < 1.00 -> state_flight-mode = vertical) -- proves
+
+-- Even when it is in transition mode it does not immediately go to horizontal mode
+-- INVARSPEC (state_operator_name = transition -> state_flight-mode = horizontal) -- generates a counterexample
+-- LTLSPEC F(X state_operator_name = transition -> state_flight-mode = horizontal) -- proves
+-- LTLSPEC G(state_operator_name = transition -> F state_flight-mode = horizontal) -- proves
+
+-- When it is in horizontal mode, the plane is in flight
+-- INVARSPEC (state_flight-mode = horizontal -> state_operator_name = transition) -- generates a counterexample
+
+-- During takeoff it always remains vertical
+-- INVARSPEC (state_operator_name = takeoff -> state_flight-mode = vertical) -- generates counterexample
+
+
+-- -- Detect sensor error
+-- INVARSPEC (state_operator_name = gps-sensor-error-over-limit -> state_sensor-unreliable = yes) -- generates counterexample
+-- LTLSPEC F (X state_operator_name = gps-sensor-error-over-limit -> state_sensor-unreliable = yes) -- proves
+-- LTLSPEC G(state_operator_name = gps-sensor-error-over-limit -> F state_sensor-unreliable = yes) -- proves
+
+-- -- Detect whether the pilot agrees or not with the sensor warning
+-- LTLSPEC F (state_operator_name = pilot-agrees) -- generates counterexample
+-- LTLSPEC F (state_io_pilot_decision = agree) -- generates counterexample
+-- LTLSPEC F (state_io_pilot_decision = disagree) -- generates counterexample
+-- LTLSPEC F (state_io_GPSUnreliable = yes) -- generates counterexample
+-- LTLSPEC F (state_io_LIDARUnreliable = yes) -- generates counterexample
+-- LTLSPEC F (state_io_sensor-to-use = gps) -- generates counterexample
+-- LTLSPEC F (state_io_IMUUnreliable = yes) -- generates counterexample
+
+
+-- -- Detect faulty sensor
+-- LTLSPEC F (state_sensor-unreliable = yes) -- generates counterexample
+-- LTLSPEC F (state_operator_name = gps-sensor-error-over-limit) -- generates counterexample
+-- LTLSPEC F (state_faulty-sensor = gps) -- generates counterexample
+-- LTLSPEC F (state_io_sensor-to-use = lidar) -- generates counterexample
+-- INVARSPEC (state_faulty-sensor = gps -> state_io_sensor-to-use = lidar) -- generates counterexample
+-- LTLSPEC F(X state_faulty-sensor = gps -> state_io_sensor-to-use = lidar) -- proves true
+-- LTLSPEC G(state_faulty-sensor = gps -> F state_io_sensor-to-use = lidar) -- generates counterexample
 
 -- The Abort Landing Scenario
 
 -- Detect landing
 
 -- Detect In-flight
--- LTLSPEC F (state_io_altitude > 10000) -- does not prove, generates a counterexample in 61 steps
+-- LTLSPEC F (state_io_altitude > 10000) -- generates counterexample
 -- LTLSPEC F (state_io_altitude < 2000) -- proves in 2 steps
--- LTLSPEC F (state_io_initiate-landing = no) -- does not prove, generates a counterexample in 61 steps
+-- LTLSPEC F (state_io_initiate-landing = no) -- generates counterexample
 
 -- Landing Phase 1
--- LTLSPEC F (state_landing = phase-one) -- proves in 56 steps, indicating landing is initiated by the pilot
--- LTLSPEC F (state_operator_name = start-landing) -- proves in 53 steps
--- INVARSPEC (state_operator_name = start-landing -> state_landing = phase-one) -- does not prove, throws a counterexample in 29 steps
--- INVARSPEC (state_io_initiate-landing = yes -> state_operator_name = start-landing) -- does not prove, throws a counterexample in 24 steps
--- LTLSPEC G(state_operator_name = start-landing -> F state_landing = phase-one) -- proves true in 12 steps
+-- LTLSPEC F (state_landing = phase-one) -- generates counterexample
+-- LTLSPEC F (state_operator_name = start-landing) -- generates counterexample
+-- INVARSPEC (state_operator_name = start-landing -> state_landing = phase-one) -- generates counterexample
+-- INVARSPEC (state_io_initiate-landing = yes -> state_operator_name = start-landing) -- generates counterexample
+-- LTLSPEC G(state_operator_name = start-landing -> F state_landing = phase-one) -- generates counterexample
 
 -- Landing Phase 2
--- LTLSPEC F (state_landing = phase-two) -- proves in 89 steps, indicating that it goes through phase two
--- LTLSPEC F (state_operator_name = landing-phase-two) -- proves in 70 steps
--- INVARSPEC (state_operator_name = landing-phase-two -> state_landing = phase-two) -- does not prove, throws a counterexample in 45 steps
--- LTLSPEC G(state_operator_name = landing-phase-two -> F state_landing = phase-two) -- proves true in 7 steps
+-- LTLSPEC F (state_landing = phase-two) -- generates counterexample
+-- LTLSPEC F (state_operator_name = landing-phase-two) -- generates counterexample
+-- INVARSPEC (state_operator_name = landing-phase-two -> state_landing = phase-two) -- generates counterexample
+-- LTLSPEC G(state_operator_name = landing-phase-two -> F state_landing = phase-two) -- proves true
 
 -- Landing Phase 3
--- LTLSPEC F (state_landing = phase-three) -- proves in 110 steps
--- LTLSPEC F (state_operator_name = landing-phase-three) -- proves in 90 steps
+-- LTLSPEC F (state_landing = phase-three) -- generates counterexample
+-- LTLSPEC F (state_operator_name = landing-phase-three) -- generates counterexample
 
 -- Landing Phase 4
--- LTLSPEC F (state_landing = phase-four) -- proves in 76 steps
--- LTLSPEC F (state_operator_name = landing-phase-four) -- proves in 99 steps
--- LTLSPEC F (state_landing = landed) -- proves in 113 steps
-
+-- LTLSPEC F (state_landing = phase-four) -- generates counterexample
+-- LTLSPEC F (state_operator_name = landing-phase-four) -- generates counterexample
+-- LTLSPEC F (state_landing = landed) -- generates counterexample
 
 -- Does IAS Respond according to the human input - Abort Landing in this case
 
--- LTLSPEC F (state_io_abort-landing = yes) -- proves in 55 steps
--- LTLSPEC F (state_operator_name = abort-landing) -- proves in 47 steps
+-- LTLSPEC F (state_io_abort-landing = yes) -- generates counterexample
+-- LTLSPEC F (state_operator_name = abort-landing) -- generates counterexample
 
 -- Does IAS execute the sequential flow of actions after abort landing has been initiated
 
--- INVARSPEC (state_operator_name = abort-landing -> state_io_throttle >= 0.9) -- does not prove, throws a counterexample
--- LTLSPEC F(X state_operator_name = abort-landing -> state_io_throttle >= 0.9) -- proves in 4 steps
--- LTLSPEC G(state_operator_name = abort-landing -> F state_io_throttle >= 0.9) -- proves in 18 steps
+-- INVARSPEC (state_operator_name = abort-landing -> state_io_throttle >= 0.9) -- does not prove
+-- LTLSPEC F(X state_operator_name = abort-landing -> state_io_throttle >= 0.9) -- proves
+-- LTLSPEC G(state_operator_name = abort-landing -> F state_io_throttle >= 0.9) -- proves
 
--- INVARSPEC (state_operator_name = abort-landing -> state_io_altitude >= 5000) -- does not prove, generates a counterexample
+-- INVARSPEC (state_operator_name = abort-landing -> state_io_altitude >= 5000) -- generates counterexample
 -- LTLSPEC F(X state_operator_name = abort-landing -> state_io_altitude >= 5000) -- proves
--- LTLSPEC G(state_operator_name = abort-landing -> F state_io_altitude >= 5000) -- proves in 56 steps
--- LTLSPEC G(state_operator_name = abort-landing -> F state_io_altitude > 10000) -- does not prove, gives a counterexample in 61 steps
+-- LTLSPEC G(state_operator_name = abort-landing -> F state_io_altitude >= 5000) -- generates counterexample
+-- LTLSPEC G(state_operator_name = abort-landing -> F state_io_altitude > 10000) -- generates counterexample
 
--- INVARSPEC (state_operator_name = abort-landing -> state_landing = phase-one) -- does not prove, generates a counterexample in 36 steps
+-- INVARSPEC (state_operator_name = abort-landing -> state_landing = phase-one) -- does not prove
 -- LTLSPEC F(X state_operator_name = abort-landing -> state_landing = phase-one) -- proves
--- LTLSPEC G(state_operator_name = abort-landing -> F state_landing = phase-one) -- proves in 85 steps
+-- LTLSPEC G(state_operator_name = abort-landing -> F state_landing = phase-one) -- generates counterexample
 
--- INVARSPEC (state_operator_name = abort-landing -> state_landing = phase-two) -- does not prove, generates a counterexample in 34 steps
--- LTLSPEC F(X state_operator_name = abort-landing -> state_landing = phase-two) -- proves in 3 steps
--- LTLSPEC G(state_operator_name = abort-landing -> F state_landing = phase-two) -- proves in 91 steps
+-- INVARSPEC (state_operator_name = abort-landing -> state_landing = phase-two) -- does not prove
+-- LTLSPEC F(X state_operator_name = abort-landing -> state_landing = phase-two) -- proves
+-- LTLSPEC G(state_operator_name = abort-landing -> F state_landing = phase-two) -- generates counterexample
 
--- INVARSPEC (state_operator_name = abort-landing -> state_landing = phase-three) -- does not prove, generates a counterexample in 34 steps
+-- INVARSPEC (state_operator_name = abort-landing -> state_landing = phase-three) -- does not prove
 -- LTLSPEC F(X state_operator_name = abort-landing -> state_landing = phase-three) -- proves
--- LTLSPEC G(state_operator_name = abort-landing -> F state_landing = phase-three) -- proves in 88 steps
+-- LTLSPEC G(state_operator_name = abort-landing -> F state_landing = phase-three) -- generates counterexample
 
--- INVARSPEC (state_operator_name = abort-landing -> state_landing = phase-four) -- does not prove 34 steps
+-- INVARSPEC (state_operator_name = abort-landing -> state_landing = phase-four) -- does not prove
 -- LTLSPEC F(X state_operator_name = abort-landing -> state_landing = phase-four) -- proves
--- LTLSPEC G(state_operator_name = abort-landing -> F state_landing = phase-four) -- proves in 84 steps
+-- LTLSPEC G(state_operator_name = abort-landing -> F state_landing = phase-four) -- does not prove
 
--- INVARSPEC (state_operator_name = abort-landing -> state_landing = landed) -- does not prove, generates a counterexample in 34 steps
+-- INVARSPEC (state_operator_name = abort-landing -> state_landing = landed) -- does not prove
 -- LTLSPEC F(X state_operator_name = abort-landing -> state_landing = landed) -- proves
--- LTLSPEC G(state_operator_name = abort-landing -> F state_landing = landed) -- proves in 94 steps
+-- LTLSPEC G(state_operator_name = abort-landing -> F state_landing = landed) -- does not prove
 
--- INVARSPEC (state_operator_name = abort-landing -> state_io_autoflaps = on) -- does not prove, generates a counterexample in 34 steps
+-- INVARSPEC (state_operator_name = abort-landing -> state_io_autoflaps = on) -- does not prove
 -- LTLSPEC F(X state_operator_name = abort-landing -> state_io_autoflaps = on ) -- proves
--- LTLSPEC G(state_operator_name = abort-landing -> F state_io_autoflaps = on ) -- proves in 78 steps
+-- LTLSPEC G(state_operator_name = abort-landing -> F state_io_autoflaps = on ) -- does not prove
 
--- INVARSPEC (state_operator_name = abort-landing -> state_io_air-brake > 0) -- does not prove, generates a counterexample in 36 steps
+-- INVARSPEC (state_operator_name = abort-landing -> state_io_air-brake > 0) -- does not prove
 -- LTLSPEC F(X state_operator_name = abort-landing -> state_io_air-brake > 0) -- proves
--- LTLSPEC G(state_operator_name = abort-landing -> F state_io_air-brake > 0) -- proves in 85 steps
+-- LTLSPEC G(state_operator_name = abort-landing -> F state_io_air-brake > 0) -- does not prove
 
-
--- INVARSPEC (state_operator_name = abort-landing -> state_io_VTOLMode = horizontal) -- does not prove, generates a counterexample in 36 steps
+-- INVARSPEC (state_operator_name = abort-landing -> state_io_VTOLMode = horizontal) -- does not prove
 -- LTLSPEC (state_operator_name = abort-landing -> X state_io_VTOLMode = horizontal) -- proves
--- LTLSPEC G(state_operator_name = abort-landing -> F state_io_VTOLMode = horizontal) -- proves in 80 steps
+-- LTLSPEC G(state_operator_name = abort-landing -> F state_io_VTOLMode = horizontal) -- does not prove
 
--- INVARSPEC (state_io_throttle <= 1.0) -- proves in 60 steps
--- LTLSPEC O(state_operator_name = abort-landing) -- once property, generates counter example in 61 steps because it remains at abort-landing state for more than one step of execution
+-- LTLSPEC O(state_operator_name = abort-landing) -- once property, generates counter example
+-- LTLSPEC (state_io_sensor-to-use != lidar U state_operator_name = pilot-agrees) -- generates counterexample
+-- LTLSPEC (state_io_sensor-to-use = gps U state_operator_name = pilot-disagrees) -- generates counterexample
+-- LTLSPEC (state_io_sensor-to-use = lidar S state_operator_name = pilot-agrees) -- generates counterexample
 
 -- ********************************X*********************************X**********************************************************
 -- ********************************X*********************************X**********************************************************
-
-
-MODULE inputModule(state_io_altitude, state_io_initiate-landing, state_io_throttle, state_io_abort-landing, state_operator_name, state_landing, state_io_pilot-selected-landing-zone, state_io_pilot_decision, state_io_lidar-imu-error, state_io_gps-imu-error, state_io_gps-lidar-error, state_io_airspeed, state_io_distance-to-target)
-
-VAR counter_state_pilot_decision_to_abort : integer; -- counter to keep check on the number of aborts
-
-ASSIGN
-
-      next(state_io_pilot_decision) :=
-            case
-                (state_io_pilot_decision = nil) : state_io_pilot_decision;
-                TRUE: state_io_pilot_decision;
-            esac;
-
-      next(state_io_gps-lidar-error) :=
-            case
-                (state_io_gps-lidar-error = 0.0) : state_io_gps-lidar-error;
-                TRUE : state_io_gps-lidar-error;
-            esac;
-
-      next(state_io_gps-imu-error) :=
-            case
-                (state_io_gps-imu-error = 0.0) : state_io_gps-imu-error;
-                TRUE : state_io_gps-imu-error;
-            esac;
-
-      next(state_io_lidar-imu-error) :=
-            case
-                (state_io_lidar-imu-error = 0.0) : state_io_lidar-imu-error;
-                TRUE : state_io_lidar-imu-error;
-            esac;
-
-      next(state_io_altitude) :=
-            case
-                (state_io_initiate-landing = yes & state_io_altitude > 2500 & state_operator_name != abort-landing): state_io_altitude - 500;
-                --(state_io_throttle >= 0.9 & state_io_altitude > 2500 & state_operator_name != abort-landing): state_io_altitude - 500; -- we can also include airspeed here
-                (state_io_throttle < 0.90 & state_io_altitude < 9500): state_io_altitude + 300; -- we can also include airspeed here
-                (state_io_throttle >= 0.90 & state_io_altitude < 9500): state_io_altitude + 300;
-                TRUE: state_io_altitude;
-            esac;
-
-      next(state_io_airspeed) :=
-            case
-                (state_operator_name = landing-phase-four | state_operator_name = landing-finished): 5;
-                (state_io_altitude > 0 & state_io_airspeed < 150): state_io_airspeed + 15;
-                (state_io_airspeed > 150): state_io_airspeed;
-                TRUE: state_io_airspeed;
-            esac;
-
-      next(state_io_initiate-landing) :=
-            case
-                (state_io_throttle >=0.9 & state_io_altitude >= 9500) : yes;
-                TRUE: state_io_initiate-landing;
-            esac;
-
-      next(state_io_abort-landing) :=
-            case
-                 (counter_state_pilot_decision_to_abort < 1 & state_io_initiate-landing = yes & state_landing = phase-one) : yes;
-                 (state_landing = abort) : nil;
-                 TRUE: state_io_abort-landing;
-            esac;
-
-      init (counter_state_pilot_decision_to_abort) := 0;
-      next(counter_state_pilot_decision_to_abort) :=
-            case
-                (state_operator_name = abort-landing) : counter_state_pilot_decision_to_abort + 1;
-                TRUE : counter_state_pilot_decision_to_abort;
-            esac;
-
-      next(state_io_pilot-selected-landing-zone) :=
-          case
-                (state_landing = abort) : yes;
-                TRUE: state_io_pilot-selected-landing-zone;
-          esac;
-
-      next(state_io_distance-to-target) :=
-          case
-                (state_operator_name = landing-phase-three) : 0.5;
-                TRUE: state_io_distance-to-target;
-          esac;
 
 MODULE soarRules(state_superstate, state_name, state_operator_name, state_flight-mode, state_io_throttle, state_io_altitude, state_io_airspeed, state_sensor-unreliable, state_io_gps-lidar-error, state_io_gps-imu-error, state_io_lidar-imu-error, state_io_pilot_decision, state_faulty-sensor, state_io_initiate-landing, state_landing, state_io_distance-to-target, state_io_abort-landing, state_io_pilot-selected-landing-zone, state_notified-pilot, state_io_target-altitude, state_io_autoflaps, state_io_air-brake, state_io_VTOLMode, state_io_GPSUnreliable, state_io_LIDARUnreliable, state_io_IMUUnreliable, state_io_sensor-to-use, state_io_target-speed)
 

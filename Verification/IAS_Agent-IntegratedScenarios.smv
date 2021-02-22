@@ -16,7 +16,7 @@ VAR state_faulty-sensor : {gps,nil,lidar,imu,none};
 VAR state_io_initiate-landing : {yes,nil};
 VAR state_landing : {no,nil,phase-one,phase-two,phase-three,phase-four,abort,landed};
 VAR state_io_distance-to-target : real;
-VAR state_io_abort-landing : {yes,nil,no};
+VAR state_io_abort-landing : {yes,nil};
 VAR state_io_pilot-selected-landing-zone : {yes,nil};
 VAR state_notified-pilot : {no,nil};
 VAR state_io_target-altitude : integer;
@@ -194,7 +194,6 @@ VAR inputModuleRule : inputModule(state_io_altitude, state_io_initiate-landing, 
 -- LTLSPEC F(X state_operator_name = abort-landing -> state_io_air-brake > 0) -- proves
 -- LTLSPEC G(state_operator_name = abort-landing -> F state_io_air-brake > 0) -- proves in 86 steps
 
-
 -- INVARSPEC (state_operator_name = abort-landing -> state_io_VTOLMode = horizontal) -- does not prove
 -- LTLSPEC (state_operator_name = abort-landing -> X state_io_VTOLMode = horizontal) -- proves
 -- LTLSPEC G(state_operator_name = abort-landing -> F state_io_VTOLMode = horizontal) -- proves in 64 steps
@@ -205,7 +204,7 @@ VAR inputModuleRule : inputModule(state_io_altitude, state_io_initiate-landing, 
 
 -- LTLSPEC O(state_operator_name = abort-landing) -- once property, generates counter example because it remains at abort for more than one step of execution
 -- LTLSPEC (state_io_sensor-to-use != lidar U state_operator_name = pilot-agrees) -- untill property, proves
--- LTLSPEC (state_io_sensor-to-use = gps U state_operator_name = pilot-disagree)
+-- LTLSPEC (state_io_sensor-to-use = gps U state_operator_name = pilot-disagrees)
 -- LTLSPEC (state_io_sensor-to-use = lidar S state_operator_name = pilot-agrees) -- since property, generates counterexample
 
 -- ********************************X*********************************X**********************************************************
@@ -213,13 +212,15 @@ VAR inputModuleRule : inputModule(state_io_altitude, state_io_initiate-landing, 
 
 MODULE inputModule(state_io_altitude, state_io_initiate-landing, state_io_throttle, state_io_abort-landing, state_operator_name, state_landing, state_io_pilot-selected-landing-zone, state_io_pilot_decision, state_io_lidar-imu-error, state_io_gps-imu-error, state_io_gps-lidar-error, state_io_airspeed, state_io_distance-to-target)
 
+VAR counter_state_pilot_decision_to_abort : integer; -- counter to keep check on the number of aborts
+
 ASSIGN
 
         next(state_io_altitude) :=
               case
                   (state_io_initiate-landing = yes & state_io_altitude > 2500 & state_operator_name != abort-landing): state_io_altitude - 500;
                   --(state_io_throttle >= 0.9 & state_io_altitude > 2500 & state_operator_name != abort-landing): state_io_altitude - 500; -- we can also include airspeed here
-                  (state_io_throttle < 0.90 & state_io_altitude < 9500): state_io_altitude + 500; -- we can also include airspeed here
+                  (state_io_throttle < 0.90 & state_io_altitude < 9500): state_io_altitude + 300; -- we can also include airspeed here
                   (state_io_throttle >= 0.90 & state_io_altitude < 9500): state_io_altitude + 300;
                   TRUE: state_io_altitude;
               esac;
@@ -268,9 +269,16 @@ ASSIGN
 
         next(state_io_abort-landing) :=
               case
-                   (state_io_abort-landing = nil & state_io_initiate-landing = yes & state_landing = phase-one) : yes;
-                   (state_landing = abort) : no;
+                   (counter_state_pilot_decision_to_abort < 1 & state_io_initiate-landing = yes & state_landing = phase-one) : yes;
+                   (state_landing = abort) : nil;
                    TRUE: state_io_abort-landing;
+              esac;
+
+        init (counter_state_pilot_decision_to_abort) := 0;
+        next(counter_state_pilot_decision_to_abort) :=
+              case
+                  (state_operator_name = abort-landing) : counter_state_pilot_decision_to_abort + 1;
+                  TRUE : counter_state_pilot_decision_to_abort;
               esac;
 
         next(state_io_pilot-selected-landing-zone) :=
@@ -505,6 +513,7 @@ TRANS
         (state = run & state_operator_name=transition-after-abort): no;
             TRUE : state_landing;
             esac;
+
 
 TRANS
         next (state_notified-pilot) =

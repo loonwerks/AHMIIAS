@@ -16,7 +16,7 @@ VAR state_faulty-sensor : {gps,nil,lidar,imu,none};
 VAR state_io_initiate-landing : {yes,nil};
 VAR state_landing : {no,nil,phase-one,phase-two,phase-three,phase-four,abort,landed};
 VAR state_io_distance-to-target : real;
-VAR state_io_abort-landing : {yes,nil,no};
+VAR state_io_abort-landing : {yes,nil};
 VAR state_io_pilot-selected-landing-zone : {yes,nil};
 VAR state_notified-pilot : {no,nil};
 VAR state_io_target-altitude : integer;
@@ -85,7 +85,7 @@ VAR inputModuleRule : inputModule(state_io_altitude, state_io_initiate-landing, 
 
 -- Even when it is in transition mode it does not immediately go to horizontal mode
 -- INVARSPEC (state_operator_name = transition -> state_flight-mode = horizontal) -- generates a counterexample in 25 steps
--- LTLSPEC F(X state_operator_name = transition -> state_flight-mode = horizontal) -- generates a counterexample
+-- LTLSPEC F(X state_operator_name = transition -> state_flight-mode = horizontal) -- proves true
 
 -- LTLSPEC G(state_operator_name = transition -> F state_flight-mode = horizontal)
 
@@ -139,7 +139,7 @@ VAR inputModuleRule : inputModule(state_io_altitude, state_io_initiate-landing, 
 -- LTLSPEC G(state_operator_name = start-landing -> F state_landing = phase-one) -- proves true
 
 -- Landing Phase 2
--- LTLSPEC F (state_landing = phase-two) -- proves in 140 steps, indicating that it goes through phase two
+-- LTLSPEC F (state_landing = phase-two) -- proves in 82 steps, indicating that it goes through phase two
 -- LTLSPEC F (state_operator_name = landing-phase-two) -- proves in 76 steps
 -- INVARSPEC (state_operator_name = landing-phase-two -> state_landing = phase-two) -- does not prove, throws a counterexample in 46 steps
 -- LTLSPEC G(state_operator_name = landing-phase-two -> F state_landing = phase-two) -- proves true
@@ -237,124 +237,133 @@ VAR counter_detect_autoflaps : integer; -- detect change in autoflaps after abor
 VAR counter_detect_transition_after_abort : integer; -- detect VTOL mode transition during landing phase 3
 VAR counter_detect_target_altitude : integer; -- detect change in target altitude after abort
 VAR counter_detect_air_brake : integer; -- detect change in air brake after abort has been initiated
+VAR counter_state_pilot_decision_to_abort : integer; -- counter to keep check on the number of aborts
 
 ASSIGN
-        init (counter_detect_transition_to_lidar) := 0;
-        next (counter_detect_transition_to_lidar) :=
-            case
-                (state_operator_name = gps-sensor-error-over-limit | state_operator_name = pilot-agrees): counter_detect_transition_to_lidar + 1;
-                (state_io_sensor-to-use = lidar): counter_detect_transition_to_lidar;
-                TRUE: counter_detect_transition_to_lidar;
+      init (counter_detect_transition_to_lidar) := 0;
+      next (counter_detect_transition_to_lidar) :=
+          case
+              (state_operator_name = gps-sensor-error-over-limit | state_operator_name = pilot-agrees): counter_detect_transition_to_lidar + 1;
+              (state_io_sensor-to-use = lidar): counter_detect_transition_to_lidar;
+              TRUE: counter_detect_transition_to_lidar;
 
+          esac;
+
+      init (counter_detect_autoflaps) := 0;
+      next (counter_detect_autoflaps) :=
+          case
+              ((state_operator_name = abort-landing | state_operator_name = transition-after-abort) & state_io_autoflaps != on): counter_detect_autoflaps + 1;
+              ((state_operator_name = start-landing | state_operator_name = landing-phase-two) & counter_detect_autoflaps > 0 & state_io_autoflaps != on): counter_detect_autoflaps + 1;
+              (state_io_autoflaps = on): counter_detect_autoflaps;
+              TRUE: counter_detect_autoflaps;
+
+          esac;
+
+      init (counter_detect_transition_after_abort) := 0;
+      next (counter_detect_transition_after_abort) :=
+          case
+              (state_operator_name = abort-landing | state_operator_name = transition-after-abort): counter_detect_transition_after_abort + 1;
+              ((state_operator_name = start-landing | state_operator_name = landing-phase-two | state_operator_name = landing-phase-three) & counter_detect_transition_after_abort > 0 & state_io_VTOLMode != vertical): counter_detect_transition_after_abort + 1;
+              (state_io_VTOLMode = vertical): counter_detect_transition_after_abort;
+              TRUE: counter_detect_transition_after_abort;
+
+          esac;
+
+      init (counter_detect_target_altitude) := 0;
+      next (counter_detect_target_altitude) :=
+          case
+              ((state_operator_name = abort-landing | state_operator_name = transition-after-abort) & state_io_target-altitude != 5000): counter_detect_target_altitude + 1;
+              --(state_io_target-altitude = 5000): counter_detect_target_altitude;
+              TRUE: counter_detect_target_altitude;
+
+          esac;
+
+      init (counter_detect_air_brake) := 0;
+      next (counter_detect_air_brake) :=
+          case
+              ((state_operator_name = abort-landing | state_operator_name = transition-after-abort) & state_io_air-brake != 0): counter_detect_air_brake + 1;
+              TRUE: counter_detect_air_brake;
+
+          esac;
+
+      next(state_io_altitude) :=
+            case
+                (state_io_initiate-landing = yes & state_io_altitude > 2500 & state_operator_name != abort-landing): state_io_altitude - 500;
+                --(state_io_throttle >= 0.9 & state_io_altitude > 2500 & state_operator_name != abort-landing): state_io_altitude - 500; -- we can also include airspeed here
+                (state_io_throttle < 0.90 & state_io_altitude < 9500): state_io_altitude + 300; -- we can also include airspeed here
+                (state_io_throttle >= 0.90 & state_io_altitude < 9500): state_io_altitude + 300;
+                TRUE: state_io_altitude;
             esac;
 
-        init (counter_detect_autoflaps) := 0;
-        next (counter_detect_autoflaps) :=
+      next(state_io_airspeed) :=
             case
-                ((state_operator_name = abort-landing | state_operator_name = transition-after-abort) & state_io_autoflaps != on): counter_detect_autoflaps + 1;
-                ((state_operator_name = start-landing | state_operator_name = landing-phase-two) & counter_detect_autoflaps > 0 & state_io_autoflaps != on): counter_detect_autoflaps + 1;
-                (state_io_autoflaps = on): counter_detect_autoflaps;
-                TRUE: counter_detect_autoflaps;
-
+                (state_operator_name = landing-phase-four | state_operator_name = landing-finished): 5;
+                (state_io_altitude > 0 & state_io_airspeed < 150): state_io_airspeed + 15;
+                (state_io_airspeed > 150): state_io_airspeed;
+                TRUE: state_io_airspeed;
             esac;
 
-        init (counter_detect_transition_after_abort) := 0;
-        next (counter_detect_transition_after_abort) :=
-            case
-                (state_operator_name = abort-landing | state_operator_name = transition-after-abort): counter_detect_transition_after_abort + 1;
-                ((state_operator_name = start-landing | state_operator_name = landing-phase-two | state_operator_name = landing-phase-three) & counter_detect_transition_after_abort > 0 & state_io_VTOLMode != vertical): counter_detect_transition_after_abort + 1;
-                (state_io_VTOLMode = vertical): counter_detect_transition_after_abort;
-                TRUE: counter_detect_transition_after_abort;
+      next(state_io_gps-lidar-error) :=
+      case
+          (state_io_gps-lidar-error < 11) : state_io_gps-lidar-error + 2;
+          TRUE: state_io_gps-lidar-error;
+      esac;
 
+      next(state_io_gps-imu-error) :=
+            case
+                (state_io_gps-imu-error < 11) : state_io_gps-imu-error + 1;
+                (state_operator_name = gps-sensor-error-over-limit) : 0.0;
+                TRUE: state_io_gps-imu-error;
             esac;
 
-        init (counter_detect_target_altitude) := 0;
-        next (counter_detect_target_altitude) :=
+      next(state_io_lidar-imu-error) :=
             case
-                ((state_operator_name = abort-landing | state_operator_name = transition-after-abort) & state_io_target-altitude != 5000): counter_detect_target_altitude + 1;
-                --(state_io_target-altitude = 5000): counter_detect_target_altitude;
-                TRUE: counter_detect_target_altitude;
-
+                (state_io_lidar-imu-error = 0.0) : state_io_lidar-imu-error;
+                (state_operator_name = gps-sensor-error-over-limit) : 0.0;
+                TRUE : state_io_lidar-imu-error;
             esac;
 
-        init (counter_detect_air_brake) := 0;
-        next (counter_detect_air_brake) :=
+      next(state_io_pilot_decision) :=
             case
-                ((state_operator_name = abort-landing | state_operator_name = transition-after-abort) & state_io_air-brake != 0): counter_detect_air_brake + 1;
-                TRUE: counter_detect_air_brake;
-
+                (state_io_pilot_decision = nil & state_operator_name = gps-sensor-error-over-limit) : agree;
+                (state_io_pilot_decision = agree) : nil;
+                TRUE: state_io_pilot_decision;
             esac;
 
-        next(state_io_altitude) :=
-              case
-                  (state_io_initiate-landing = yes & state_io_altitude > 2500 & state_operator_name != abort-landing): state_io_altitude - 500;
-                  --(state_io_throttle >= 0.9 & state_io_altitude > 2500 & state_operator_name != abort-landing): state_io_altitude - 500; -- we can also include airspeed here
-                  (state_io_throttle < 0.90 & state_io_altitude < 9500): state_io_altitude + 500; -- we can also include airspeed here
-                  (state_io_throttle >= 0.90 & state_io_altitude < 9500): state_io_altitude + 300;
-                  TRUE: state_io_altitude;
-              esac;
-
-        next(state_io_airspeed) :=
-              case
-                  (state_operator_name = landing-phase-four | state_operator_name = landing-finished): 5;
-                  (state_io_altitude > 0 & state_io_airspeed < 150): state_io_airspeed + 15;
-                  (state_io_airspeed > 150): state_io_airspeed;
-                  TRUE: state_io_airspeed;
-              esac;
-
-        next(state_io_gps-lidar-error) :=
-        case
-            (state_io_gps-lidar-error < 11) : state_io_gps-lidar-error + 2;
-            TRUE: state_io_gps-lidar-error;
-        esac;
-
-        next(state_io_gps-imu-error) :=
-              case
-                  (state_io_gps-imu-error < 11) : state_io_gps-imu-error + 1;
-                  (state_operator_name = gps-sensor-error-over-limit) : 0.0;
-                  TRUE: state_io_gps-imu-error;
-              esac;
-
-        next(state_io_lidar-imu-error) :=
-              case
-                  (state_io_lidar-imu-error = 0.0) : state_io_lidar-imu-error;
-                  (state_operator_name = gps-sensor-error-over-limit) : 0.0;
-                  TRUE : state_io_lidar-imu-error;
-              esac;
-
-        next(state_io_pilot_decision) :=
-              case
-                  (state_io_pilot_decision = nil & state_operator_name = gps-sensor-error-over-limit) : agree;
-                  (state_io_pilot_decision = agree) : nil;
-                  TRUE: state_io_pilot_decision;
-              esac;
-
-        next(state_io_initiate-landing) :=
-              case
-                  (state_io_throttle >=0.9 & state_io_altitude >= 6000 & state_io_pilot_decision = agree) : yes;
-                  -- (state_io_abort-landing = yes) : nil;
-                  TRUE: state_io_initiate-landing;
-              esac;
-
-        next(state_io_abort-landing) :=
-              case
-                   (state_io_abort-landing = nil & state_io_initiate-landing = yes & state_landing = phase-one) : yes;
-                   (state_landing = abort) : no;
-                   TRUE: state_io_abort-landing;
-              esac;
-
-        next(state_io_pilot-selected-landing-zone) :=
+      next(state_io_initiate-landing) :=
             case
-                  (state_landing = abort) : yes;
-                  --(state_operator_name = transition-after-abort) : no;
-                  TRUE: state_io_pilot-selected-landing-zone;
+                (state_io_throttle >=0.9 & state_io_altitude >= 6000 & state_io_pilot_decision = agree) : yes;
+                -- (state_io_abort-landing = yes) : nil;
+                TRUE: state_io_initiate-landing;
             esac;
 
-        next(state_io_distance-to-target) :=
+      next(state_io_abort-landing) :=
             case
-                  (state_operator_name = landing-phase-three) : 0.5;
-                  TRUE: state_io_distance-to-target;
+                 (counter_state_pilot_decision_to_abort < 1 & state_io_initiate-landing = yes & state_landing = phase-one) : yes;
+                 (state_landing = abort) : nil;
+                 TRUE: state_io_abort-landing;
             esac;
+
+      init (counter_state_pilot_decision_to_abort) := 0;
+      next(counter_state_pilot_decision_to_abort) :=
+            case
+                (state_operator_name = abort-landing) : counter_state_pilot_decision_to_abort + 1;
+                TRUE : counter_state_pilot_decision_to_abort;
+            esac;
+
+      next(state_io_pilot-selected-landing-zone) :=
+          case
+                (state_landing = abort) : yes;
+                --(state_operator_name = transition-after-abort) : no;
+                TRUE: state_io_pilot-selected-landing-zone;
+          esac;
+
+      next(state_io_distance-to-target) :=
+          case
+                (state_operator_name = landing-phase-three) : 0.5;
+                TRUE: state_io_distance-to-target;
+          esac;
+
 
 MODULE soarRules(state_superstate, state_name, state_operator_name, state_flight-mode, state_io_throttle, state_io_altitude, state_io_airspeed, state_sensor-unreliable, state_io_gps-lidar-error, state_io_gps-imu-error, state_io_lidar-imu-error, state_io_pilot_decision, state_faulty-sensor, state_io_initiate-landing, state_landing, state_io_distance-to-target, state_io_abort-landing, state_io_pilot-selected-landing-zone, state_notified-pilot, state_io_target-altitude, state_io_autoflaps, state_io_air-brake, state_io_VTOLMode, state_io_GPSUnreliable, state_io_LIDARUnreliable, state_io_IMUUnreliable, state_io_sensor-to-use, state_io_target-speed)
 
@@ -575,6 +584,7 @@ TRANS
         (state = run & state_operator_name=transition-after-abort): no;
             TRUE : state_landing;
             esac;
+
 
 TRANS
         next (state_notified-pilot) =

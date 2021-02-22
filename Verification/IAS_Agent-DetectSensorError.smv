@@ -16,7 +16,7 @@ VAR state_faulty-sensor : {gps,nil,lidar,imu,none};
 VAR state_io_initiate-landing : {yes,nil};
 VAR state_landing : {no,nil,phase-one,phase-two,phase-three,phase-four,abort,landed};
 VAR state_io_distance-to-target : real;
-VAR state_io_abort-landing : {yes,nil,no};
+VAR state_io_abort-landing : {yes,nil};
 VAR state_io_pilot-selected-landing-zone : {yes,nil};
 VAR state_notified-pilot : {no,nil};
 VAR state_io_target-altitude : integer;
@@ -136,7 +136,7 @@ ASSIGN
               case
                   (state_io_initiate-landing = yes & state_io_altitude > 2500 & state_operator_name != abort-landing): state_io_altitude - 500;
                   --(state_io_throttle >= 0.9 & state_io_altitude > 2500 & state_operator_name != abort-landing): state_io_altitude - 500; -- we can also include airspeed here
-                  (state_io_throttle < 0.90 & state_io_altitude < 9500): state_io_altitude + 500; -- we can also include airspeed here
+                  (state_io_throttle < 0.90 & state_io_altitude < 9500): state_io_altitude + 300; -- we can also include airspeed here
                   (state_io_throttle >= 0.90 & state_io_altitude < 9500): state_io_altitude + 300;
                   TRUE: state_io_altitude;
               esac;
@@ -199,7 +199,6 @@ ASSIGN
                   (state_io_distance-to-target = 0.0) : state_io_distance-to-target;
                   TRUE: state_io_distance-to-target;
             esac;
-
 
 MODULE soarRules(state_superstate, state_name, state_operator_name, state_flight-mode, state_io_throttle, state_io_altitude, state_io_airspeed, state_sensor-unreliable, state_io_gps-lidar-error, state_io_gps-imu-error, state_io_lidar-imu-error, state_io_pilot_decision, state_faulty-sensor, state_io_initiate-landing, state_landing, state_io_distance-to-target, state_io_abort-landing, state_io_pilot-selected-landing-zone, state_notified-pilot, state_io_target-altitude, state_io_autoflaps, state_io_air-brake, state_io_VTOLMode, state_io_GPSUnreliable, state_io_LIDARUnreliable, state_io_IMUUnreliable, state_io_sensor-to-use, state_io_target-speed)
 
@@ -420,6 +419,7 @@ TRANS
         (state = run & state_operator_name=transition-after-abort): no;
             TRUE : state_landing;
             esac;
+
 
 TRANS
         next (state_notified-pilot) =

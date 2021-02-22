@@ -16,7 +16,7 @@ VAR state_faulty-sensor : {gps,nil,lidar,imu,none};
 VAR state_io_initiate-landing : {yes,nil};
 VAR state_landing : {no,nil,phase-one,phase-two,phase-three,phase-four,abort,landed};
 VAR state_io_distance-to-target : real;
-VAR state_io_abort-landing : {yes,nil,no};
+VAR state_io_abort-landing : {yes,nil};
 VAR state_io_pilot-selected-landing-zone : {yes,nil};
 VAR state_notified-pilot : {no,nil};
 VAR state_io_target-altitude : integer;
@@ -79,24 +79,24 @@ VAR inputModuleRule : inputModule(state_io_altitude, state_io_initiate-landing, 
 -- LTLSPEC F (state_io_initiate-landing = no) -- does not prove, generates a counterexample in 61 steps
 
 -- Landing Phase 1
--- LTLSPEC F (state_landing = phase-one) -- proves in 55 steps, indicating landing is initiated by the pilot
--- LTLSPEC F (state_operator_name = start-landing) -- proves in 51 steps
+-- LTLSPEC F (state_landing = phase-one) -- proves in 51 steps, indicating landing is initiated by the pilot
+-- LTLSPEC F (state_operator_name = start-landing) -- proves in 50 steps
 -- INVARSPEC (state_operator_name = start-landing -> state_landing = phase-one) -- does not prove, throws a counterexample in 29 steps
 -- INVARSPEC (state_io_initiate-landing = yes -> state_operator_name = start-landing) -- does not prove, throws a counterexample in 24 steps
--- LTLSPEC G(state_operator_name = start-landing -> F state_landing = phase-one) -- proves true in 20 steps
+-- LTLSPEC G(state_operator_name = start-landing -> F state_landing = phase-one) -- proves true in 17 steps
 
 -- Landing Phase 2
 -- LTLSPEC F (state_landing = phase-two) -- proves in 89 steps, indicating that it goes through phase two
--- LTLSPEC F (state_operator_name = landing-phase-two) -- proves in 78 steps
+-- LTLSPEC F (state_operator_name = landing-phase-two) -- proves in 77 steps
 -- INVARSPEC (state_operator_name = landing-phase-two -> state_landing = phase-two) -- does not prove, throws a counterexample in 46 steps
--- LTLSPEC G(state_operator_name = landing-phase-two -> F state_landing = phase-two) -- proves true in 12 steps
+-- LTLSPEC G(state_operator_name = landing-phase-two -> F state_landing = phase-two) -- proves true in 9 steps
 
 -- Landing Phase 3
--- LTLSPEC F (state_landing = phase-three) -- proves in 83 steps
--- LTLSPEC F (state_operator_name = landing-phase-three) -- proves in 72 steps
+-- LTLSPEC F (state_landing = phase-three) -- proves in 91 steps
+-- LTLSPEC F (state_operator_name = landing-phase-three) -- proves in 100 steps
 
 -- Landing Phase 4
--- LTLSPEC F (state_landing = phase-four) -- proves in 90 steps
+-- LTLSPEC F (state_landing = phase-four) -- proves in 92 steps
 -- LTLSPEC F (state_operator_name = landing-phase-four) -- proves in 110 steps
 -- LTLSPEC F (state_landing = landed) -- proves in 109 steps
 
@@ -167,6 +167,7 @@ VAR inputModuleRule : inputModule(state_io_altitude, state_io_initiate-landing, 
 
 MODULE inputModule(state_io_altitude, state_io_initiate-landing, state_io_throttle, state_io_abort-landing, state_operator_name, state_landing, state_io_pilot-selected-landing-zone, state_io_pilot_decision, state_io_lidar-imu-error, state_io_gps-imu-error, state_io_gps-lidar-error, state_io_airspeed, state_io_distance-to-target, state_io_autoflaps, state_io_VTOLMode, state_io_target-altitude, state_io_air-brake)
 
+VAR counter_state_pilot_decision_to_abort : integer; -- counter to keep check on the number of aborts
 VAR counter_detect_autoflaps : integer; -- detect change in autoflaps after abort landing has been initiated
 VAR counter_detect_transition_after_abort : integer; -- detect VTOL mode transition during landing phase 3
 VAR counter_detect_target_altitude : integer; -- detect change in target altitude after abort
@@ -239,7 +240,7 @@ ASSIGN
             case
                 (state_io_initiate-landing = yes & state_io_altitude > 2500 & state_operator_name != abort-landing): state_io_altitude - 500;
                 --(state_io_throttle >= 0.9 & state_io_altitude > 2500 & state_operator_name != abort-landing): state_io_altitude - 500; -- we can also include airspeed here
-                (state_io_throttle < 0.90 & state_io_altitude < 9500): state_io_altitude + 500; -- we can also include airspeed here
+                (state_io_throttle < 0.90 & state_io_altitude < 9500): state_io_altitude + 300; -- we can also include airspeed here
                 (state_io_throttle >= 0.90 & state_io_altitude < 9500): state_io_altitude + 300;
                 TRUE: state_io_altitude;
             esac;
@@ -255,15 +256,21 @@ ASSIGN
       next(state_io_initiate-landing) :=
             case
                 (state_io_throttle >=0.9 & state_io_altitude >= 9500) : yes;
-                -- (state_io_abort-landing = yes) : nil;
                 TRUE: state_io_initiate-landing;
             esac;
 
       next(state_io_abort-landing) :=
             case
-                 (state_io_abort-landing = nil & state_io_initiate-landing = yes & state_landing = phase-one) : yes;
-                 (state_landing = abort) : no;
+                 (counter_state_pilot_decision_to_abort < 1 & state_io_initiate-landing = yes & state_landing = phase-one) : yes;
+                 (state_landing = abort) : nil;
                  TRUE: state_io_abort-landing;
+            esac;
+
+      init (counter_state_pilot_decision_to_abort) := 0;
+      next(counter_state_pilot_decision_to_abort) :=
+            case
+                (state_operator_name = abort-landing) : counter_state_pilot_decision_to_abort + 1;
+                TRUE : counter_state_pilot_decision_to_abort;
             esac;
 
       next(state_io_pilot-selected-landing-zone) :=
@@ -278,7 +285,6 @@ ASSIGN
                 (state_operator_name = landing-phase-three) : 0.5;
                 TRUE: state_io_distance-to-target;
           esac;
-
 
 MODULE soarRules(state_superstate, state_name, state_operator_name, state_flight-mode, state_io_throttle, state_io_altitude, state_io_airspeed, state_sensor-unreliable, state_io_gps-lidar-error, state_io_gps-imu-error, state_io_lidar-imu-error, state_io_pilot_decision, state_faulty-sensor, state_io_initiate-landing, state_landing, state_io_distance-to-target, state_io_abort-landing, state_io_pilot-selected-landing-zone, state_notified-pilot, state_io_target-altitude, state_io_autoflaps, state_io_air-brake, state_io_VTOLMode, state_io_GPSUnreliable, state_io_LIDARUnreliable, state_io_IMUUnreliable, state_io_sensor-to-use, state_io_target-speed)
 
@@ -499,6 +505,7 @@ TRANS
         (state = run & state_operator_name=transition-after-abort): no;
             TRUE : state_landing;
             esac;
+
 
 TRANS
         next (state_notified-pilot) =

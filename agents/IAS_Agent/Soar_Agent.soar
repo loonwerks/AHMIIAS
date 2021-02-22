@@ -432,7 +432,6 @@ sp {apply*abort-landing
     (<s> ^flight-mode <fm> -)
     (<s> ^flight-mode vertical)
     (<fd> ^abort-landing <ab> -)
-    (<fd> ^abort-landing no)
     (write (crlf) |Aborting Landing|)
 }
 
