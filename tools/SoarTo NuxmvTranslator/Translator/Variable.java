@@ -6,7 +6,7 @@ public class Variable {
 	String name;
 	ArrayList<String> values;
 	String type = "default";
-	
+
 	public Variable(String name,String val) {
 		this.name = name;
 		values = new ArrayList<String>();
@@ -31,7 +31,7 @@ public class Variable {
 		if(val.contains("(")) {
 			val = val.replaceFirst("\\(","");
 		}
-		
+
 		val = val.trim();
 		String temp = val.replaceAll(">", "");
 		temp = temp.replaceAll("<", "");
@@ -41,9 +41,9 @@ public class Variable {
 			values.add(val);
 		}
 		
-		
-		
-		
+
+
+
 		try {
 			Integer.parseInt(temp);
 			this.type = "int";
@@ -52,7 +52,7 @@ public class Variable {
 				Double.parseDouble(temp);
 				this.type = "float";
 			}catch(Exception e1) {
-				
+
 			}
 		}
 	}

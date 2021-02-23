@@ -13,19 +13,19 @@ public class Rule {
 	public String transCondition = "";
 	public boolean priority = false;
 	public Rule(String rule) {
-		
+
 		this.name = rule.substring(0,rule.indexOf("("));
 		rule = rule.substring(rule.indexOf("("));
 		lhs = rule.split("-->")[0];
 		rhs = rule.split("-->")[1];
-		
+
 		matches = new HashMap<String,String>();
 		variables = new ArrayList<Variable>();
 		variablesRHS = new ArrayList<Variable>();
 	}
 	public void generateTransCondition() {
 		int count = 0;
-		for(int i=0;i<variables.size();i++) {	
+		for(int i=0;i<variables.size();i++) {
 			for(int j=0;j<variables.get(i).values.size();j++) {
 				if(count>0) {
 					transCondition += " & ";
@@ -36,9 +36,9 @@ public class Rule {
 				}else {
 					transCondition += variables.get(i).name + "=" +variables.get(i).values.get(j);
 				}
-			}		
+			}
 		}
-		
+
 	}
 	public void generateFullName() {
 		fullName = name +"(";
@@ -56,9 +56,9 @@ public class Rule {
 			value = value.replaceAll(word, "");
 			value = this.matches.get(word) + value;
 		}
-		
+
 		return value;
-		
+
 	}
-	
+
 }

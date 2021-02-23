@@ -11,32 +11,32 @@ public class SoarToNuxmvTranslator {
 	public static boolean usePriority = false;
 	public static void main(String[] args) {
 		new SoarToNuxmvTranslator(args);
-		
+
 	}
 	public SoarToNuxmvTranslator(String[] args) {
 		try {
 				Scanner sc;
 				File outputFile;
-				
+
 				if(args.length < 1) {
 				JFileChooser fileSelector = new JFileChooser();
-	
-		        
+
+
 		        if(fileSelector.showOpenDialog(null) != JFileChooser.APPROVE_OPTION) {
-		        
+
 		        	System.exit(0);
 		        }
 				sc = new Scanner(fileSelector.getSelectedFile());
 				outputFile = new File(fileSelector.getSelectedFile().getParentFile().getAbsolutePath()+"/output.smv");
-			
+
 				}else if(args.length < 2) {
 					sc = new Scanner(new File(args[0]));
 					outputFile = new File("output.smv");
 				}else {
 					sc = new Scanner(new File(args[0]));
 					outputFile = new File(args[1]);
-					
-					
+
+
 				}
 			String input = "";
 			String inputLine = "";
@@ -53,7 +53,7 @@ public class SoarToNuxmvTranslator {
 				input += inputLine;
 			}
 			/*Format input by:
-			 * converting all input-links/output-links to io 
+			 * converting all input-links/output-links to io
 			 * removing new lines
 			 * removing tabs
 			 * removing spaces after and before brackets
@@ -71,9 +71,9 @@ public class SoarToNuxmvTranslator {
 				input = input.replaceAll("  ", " ");
 			}
 			//System.out.println(input);
-			
+
 			Parser SoarParser = new Parser(input, usePriority, outputFile);
-		
+
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
