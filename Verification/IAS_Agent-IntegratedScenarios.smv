@@ -35,7 +35,7 @@ ASSIGN
     init (state_operator_name) := nil;
     init (state_flight-mode) := nil;
     init (state_io_throttle) := 0.0;
-    init (state_io_altitude) := 0;
+    init (state_io_altitude) := 2300;
     init (state_io_airspeed) := 0;
     init (state_sensor-unreliable) := nil;
     init (state_io_gps-lidar-error) := 0.0;
@@ -74,39 +74,39 @@ VAR inputModuleRule : inputModule(state_io_altitude, state_io_initiate-landing, 
 -- -- Detect Transition while takeoff
 -- LTLSPEC F (state_operator_name = takeoff) -- proves in 6 steps
 -- LTLSPEC F (state_operator_name = transition); -- proves in 26 steps
--- LTLSPEC F (state_io_throttle >= 0.9 & state_io_throttle < 1.0) -- proves in 24 steps
+-- LTLSPEC F (state_io_throttle >= 0.9 & state_io_throttle < 1.0) -- proves in 33 steps
 -- LTLSPEC F (state_flight-mode = horizontal); -- proves in 46 steps
 -- LTLSPEC F (state_io_throttle > 1.0) -- does not prove, generates a counterexample in 67 steps
 
 -- -- Safety Property
--- INVARSPEC (state_io_throttle > 1.2 -> state_flight-mode = horizontal) -- proves true in 61 steps
--- LTLSPEC F(X state_io_throttle < 1.00 -> state_flight-mode = horizontal) -- proves in 26 steps
+-- INVARSPEC (state_io_throttle > 1.2 -> state_flight-mode = horizontal) -- proves true in 55 steps
+-- LTLSPEC F(X state_io_throttle < 1.00 -> state_flight-mode = horizontal) -- proves in 34 steps
 -- LTLSPEC F(X state_io_throttle < 1.00 -> state_flight-mode = vertical) -- proves in 4 steps
 
 -- Even when it is in transition mode it does not immediately go to horizontal mode
 -- INVARSPEC (state_operator_name = transition -> state_flight-mode = horizontal) -- generates a counterexample in 25 steps
 -- LTLSPEC F(X state_operator_name = transition -> state_flight-mode = horizontal) -- proves
--- LTLSPEC G(state_operator_name = transition -> F state_flight-mode = horizontal) -- proves true in 7 steps
+-- LTLSPEC G(state_operator_name = transition -> F state_flight-mode = horizontal) -- proves true in 11 steps
 
 -- When it is in horizontal mode, the plane is in flight
 -- INVARSPEC (state_flight-mode = horizontal -> state_operator_name = transition) -- does not prove, generates a counterexample in 29 steps, stating the value of changes to gps-sensor-error-over-limit
 
 -- During takeoff it always remains vertical
--- INVARSPEC (state_operator_name = takeoff -> state_flight-mode = vertical) -- proves in 46 steps, indicating the plane remains vertical during takeoff
+-- INVARSPEC (state_operator_name = takeoff -> state_flight-mode = vertical) -- proves in 40 steps, indicating the plane remains vertical during takeoff
 
 
 -- -- Detect sensor error
 -- INVARSPEC (state_operator_name = gps-sensor-error-over-limit -> state_sensor-unreliable = yes) -- generates counterexample in 29 steps
 -- LTLSPEC F (X state_operator_name = gps-sensor-error-over-limit -> state_sensor-unreliable = yes) -- proves in 4 steps
--- LTLSPEC G(state_operator_name = gps-sensor-error-over-limit -> F state_sensor-unreliable = yes) -- proves in 7 steps
+-- LTLSPEC G(state_operator_name = gps-sensor-error-over-limit -> F state_sensor-unreliable = yes) -- proves in 12 steps
 
 -- -- Detect whether the pilot agrees or not with the sensor warning
--- LTLSPEC F (state_operator_name = pilot-agrees) -- proves in 60 steps
--- LTLSPEC F (state_io_pilot_decision = agree) -- proves in 56 steps
+-- LTLSPEC F (state_operator_name = pilot-agrees) -- proves in 55 steps
+-- LTLSPEC F (state_io_pilot_decision = agree) -- proves in 54 steps
 -- LTLSPEC F (state_io_pilot_decision = disagree) -- does not prove, generates a counterexample in 67 steps
--- LTLSPEC F (state_io_GPSUnreliable = yes) -- proves in 54 steps
--- LTLSPEC F (state_io_LIDARUnreliable = yes) -- does not prove, generates a counterexample
--- LTLSPEC F (state_io_sensor-to-use = gps) -- does not prove, generates a counterexample
+-- LTLSPEC F (state_io_GPSUnreliable = yes) -- proves in 57 steps
+-- LTLSPEC F (state_io_LIDARUnreliable = yes) -- does not prove, generates a counterexample in 67 steps
+-- LTLSPEC F (state_io_sensor-to-use = gps) -- does not prove, generates a counterexample in 67 steps
 -- LTLSPEC F (state_io_IMUUnreliable = yes) -- does not prove, generates counterexample
 
 
@@ -124,7 +124,7 @@ VAR inputModuleRule : inputModule(state_io_altitude, state_io_initiate-landing, 
 -- Detect landing
 
 -- Detect In-flight
--- LTLSPEC F (state_io_altitude > 10000) -- does not prove, generates a counterexample in 67 steps
+-- LTLSPEC F (state_io_altitude > 6000) -- does not prove, generates a counterexample in 67 steps
 -- LTLSPEC F (state_io_altitude < 2000) -- proves in 2 steps
 -- LTLSPEC F (state_io_initiate-landing = no) -- does not prove, generates a counterexample in 61 steps
 
@@ -218,10 +218,11 @@ ASSIGN
 
         next(state_io_altitude) :=
               case
-                  (state_io_initiate-landing = yes & state_io_altitude > 2500 & state_operator_name != abort-landing): state_io_altitude - 500;
-                  --(state_io_throttle >= 0.9 & state_io_altitude > 2500 & state_operator_name != abort-landing): state_io_altitude - 500; -- we can also include airspeed here
-                  (state_io_throttle < 0.90 & state_io_altitude < 9500): state_io_altitude + 300; -- we can also include airspeed here
-                  (state_io_throttle >= 0.90 & state_io_altitude < 9500): state_io_altitude + 300;
+                  (state_io_altitude = 0) : 2300;
+                  (state_landing = landed) : state_io_altitude;
+                  (state_io_initiate-landing = yes & state_io_altitude > 2500 & state_operator_name != abort-landing): state_io_altitude - 150;
+                  (state_io_throttle > 0.0 & state_io_throttle < 0.90 & state_io_altitude < 3800): state_io_altitude + 100; -- we can also include airspeed here
+                  (state_io_throttle >= 0.90 & state_io_altitude < 6000): state_io_altitude + 150;
                   TRUE: state_io_altitude;
               esac;
 
@@ -262,8 +263,7 @@ ASSIGN
 
         next(state_io_initiate-landing) :=
               case
-                  (state_io_throttle >=0.9 & state_io_altitude >= 6000 & state_io_pilot_decision = agree) : yes;
-                  -- (state_io_abort-landing = yes) : nil;
+                  (state_io_throttle >=0.9 & state_io_altitude >= 5000 & state_io_pilot_decision = agree) : yes;
                   TRUE: state_io_initiate-landing;
               esac;
 

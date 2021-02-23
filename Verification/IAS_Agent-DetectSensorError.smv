@@ -77,7 +77,7 @@ VAR inputModuleRule : inputModule(state_io_altitude, state_io_throttle, state_op
 -- LTLSPEC F (state_io_throttle >= 0.9 & state_io_throttle < 1.0) -- proves in 24 steps
 -- LTLSPEC F (state_flight-mode = horizontal); -- proves in 40 steps
 -- LTLSPEC F (state_io_throttle > 1.0) -- does not prove, generates a counterexample in 42 steps
--- LTLSPEC F (state_io_altitude > 10000) -- does not prove, generates a counterexample in 42 steps
+LTLSPEC F (state_io_altitude > 6500) -- does not prove, generates a counterexample in 42 steps
 
 -- -- Safety Property
 -- INVARSPEC (state_io_throttle > 1.2 -> state_flight-mode = horizontal) -- proves true in 55 steps
@@ -134,10 +134,11 @@ ASSIGN
 
         next(state_io_altitude) :=
               case
-                  (state_io_initiate-landing = yes & state_io_altitude > 2500 & state_operator_name != abort-landing): state_io_altitude - 500;
-                  --(state_io_throttle >= 0.9 & state_io_altitude > 2500 & state_operator_name != abort-landing): state_io_altitude - 500; -- we can also include airspeed here
-                  (state_io_throttle < 0.90 & state_io_altitude < 9500): state_io_altitude + 300; -- we can also include airspeed here
-                  (state_io_throttle >= 0.90 & state_io_altitude < 9500): state_io_altitude + 300;
+                  (state_io_altitude = 0) : 2300;
+                  (state_landing = landed) : state_io_altitude;
+                  (state_io_initiate-landing = yes & state_io_altitude > 2500 & state_operator_name != abort-landing): state_io_altitude - 150;
+                  (state_io_throttle > 0.0 & state_io_throttle < 0.90 & state_io_altitude < 3800): state_io_altitude + 100; -- we can also include airspeed here
+                  (state_io_throttle >= 0.90 & state_io_altitude < 6000): state_io_altitude + 150;
                   TRUE: state_io_altitude;
               esac;
 

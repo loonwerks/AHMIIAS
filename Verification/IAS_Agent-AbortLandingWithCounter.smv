@@ -236,14 +236,16 @@ ASSIGN
                 TRUE : state_io_lidar-imu-error;
             esac;
 
-      next(state_io_altitude) :=
-            case
-                (state_io_initiate-landing = yes & state_io_altitude > 2500 & state_operator_name != abort-landing): state_io_altitude - 500;
-                --(state_io_throttle >= 0.9 & state_io_altitude > 2500 & state_operator_name != abort-landing): state_io_altitude - 500; -- we can also include airspeed here
-                (state_io_throttle < 0.90 & state_io_altitude < 9500): state_io_altitude + 300; -- we can also include airspeed here
-                (state_io_throttle >= 0.90 & state_io_altitude < 9500): state_io_altitude + 300;
-                TRUE: state_io_altitude;
-            esac;
+        next(state_io_altitude) :=
+              case
+                  (state_io_altitude = 0) : 2300;
+                  (state_landing = landed) : state_io_altitude;
+                  (state_io_initiate-landing = yes & state_io_altitude > 2500 & state_operator_name != abort-landing): state_io_altitude - 150;
+                  (state_io_throttle > 0.0 & state_io_throttle < 0.90 & state_io_altitude < 3800): state_io_altitude + 100; -- we can also include airspeed here
+                  (state_io_throttle >= 0.90 & state_io_altitude < 6000): state_io_altitude + 150;
+                  TRUE: state_io_altitude;
+              esac;
+
 
       next(state_io_airspeed) :=
             case
@@ -255,7 +257,7 @@ ASSIGN
 
       next(state_io_initiate-landing) :=
             case
-                (state_io_throttle >=0.9 & state_io_altitude >= 9500) : yes;
+                (state_io_throttle >=0.9 & state_io_altitude >= 6000) : yes;
                 TRUE: state_io_initiate-landing;
             esac;
 
