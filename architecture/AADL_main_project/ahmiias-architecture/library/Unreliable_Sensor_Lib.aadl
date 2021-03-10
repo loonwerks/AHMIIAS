@@ -1,0 +1,153 @@
+package Unreliable_Sensor_Lib
+public
+	with Types_Constants;
+	renames Types_Constants::all;
+	
+	annex agree{**
+			-------------------------------------
+			-- Absolute value
+			-------------------------------------
+			
+			node abs(val: real) returns (out: real);
+			let
+				out = if val >= 0.0 then val else val*-1.0;
+			tel;
+
+			-------------------------------------
+			-- Checks whether two values are within some threshold of each other
+			-------------------------------------
+			
+			node vals_within_threshold_of_each_other(val1: real, val2: real, threshold: real) returns (out: bool);
+			let
+				out = (abs(val1-val2) < threshold); 
+			tel;
+			
+			-------------------------------------
+			-- Checks whether x and y values are within a horizontal threshold of each other and z values are within a vertical threshold of each other
+			-------------------------------------
+			
+			node all_xyz_vals_within_threshold_of_each_other(pos1: Position.impl, pos2: Position.impl, Horizontal_Threshold : real, Vertical_Threshold : real) returns (out: bool);
+			let
+				out = (		vals_within_threshold_of_each_other(pos1.X, pos2.X, Horizontal_Threshold)
+						and vals_within_threshold_of_each_other(pos1.Y, pos2.Y, Horizontal_Threshold)
+						and vals_within_threshold_of_each_other(pos1.Z, pos2.Z, Vertical_Threshold));
+			tel;
+			
+			-------------------------------------
+			-- Returns true/false for each sensor depending on whether or not its value is close to at least one of the other sensor values
+			-------------------------------------
+			
+			node Sensor_Status(Sensor1_Data : Sensor_Data.impl, Sensor2_Data : Sensor_Data.impl, Sensor3_Data : Sensor_Data.impl, Horizontal_Threshold : real, Vertical_Threshold : real) returns (Sensor1_Reliable: bool, Sensor2_Reliable: bool, Sensor3_Reliable: bool);
+			var 
+				Sensor_1_2_Agreement : bool;
+				Sensor_1_3_Agreement : bool;
+				Sensor_2_3_Agreement : bool;
+			let
+				Sensor_1_2_Agreement = all_xyz_vals_within_threshold_of_each_other(Sensor1_Data.Position, Sensor2_Data.Position, Horizontal_Threshold, Vertical_Threshold);
+				Sensor_1_3_Agreement = all_xyz_vals_within_threshold_of_each_other(Sensor1_Data.Position, Sensor3_Data.Position, Horizontal_Threshold, Vertical_Threshold);
+				Sensor_2_3_Agreement = all_xyz_vals_within_threshold_of_each_other(Sensor2_Data.Position, Sensor3_Data.Position, Horizontal_Threshold, Vertical_Threshold);
+				
+				--A sensor is considered reliable if all XYZ values are within the threhold of one of the other position sensors.
+	  			Sensor1_Reliable = Sensor_1_2_Agreement or Sensor_1_3_Agreement;
+	  			Sensor2_Reliable = Sensor_1_2_Agreement or Sensor_2_3_Agreement;
+	  			Sensor3_Reliable = Sensor_1_3_Agreement or Sensor_2_3_Agreement;
+			tel; 
+						
+			-------------------------------------
+			-- AGL thresholds for phases of flight
+			-------------------------------------	
+										
+			const TAKEOFF_LANDING_MIN_AGL : real = 		0.0;
+			--Takeoff/Landing AGL Range
+			const TAKEOFF_LANDING_MAX_AGL : real = 		50.0;
+			--Approach/Departure Low Altitude AGL Range
+			const A_D_LOW_ALTITUDE_MAX_AGL : real = 	250.0;
+			--Approach/Departure High Altitude AGL Range
+			const A_D_HIGH_ALTITUDE_MAX_AGL : real = 	1000.0;
+			--En route AGL Range
+			const EN_ROUTE_MAX_AGL : real = 			3000.0;  
+			
+			-------------------------------------
+			-- Horizontal Alert Levels (HALS) at thresholds for phases of flight
+			-------------------------------------
+			
+			const TAKEOFF_LANDING_MIN_HAL : real = 		3.0;
+			--Takeoff/Landing HAL Range
+			const TAKEOFF_LANDING_MAX_HAL : real = 		5.0;
+			--Approach/Departure Low Altitude HAL Range
+			const A_D_LOW_ALTITUDE_MAX_HAL : real = 	40.0;
+			--Approach/Departure High Altitude HAL Range
+			const A_D_HIGH_ALTITUDE_MAX_HAL : real = 	80.0;
+			--En route HAL Range
+			const EN_ROUTE_MAX_HAL : real = 			150.0;  
+			
+			-------------------------------------
+			-- Compute Horizontal Alert Level given AGL by scaling linearly (y = mx + b) between the HAL and AGL thresholds for phases of flight		
+			
+			--Notes:
+			--1) When ranges are shown (such as 1-5) for HAL and time to alert, this indicates a limit scaled linearly across the AGL range for that phase with the tightest requirement specified for the minimum AGL and the loosest for the maximum AGL for that phase 
+			--2) AGL ranges are notional and may depend on the height and proximity of obstacles in the takeoff and landing area			
+			
+			-------------------------------------		
+			 
+			node HAL (z : real) returns (HAL : real);
+			let
+						--Takeoff/Landing
+				HAL = 	if 		z < TAKEOFF_LANDING_MAX_AGL 	then 
+							(TAKEOFF_LANDING_MAX_HAL 	- TAKEOFF_LANDING_MIN_HAL)	/(TAKEOFF_LANDING_MAX_AGL 	- TAKEOFF_LANDING_MIN_AGL)	*z + TAKEOFF_LANDING_MIN_HAL
+						---Approach/Departure Low Altitude
+						else if z < A_D_LOW_ALTITUDE_MAX_AGL 	then 
+							(A_D_LOW_ALTITUDE_MAX_HAL 	- TAKEOFF_LANDING_MAX_HAL)	/(A_D_LOW_ALTITUDE_MAX_AGL 	- TAKEOFF_LANDING_MAX_AGL)	*z + TAKEOFF_LANDING_MAX_HAL
+						--Approach/Departure High Altitude
+						else if z < A_D_HIGH_ALTITUDE_MAX_AGL 	then 
+							(A_D_HIGH_ALTITUDE_MAX_HAL 	- A_D_LOW_ALTITUDE_MAX_HAL)	/(A_D_HIGH_ALTITUDE_MAX_AGL - A_D_LOW_ALTITUDE_MAX_AGL)	*z + A_D_LOW_ALTITUDE_MAX_HAL
+						--En route 
+						else if z < EN_ROUTE_MAX_AGL 			then 
+							(EN_ROUTE_MAX_HAL 			- A_D_HIGH_ALTITUDE_MAX_HAL)/(EN_ROUTE_MAX_AGL 			- A_D_HIGH_ALTITUDE_MAX_AGL)*z + A_D_HIGH_ALTITUDE_MAX_HAL
+						else
+							EN_ROUTE_MAX_HAL;
+				
+			tel;			
+			
+			-------------------------------------
+			-- Vertical Alert Levels (VALS) at thresholds for phases of flight
+			-------------------------------------
+			
+			const TAKEOFF_LANDING_MIN_VAL : real = 		1.0;
+			--Takeoff/Landing HAL Range
+			const TAKEOFF_LANDING_MAX_VAL : real = 		3.0;
+			--Approach/Departure Low Altitude HAL Range
+			const A_D_LOW_ALTITUDE_MAX_VAL : real = 	35.0;
+			--Approach/Departure High Altitude HAL Range
+			const A_D_HIGH_ALTITUDE_MAX_VAL : real = 	50.0;
+			--En route HAL Range
+			const EN_ROUTE_MAX_VAL : real = 			150.0;  			
+			
+			-------------------------------------			
+			-- Compute Vertical Alert Level (VAL) given AGL by scaling linearly (y = mx + b) between the VAL and AGL thresholds for phases of flight
+
+			--Notes:
+			--1) When ranges are shown (such as 1-3) for VAL and time to alert, this indicates a limit scaled linearly across the AGL range for that phase with the tightest requirement specified for the minimum AGL and the loosest for the maximum AGL for that phase 
+			--2) AGL ranges are notional and may depend on the height and proximity of obstacles in the takeoff and landing area			
+			-------------------------------------
+						
+
+			node VAL (z : real) returns (VAL : real);
+			let
+						--Takeoff/Landing
+				VAL = 	 if 	z < TAKEOFF_LANDING_MAX_AGL 	then 
+							(TAKEOFF_LANDING_MAX_VAL 	- TAKEOFF_LANDING_MIN_VAL)	/(TAKEOFF_LANDING_MAX_AGL 	- TAKEOFF_LANDING_MIN_AGL)	*z + TAKEOFF_LANDING_MIN_VAL
+						---Approach/Departure Low Altitude
+						else if z < A_D_LOW_ALTITUDE_MAX_AGL 	then 
+							(A_D_LOW_ALTITUDE_MAX_VAL 	- TAKEOFF_LANDING_MAX_VAL)	/(A_D_LOW_ALTITUDE_MAX_AGL 	- TAKEOFF_LANDING_MAX_AGL)	*z + TAKEOFF_LANDING_MAX_VAL
+						--Approach/Departure High Altitude
+						else if z < A_D_HIGH_ALTITUDE_MAX_AGL 	then 
+							(A_D_HIGH_ALTITUDE_MAX_VAL 	- A_D_LOW_ALTITUDE_MAX_VAL)	/(A_D_HIGH_ALTITUDE_MAX_AGL - A_D_LOW_ALTITUDE_MAX_AGL)	*z + A_D_LOW_ALTITUDE_MAX_VAL
+						--En route 
+						else if z < EN_ROUTE_MAX_AGL then 
+							(EN_ROUTE_MAX_VAL 			- A_D_HIGH_ALTITUDE_MAX_VAL)/(EN_ROUTE_MAX_AGL 			- A_D_HIGH_ALTITUDE_MAX_AGL)*z + A_D_HIGH_ALTITUDE_MAX_VAL
+						else
+							EN_ROUTE_MAX_VAL;
+			tel;
+	**};
+end Unreliable_Sensor_Lib;

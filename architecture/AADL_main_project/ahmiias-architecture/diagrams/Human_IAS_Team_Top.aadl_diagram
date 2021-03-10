@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="ASCII"?>
+<diagram:Diagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:diagram="http://osate.org/diagram" formatVersion="7">
+  <element uuid="bc7c28d2-6430-4c51-a3a1-cc6b49fd0548" manual="true">
+    <bo>
+      <seg>classifier</seg>
+      <seg>top</seg>
+    </bo>
+    <position x="12.0" y="12.0"/>
+    <size width="200.0" height="100.0"/>
+  </element>
+  <config type="structure" connectionPrimaryLabelsVisible="false">
+    <enabledAadlProperties/>
+    <context>
+      <seg>classifier</seg>
+      <seg>human_ias_team::top</seg>
+    </context>
+  </config>
+</diagram:Diagram>
