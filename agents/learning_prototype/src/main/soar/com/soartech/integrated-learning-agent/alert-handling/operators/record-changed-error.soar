@@ -15,7 +15,7 @@ sp {record-changed-error*apply*remove-old-value
          -^value-changed true)
 -->
     (write (crlf) |Removing old-error value of | <v> | for | <e>)
-    (<ei> ^value <v> -)
+    (<ei> ^old-value <v> -)
     }
 
 sp {record-changed-error*apply*new-old-value
