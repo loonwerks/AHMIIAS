@@ -14,8 +14,7 @@ sp {warn*best*safety-condition
     (<o> ^name warn
          ^error-info.warn-condition safety)
 -->
-    ## Need the = preference because we are considering three types of alerts at a time
-    (<s> ^operator <o> >, =)
+    (<s> ^operator <o> >,=)
     }
 
 ### Always choose NOT to warn in the normal condition
@@ -24,8 +23,7 @@ sp {do-not-warn*best*normal-condition
     (<o> ^name do-not-warn
          ^error-info.warn-condition normal)
 -->
-    ## Need the = preference because we are considering three types of alerts at a time
-    (<s> ^operator <o> >, =)
+    (<s> ^operator <o> >,=)
     }
 
 ################################

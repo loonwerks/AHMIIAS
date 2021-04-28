@@ -13,7 +13,7 @@ sp {propose*initialize
     (<fd> ^throttle)
 
 -->
-    (<s> ^operator <o> +)
+    (<s> ^operator <o> + >,=)
     (<o> ^name initialize)
     (write (crlf) |Agent initializing...|)
 
@@ -28,7 +28,7 @@ sp {propose*takeoff
 
 -->
     (write (crlf) |Throttle | <th>)
-    (<s> ^operator <o> +)
+    (<s> ^operator <o> + >,=)
     (<o> ^name takeoff)
 
 }
@@ -42,7 +42,7 @@ sp {propose*transition
           ^altitude > 3200
           ^airspeed >= 0)
 -->
-    (<s> ^operator <o> +)
+    (<s> ^operator <o> + >,=)
     (<o> ^name transition)
     (write (crlf) |Proposing Transitioning to Horizontal mode...|)
 
@@ -54,7 +54,7 @@ sp {propose*start-landing
     (<s> ^io.input-link.flightdata.initiate-landing yes)
     (<s> ^landing no)
 -->
-    (<s> ^operator <o> + )
+    (<s> ^operator <o> + >,=)
     (<o> ^name start-landing)
 }
 
@@ -63,7 +63,7 @@ sp {propose*landing-phase-two
                ^landing phase-one
                ^io.input-link.flightdata.altitude <= 4000)
 -->
-    (<s> ^operator <o> + )
+    (<s> ^operator <o> + >,=)
     (<o> ^name landing-phase-two)
     (write (crlf) |Proposing Landing Phase 2|)
 }
@@ -75,7 +75,7 @@ sp {propose*landing-phase-three
     (<fd> ^altitude <= 4050
           ^airspeed <= 180)
 -->
-    (<s> ^operator <o> + )
+    (<s> ^operator <o> + >,=)
     (<o> ^name landing-phase-three)
 }
 
@@ -86,7 +86,7 @@ sp {propose*landing-phase-four
     (<fd> ^altitude < 3700
           ^distance-to-target < 1.0)
 -->
-    (<s> ^operator <o> + )
+    (<s> ^operator <o> + =)
     (<o> ^name landing-phase-four)
 }
 
@@ -95,7 +95,7 @@ sp {propose*landing-finished
                ^landing phase-four
                ^io.input-link.flightdata.airspeed <= 10)
 -->
-    (<s> ^operator <o> + )
+    (<s> ^operator <o> + >,=)
     (<o> ^name landing-finished)
 }
 
@@ -103,7 +103,7 @@ sp {propose*landing-finished
 sp {propose*abort-landing
     (state <s> ^io.input-link.flightdata.abort-landing yes)
 -->
-    (<s> ^operator <o> + >)
+    (<s> ^operator <o> + >,=)
     (<o> ^name abort-landing)
 }
 
@@ -114,7 +114,7 @@ sp {propose*transition-after-abort
     (<fd> ^altitude > 4200
           ^pilot-selected-landing-zone yes)
 -->
-    (<s> ^operator <o> + >)
+    (<s> ^operator <o> + >,=)
     (<o> ^name transition-after-abort)
 }
 

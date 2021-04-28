@@ -9,6 +9,7 @@ sp {do-not-warn*apply*message
     (state <s> ^operator <o>)
     (<o> ^name do-not-warn
          ^error-info.error <e>)
+          (<e>  ^warn-condition)
 -->
     (write (crlf) |Choosing NOT to issue a warning for | <e> | error|)
     }
@@ -20,6 +21,7 @@ sp {do-not-warn*apply*warning-accepted*remove
               -^warning-issued)
     (<o> ^name do-not-warn
          ^error-info <ei>)
+     (<ei>  ^warn-condition)
     (<ei> ^warning-accepted <x>)
 -->
     (<ei> ^warning-accepted <x> -)

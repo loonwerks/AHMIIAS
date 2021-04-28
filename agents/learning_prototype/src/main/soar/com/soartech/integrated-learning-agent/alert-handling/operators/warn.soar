@@ -13,6 +13,7 @@ sp {warn*apply*message
     (state <s> ^operator <o>)
     (<o> ^name warn
          ^error-info.error <e>)
+          (<e>  ^warn-condition)
 -->
     (write (crlf) |Choosing to issue a warning for | <e> | error|)
     }
@@ -24,6 +25,7 @@ sp {warn*apply*warning-accepted*remove
               -^warning-issued)
     (<o> ^name warn
          ^error-info <ei>)
+
     (<ei> ^warning-accepted <x>)
 -->
     (<ei> ^warning-accepted <x> -)
@@ -38,6 +40,7 @@ sp {warn*apply*issue-warning
               -^warning-issued)
     (<o> ^name warn
          ^error-info <ei>)
+      (<ei>  ^warn-condition)
     (<ei>  ^error <e>
            ## We use the "old-value" here because it is the value the triggeered the warning,
            ## and we don't want things to mess up if the input value happens to change in

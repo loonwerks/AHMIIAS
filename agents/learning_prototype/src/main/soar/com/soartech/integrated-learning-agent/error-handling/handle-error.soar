@@ -93,7 +93,7 @@ sp {propose*sensor-error-over-limit
     (state <s> ^sensor-unreliable no
                ^sensor-error-detected <sensor>)
 -->
-    (<s> ^operator <o> + >)
+    (<s> ^operator <o> + >,=)
     (<o> ^name sensor-error-over-limit
          ^sensor <sensor>)
     }
@@ -108,7 +108,7 @@ sp {propose*pilot-agrees
 -->
     (write (crlf) |Pilot agrees.|)
 
-    (<s> ^operator <o> + >)
+    (<s> ^operator <o> + >,=)
     (<o> ^name pilot-agrees)
 }
 
@@ -122,7 +122,7 @@ sp {propose*pilot-disagrees
 -->
     (write (crlf) |Pilot disagrees.|)
 
-    (<s> ^operator <o> + >)
+    (<s> ^operator <o> + >,=)
     (<o> ^name pilot-disagrees)
 }
 

@@ -14,6 +14,7 @@ sp {top-state*elaborate*error-info
     (<gi> ^error gps-imu)
     (<gl> ^error gps-lidar)
     (<li> ^error lidar-gps)
+
     }
 
 ### Copy current error values from input to the error-info structures
@@ -151,18 +152,20 @@ sp {record-changed-error*propose
 sp {warn*propose
     (state <s> ^error-info <ei>
               -^warning-issued)
-    (<ei> ^value-changed true)
+    (<ei> ^value-changed true
+             ^warn-condition)
 -->
-    (<s> ^operator <o> +)
+    (<s> ^operator <o> +,=)
     (<o> ^name warn
          ^error-info <ei>)
     }
 
 sp {do-not-warn*propose
     (state <s> ^error-info <ei>)
-    (<ei> ^value-changed true)
+    (<ei> ^value-changed true
+            ^warn-condition)
 -->
-    (<s> ^operator <o> +)
+    (<s> ^operator <o> +,=)
     (<o> ^name do-not-warn
          ^error-info <ei>)
     }
@@ -177,7 +180,7 @@ sp {propose*record-user-resopnse
     (<ei> ^error <e>
          -^warning-accepted)
 -->
-    (<s> ^operator <o> + =, >)
+    (<s> ^operator <o> + >,=)
     (<o> ^name record-user-response
          ^error-info <ei>
          ^user-response <x>)
