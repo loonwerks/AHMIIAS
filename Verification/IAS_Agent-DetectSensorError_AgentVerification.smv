@@ -73,7 +73,7 @@ VAR inputModuleRule : inputModule(state_io_altitude, state_io_throttle, state_op
 
 -- -- Detect Transition while takeoff
 -- LTLSPEC F (state_operator_name = transition); -- proves in 26 steps
-LTLSPEC F (state_flight-mode = horizontal); -- proves in 40 steps
+-- LTLSPEC F (state_flight-mode = horizontal); -- proves in 40 steps
 -- LTLSPEC F (state_io_altitude > 10000) -- does not prove, generates a counterexample in 42 steps
 
 -- -- Safety Property
@@ -94,7 +94,7 @@ LTLSPEC F (state_flight-mode = horizontal); -- proves in 40 steps
 -- -- Detect sensor error
 -- INVARSPEC ((state_io_gps-lidar-error > 10.0 & state_io_gps-imu-error > 10.0) -> state_operator_name = gps-sensor-error-over-limit) -- generates a counterexample in 10 steps
 -- LTLSPEC F (X (state_io_gps-lidar-error > 10.0 & state_io_gps-imu-error > 10.0) -> state_operator_name = gps-sensor-error-over-limit) -- proves in 4 steps
--- LTLSPEC G((state_io_gps-lidar-error > 10.0 & state_io_gps-imu-error > 10.0) -> F state_operator_name = gps-sensor-error-over-limit) -- generates a counterexample, an interesting trace to observe
+LTLSPEC G((state_io_gps-lidar-error > 10.0 & state_io_gps-imu-error > 10.0) -> F state_operator_name = gps-sensor-error-over-limit) -- generates a counterexample, an interesting trace to observe
 
 -- INVARSPEC (state_operator_name = gps-sensor-error-over-limit -> state_sensor-unreliable = yes) -- generates counterexample in 29 steps
 -- LTLSPEC F (X state_operator_name = gps-sensor-error-over-limit -> state_sensor-unreliable = yes) -- proves in 4 steps
