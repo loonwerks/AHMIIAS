@@ -1,0 +1,5 @@
+sp {proposeInitialize (state <s> ^name nil ^superstate nil) --> (<s> ^operator <o> +)(<o> ^name initialize)}
+
+sp {applyInitialize (state <s>  ^operator <o>)(<o> ^name initialize) --> (<s> ^name takeoff ^last-action nothing ^wait-counter 0)}
+
+sp {proposeCallAA (state <s> ^name takeoff ^io.input-link.flightdata <fd> ^last-action nothing) (<fd> ^airspeed > 80) --> (<s> ^operator <o> +)(<o> ^name callaa)}
