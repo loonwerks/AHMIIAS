@@ -121,19 +121,30 @@ public
 						or 	(previous_active_sensor = 3 and Output.Sensor3_Reliable)
 					)
 						=> (Output.Recommended_Sensor = previous_active_sensor);
-			
+ 
 			guarantee "The active sensor should stay the same unless the operator agrees that it is unreliable 
 						and there is another reliable sensor available.":
 				Output.Active_Sensor = 	
-					if (previous_recommended_sensor = NIL) 
+					if (previous_recommended_sensor = NIL)
 						then previous_active_sensor
-					else if (previous_active_sensor = 1 and InputFromHuman.Sensor1_Unreliable_Response = enum(Response, Agree)) 
-							then previous_recommended_sensor
-						 else if (previous_active_sensor = 2 and InputFromHuman.Sensor2_Unreliable_Response = enum(Response, Agree)) 
-						 		then previous_recommended_sensor
-							  else if (previous_active_sensor = 3 and InputFromHuman.Sensor3_Unreliable_Response = enum(Response, Agree)) 
-							  			then previous_recommended_sensor
-								   else	previous_active_sensor;
+					else if ((previous_active_sensor = 1 and InputFromHuman.Sensor1_Unreliable_Response = enum(Response, Agree))
+							  or (previous_active_sensor = 2 and InputFromHuman.Sensor2_Unreliable_Response = enum(Response, Agree))
+							  or (previous_active_sensor = 3 and InputFromHuman.Sensor3_Unreliable_Response = enum(Response, Agree)))
+						then previous_recommended_sensor
+					else previous_active_sensor;
+			
+--			guarantee "The active sensor should stay the same unless the operator agrees that it is unreliable 
+--						and there is another reliable sensor available.":
+--				Output.Active_Sensor = 	
+--					if (previous_recommended_sensor = NIL) 
+--						then previous_active_sensor
+--					else if (previous_active_sensor = 1 and InputFromHuman.Sensor1_Unreliable_Response = enum(Response, Agree)) 
+--							then previous_recommended_sensor
+--						 else if (previous_active_sensor = 2 and InputFromHuman.Sensor2_Unreliable_Response = enum(Response, Agree)) 
+--						 		then previous_recommended_sensor
+--							  else if (previous_active_sensor = 3 and InputFromHuman.Sensor3_Unreliable_Response = enum(Response, Agree)) 
+--							  			then previous_recommended_sensor
+--								   else	previous_active_sensor;
 
 			-----------------------
 			--FLIGHT PHASE STATE MACHINE
