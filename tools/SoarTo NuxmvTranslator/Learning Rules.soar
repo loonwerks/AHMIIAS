@@ -1,0 +1,284 @@
+sp {top-state*elaborate*error-info*warn-condition*safety
+    (state <s> ^flight-mode horizontal
+               ^safety-error <v>
+               ^error-info <ei>)
+    (<ei> ^error <e>
+          ^current-value > <v>)
+-->
+    (<ei> ^warn-condition safety)
+    }
+
+##########################
+### Detect high warn-condition for a sensor
+sp {top-state*elaborate*error-info*warn-condition*high
+    (state <s> ^flight-mode horizontal
+               ^high-low-warn-error <v>
+               ^error-info <ei>)
+    (<ei> ^error <e>
+          ^current-value > <v>
+         -^warn-condition safety)
+-->
+    (<ei> ^warn-condition high)
+    }
+
+##########################
+### Detect low warn-condition for a sensor
+sp {top-state*elaborate*error-info*warn-condition*low
+    (state <s> ^flight-mode horizontal
+               ^normal-error <v>
+               ^error-info <ei>)
+    (<ei> ^error <e>
+          ^current-value > <v>
+         -^warn-condition safety
+         -^warn-condition high)
+-->
+    (<ei> ^warn-condition low)
+    }
+
+sp {top-state*elaborate*safety-error
+    (state <s> ^superstate nil)
+-->
+    (<s> ^safety-error 10.0)
+    }
+
+sp {top-state*elaborate*high-low-warn-error
+    (state <s> ^superstate nil)
+-->
+    (<s> ^high-low-warn-error 9.0)
+    }
+
+sp {top-state*elaborate*normal-error
+    (state <s> ^superstate nil)
+-->
+    (<s> ^normal-error 8.0)
+    }
+
+
+sp {warn*propose
+    (state <s> ^error-info <ei>
+              -^warning-issued)
+    (<ei> ^value-changed true
+             ^warn-condition)
+-->
+    (<s> ^operator <o> +,=)
+    (<o> ^name warn
+         ^error-info <ei>)
+    }
+
+
+sp {do-not-warn*propose
+    (state <s> ^error-info <ei>
+              -^warning-issued)
+    (<ei> ^value-changed true
+            ^warn-condition)
+-->
+    (<s> ^operator <o> +,=)
+    (<o> ^name do-not-warn
+         ^error-info <ei>)
+    }
+
+sp {do-not-warn*when-warning-issued*propose
+    (state <s> ^error-info <ei>
+              ^warning-issued)
+    (<ei> ^value-changed true
+            ^warn-condition)
+-->
+    (<s> ^operator <o> +,=)
+    (<o> ^name do-not-warn)
+    }
+
+
+### Always choose to warn in the safety condition
+sp {warn*best*safety-condition
+    (state <s> ^operator <o> +)
+    (<o> ^name warn)
+    (<s> ^error-info.warn-condition safety)
+-->
+    (<s> ^operator <o> >,=)
+    }
+
+### Always choose NOT to warn in the normal condition
+sp {do-not-warn*best*normal-condition
+    (state <s> ^operator <o> +)
+    (<o> ^name do-not-warn)
+    (<s> ^error-info.warn-condition normal)
+-->
+    (<s> ^operator <o> >,=)
+    }
+
+
+
+################################
+### Learning conditions
+
+### if the warn-condition is low or high, then we want to
+### learn the user's preferred thresholds for when to warn.
+### For this simple case, we will have one rule for each warn condition times one
+### rule for each error type, which allows us to learn different thresholds for each
+### error type, if we want.
+### If we wanted to just learn one threshold across all three error types, we would just
+### use two rules.
+### If we wanted to distinguish between even more cases (such as different thresholds during
+### different flight modes), we would add even more rules.
+
+sp {warn*select*low*gps (state <s> ^operator <o> +)
+(<o> ^name warn)
+(<s> ^error-info <ei>)
+(<ei> ^warn-condition low ^error gps)
+-->
+(<s> ^operator <o> = -1.6409953320300001)
+}
+sp {warn*select*low*lidar
+(state <s> ^operator <o> +)
+(<o> ^name warn ^error-info <ei>)
+(<ei> ^warn-condition low ^error lidar)
+-->
+(<s> ^operator <o> = 0.0)
+}
+sp {warn*select*low*imu
+(state <s> ^operator <o> +)
+(<o> ^name warn)
+(<s> ^error-info <ei>)
+(<ei> ^warn-condition low ^error imu)
+-->
+(<s> ^operator <o> = 0.0)
+}
+sp {warn*select*high*gps
+(state <s> ^operator <o> +)
+(<o> ^name warn)
+(<s> ^error-info <ei>)
+(<ei> ^warn-condition high ^error gps)
+-->
+(<s> ^operator <o> = 1.569174147)
+}
+sp {warn*select*high*lidar
+(state <s> ^operator <o> +)
+(<o> ^name warn)
+(<s> ^error-info <ei>)
+(<ei> ^warn-condition high ^error lidar)
+-->
+(<s> ^operator <o> = 0.0)
+}
+sp {warn*select*high*imu
+(state <s> ^operator <o> +)
+(<o> ^name warn)
+(<s> ^error-info <ei>)
+(<ei> ^warn-condition high ^error imu)
+-->
+(<s> ^operator <o> = 0.0)
+}
+sp {do-not-warn*select*low*gps
+(state <s> ^operator <o> +)
+(<o> ^name do-not-warn)
+(<s> ^error-info <ei>)
+(<ei> ^warn-condition low ^error gps)
+-->
+(<s> ^operator <o> = 0.0)
+}
+sp {do-not-warn*select*low*lidar
+(state <s> ^operator <o> +)
+(<o> ^name do-not-warn)
+(<s> ^error-info <ei>)
+(<ei> ^warn-condition low ^error lidar)
+-->
+(<s> ^operator <o> = 0.0)
+}
+sp {do-not-warn*select*low*imu
+(state <s> ^operator <o> +)
+(<o> ^name do-not-warn)
+(<s> ^error-info <ei>)
+(<ei> ^warn-condition low ^error imu)
+-->
+(<s> ^operator <o> = 0.0)
+}
+sp {do-not-warn*select*high*gps
+(state <s> ^operator <o> +)
+(<o> ^name do-not-warn)
+(<s> ^error-info <ei>)
+(<ei> ^warn-condition high ^error gps)
+-->
+(<s> ^operator <o> = 0.0)
+}
+sp {do-not-warn*select*high*lidar
+(state <s> ^operator <o> +)
+(<o> ^name do-not-warn)
+(<s> ^error-info <ei>)
+(<ei> ^warn-condition high ^error lidar)
+-->
+(<s> ^operator <o> = 0.0)
+}
+sp {do-not-warn*select*high*imu
+(state <s> ^operator <o> +)
+(<o> ^name do-not-warn)
+(<s> ^error-info <ei>)
+(<ei> ^warn-condition high ^error imu)
+-->
+(<s> ^operator <o> = 0.0)
+}
+
+
+
+sp {warn*apply*issue-warning
+    :o-support
+    (state <s> ^operator <o>
+               ^io.output-link <out>
+              -^warning-issued)
+    (<out> ^alert-sensor-error <se>)
+    (<out>  ^alert-sensor-error-value <sv>)
+    (<o> ^name warn)
+    (<s> ^error-info <ei>)
+
+    (<ei>  ^error <e>
+           ## We use the "old-value" here because it is the value the triggeered the warning,
+           ## and we don't want things to mess up if the input value happens to change in
+           ## the middle of the warning process
+           ^old-value <v>
+           ^value-changed true
+          -^warning-accepted)
+-->
+    (<out> ^alert-sensor-error <se> -)
+    (<out>  ^alert-sensor-error-value <sv> -)
+    (<out> ^alert-sensor-error <e>
+           ^alert-sensor-error-value <v>)
+    (<s> ^warning-issued <e>)
+    (<ei> ^value-changed true -)
+    }
+
+sp {record-changed-error*propose
+    (state <s> ^error-info <ei>)
+    (<ei> ^current-value <v>)
+    (<ei> -^old-value <v>)
+    (<ei> -^value-changed)
+-->
+    (<s> ^operator <o> + =)
+    (<o> ^name record-changed-error)
+    }
+
+sp {record-changed-error*apply*remove-old-value
+    (state <s> ^operator <o>)
+    (<o> ^name record-changed-error)
+    (<ei> ^old-value <v>)
+    (<s>  ^error-info <ei>
+         ^value <> <v>)
+    (<ei> ^error <e>)
+
+    (<ei> -^value-changed)
+-->
+    (write (crlf) |Removing old-error value of | <v> | for | <e>)
+    #(<ei> ^value <v> -) Changed this!
+    (<ei> ^old-value <v> -)
+    }
+
+sp {record-changed-error*apply*new-old-value
+    (state <s> ^operator <o>)
+    (<o> ^name record-changed-error)
+    (<s> ^error-info <ei>
+         ^value <v>)
+    (<ei> ^error <e>)
+    (<ei> -^old-value)
+    (<ei> -^value-changed)
+-->
+    (write (crlf) |Recording new old-value of | <v> | and value-changed flag for | <e>)
+    (<ei> ^old-value <v>)
+    (<ei> ^value-changed true)
+    }

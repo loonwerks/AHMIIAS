@@ -10,7 +10,7 @@ public class main{
         try{
             // read soar agent into a string
             String inputText = cleanText(readInputFile(debugPath));
-
+            //System.out.println(inputText);
 
             //System.out.println(inputText);
             //System.exit(0);

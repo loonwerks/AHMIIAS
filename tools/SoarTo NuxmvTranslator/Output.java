@@ -1,4 +1,5 @@
 import java.util.LinkedHashMap;
+import java.util.ArrayList;
 public class Output{
     SoarRules rules;
     public Output(SoarRules rules){
@@ -7,6 +8,7 @@ public class Output{
 
     public String generateOutput(){
         String output = "MODULE main\n\n";
+        rules.parseVariableValuePass();
         rules.checkForImpasse();
         output += generateVariableDeclarations();
         output += generateAssignStatements();
@@ -82,7 +84,11 @@ public class Output{
                 for(String key : rule.valueMap.keySet()){
                     if(key.equals("state_operator_name") || !key.equals(variable)) continue;
                     varTrans += "        --" + rule.ruleName + " (" + rule.listVariables() + ")\n";
-                    varTrans += "        (state = run & "+ rule.formatGuard() +"): " + rule.valueMap.get(key) + ";\n";
+                    if(rule.isElaboration){
+                        varTrans += "        ("+ rule.formatGuard() +"): " + rule.valueMap.get(key) + ";\n";
+                    }else{
+                        varTrans += "        (state = start & "+ rule.formatGuard() +"): " + rule.valueMap.get(key) + ";\n";
+                    }
                 }
             }
             if(varTrans.length() > 0){
@@ -100,6 +106,9 @@ public class Output{
         output += "        init (state) := start;\n";
         output += "        next (state) :=\n            case\n";
         for(Rule rule : rules.rules){
+            if(rule.isElaboration){
+                continue;
+            }
             rule.formatGuard();
             // format comment
             output += "        --" + rule.ruleName + " (" + rule.listVariables() + ")\n";
@@ -163,19 +172,27 @@ public class Output{
     public String generateAssignStatements(){
         String output = "ASSIGN\n";
         for(Variable var : rules.variables.values()){
-            if(var.values.size() <= 1){
+            if(var.values.size() <= 1 && var.varType == Variable.S_CONST){
                 continue;
             }
             output += "    init ("+var.name+") := ";
             switch(var.varType){
                 case Variable.S_CONST:
-                    output += "nil;\n";
+                    if(var.name.endsWith("_exists")){
+                        output += "no;\n";
+                    }else {
+                        output += "nil;\n";
+                    }
                     break;
                 case Variable.INT:
                     output += "0;\n";
                     break;
                 case Variable.FLOAT:
-                    output += "0.0;\n";
+                    if(var.initialValue.length()>0) {
+                        output += var.initialValue + ";\n";
+                    }else{
+                        output += "0.0;\n";
+                    }
                     break;
                 default:
                     output += "TYPE ERROR\n";
@@ -188,8 +205,59 @@ public class Output{
 
     public String generateVariableDeclarations(){
         String output = "";
+
+
+        // Generate types for all variables :D
         for(Variable var : rules.variables.values()){
             var.generateType();
+            rules.mapNameToType.put(var.name, var.varType);
+        }
+
+
+        for(String startNode : rules.mapNameToType.keySet()){
+            if(rules.mapNameToType.get(startNode) == Variable.INVALID){
+                continue;
+            }
+            String node = startNode;
+            int startNodeType = rules.mapNameToType.get(startNode);
+            ArrayList<String> queue = new ArrayList<String>();
+            queue.add(node);
+            while(queue.size()>0){
+                String currentNode = queue.remove(0);
+                if(!rules.typeGraph.containsKey(currentNode)){
+                    continue;
+                }
+                for(String child : rules.typeGraph.get(currentNode)){
+                    if(!rules.mapNameToType.containsKey(child)){
+                        continue;
+                    }
+                    if(rules.mapNameToType.get(child) == Variable.INVALID){
+                        rules.mapNameToType.put(child,startNodeType);
+                        queue.add(child);
+                    }
+                }
+            }
+        }
+
+        for(String varName : rules.variables.keySet()){
+            Variable var = rules.variables.get(varName);
+            var.varType = rules.mapNameToType.get(var.name);
+            if(var.varType == Variable.INVALID){
+                var.varType = Variable.S_CONST;
+            }
+            rules.variables.put(varName,var);
+        }
+
+        // generate Exists variables for reals and integers
+        rules.addExistsVariables();
+
+
+        for(Variable var : rules.variables.values()){
+            //var.generateType();
+            if(var.varType==Variable.INVALID){
+                var.varType = Variable.S_CONST;
+            }
+
             output += "VAR " + var.name + " : ";
             if(var.varType == Variable.S_CONST){
                 output += "{";

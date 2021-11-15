@@ -2359,12 +2359,14 @@ public class SoarParser extends Parser {
 				break;
 			case 2:
 				{
+				{
 				setState(300);
 				match(Negative_pref);
 				setState(301);
 				value();
 				setState(302);
 				match(Positive_pref);
+				}
 				}
 				break;
 			}
@@ -2459,6 +2461,7 @@ public class SoarParser extends Parser {
 			case 3:
 				enterOuterAlt(_localctx, 3);
 				{
+				{
 				setState(314);
 				unary_or_binary_pref();
 				setState(315);
@@ -2473,6 +2476,7 @@ public class SoarParser extends Parser {
 					}
 				}
 
+				}
 				}
 				break;
 			}

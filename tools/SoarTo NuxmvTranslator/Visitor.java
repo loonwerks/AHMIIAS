@@ -9,12 +9,13 @@ import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
  * which can be extended to create a visitor which only needs to handle a subset
  * of the available methods.
  *
- * @param <T> The return type of the visit operation. Use {@link Void} for
+ * @param <Object> The return type of the visit operation. Use {@link Void} for
  * operations with no return type.
  */
 public class Visitor<Object> extends AbstractParseTreeVisitor<Object> implements SoarVisitor<Object> {
     Rule currentRule;
     String currentContext = "";
+    boolean negateCondition = false;
 
     public SoarRules rules;
 	/**
@@ -37,9 +38,11 @@ public class Visitor<Object> extends AbstractParseTreeVisitor<Object> implements
 	@Override public Object visitSoar_production(SoarParser.Soar_productionContext ctx) {
         // create a new rule
         String ruleName = ctx.sym_constant().getText();
-
+        boolean currentIsElaboration;
         if(ruleName.contains("elaborate")){
-            return null;
+            currentIsElaboration = true;
+        }else{
+            currentIsElaboration = false;
         }
         //System.out.println(ruleName);
         rules.createNewRule(ruleName);
@@ -49,6 +52,7 @@ public class Visitor<Object> extends AbstractParseTreeVisitor<Object> implements
         SoarParser.Condition_sideContext conditions = ctx.condition_side();
 
         currentRule = rules.getRuleByName(ruleName);
+        currentRule.isElaboration = currentIsElaboration;
         // sp{ ruleName
         visit(ctx.condition_side());
         // -->
@@ -118,6 +122,7 @@ public class Visitor<Object> extends AbstractParseTreeVisitor<Object> implements
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
 	@Override public Object visitCond(SoarParser.CondContext ctx) {
+        negateCondition = ctx.Negative_pref() != null;
         visit(ctx.positive_cond());
 
         return null;
@@ -168,6 +173,7 @@ public class Visitor<Object> extends AbstractParseTreeVisitor<Object> implements
 	@Override public Object visitAttr_value_tests(SoarParser.Attr_value_testsContext ctx) {
         //System.out.println(ctx.getText());
         String line = ctx.getText();
+        //System.out.println(line);
         String variable = ctx.attr_test(0).getText();
         variable = currentContext+"_"+variable;
         variable = cleanVariableName(variable);
@@ -185,19 +191,38 @@ public class Visitor<Object> extends AbstractParseTreeVisitor<Object> implements
 
         // Attribute has no value, so guard is checking for existance
         if(existsCheck){
-            if(line.startsWith("-")){ // check for not existing
+            if(ctx.Negative_pref() != null){ // check for not existing
                 currentRule.addGuard(variable+" = nil");
             }else{ // check for presence
                 currentRule.addGuard(variable+" != nil");
             }
         }else{ // Attribute has a value
             String value = (String)visit(values.get(0));
-            //System.out.println(value);
+
+            //System.out.println(variable);
+
+
             if(!(value.startsWith("<") && value.endsWith(">"))){
                 // Removes the conditional check from value
                 String onlyValue = value.replaceAll("<= ", "").replaceAll(">= ", "").replaceAll("= ", "");
                 onlyValue = onlyValue.replaceAll("< ", "").replaceAll("> ", "");
-                rules.addVariableValue(variable, onlyValue);
+
+                // Don't add inequalities to the list of values a variable can have
+                if(onlyValue.equals(value)){
+                    rules.addVariableValue(variable, onlyValue);
+                }else{
+                    // It is an inequality, hence we can use it for setting Types
+                    // Example: ^var1 <= <v2>, where <v2> is ^var2
+                    // Hence, type of ^var1 is the same as ^var2
+                    String leftSide = variable;
+                    String rightSide = currentRule.getContext(onlyValue);
+                    //System.out.println(leftSide);
+                    //System.out.println(rightSide);
+                    rules.addTypeNode(leftSide, rightSide);
+                    rules.addTypeNode(rightSide, leftSide);
+
+                }
+
                 for(String key : currentRule.contextMap.keySet()){
                     if(value.contains(key)){
                         value = value.replaceAll(key, currentRule.contextMap.get(key));
@@ -208,10 +233,57 @@ public class Visitor<Object> extends AbstractParseTreeVisitor<Object> implements
                 if(value.contains("<") || value.contains(">")){
                     currentRule.addGuard(variable+" "+value);
                 }else{
-                    currentRule.addGuard(variable+" = "+value);
+                    if(ctx.Negative_pref() != null ^ negateCondition){
+                        currentRule.addGuard(variable+" != "+value);
+
+                        if(rules.variables.containsKey(value)){
+                            String leftSide = variable;
+                            String rightSide = value;
+                            //System.out.println(leftSide);
+                            //System.out.println(rightSide);
+                            rules.addTypeNode(leftSide, rightSide);
+                            rules.addTypeNode(rightSide, leftSide);
+                        }
+
+
+                    }else{
+                        currentRule.addGuard(variable+" = "+value);
+
+                    }
                 }
             }else{
-                currentRule.addContext(value, variable);
+
+                // check for negation
+
+                // Negate if one negation exists, if two exist, then don't
+                /*if(ctx.Negative_pref() != null ^ negateCondition){
+
+                    value = "!" + value;
+                    currentRule.addContext(value, variable);
+                }else{
+                    currentRule.addContext(value, variable);
+                }*/
+                if(!currentRule.contextMap.containsKey(value)){
+                    // assignment
+                    currentRule.addContext(value, variable);
+                }else{
+                    // equality check
+                    String leftSide = variable;
+                    value = currentRule.getContext(value);
+                    String rightSide = value;
+                    //System.out.println(leftSide);
+                    //System.out.println(rightSide);
+                    rules.addTypeNode(leftSide, rightSide);
+                    rules.addTypeNode(rightSide, leftSide);
+
+
+                    if(ctx.Negative_pref() != null ^ negateCondition){
+                        currentRule.addGuard(variable+" != "+value);
+                    }else{
+                        currentRule.addGuard(variable+" = "+value);
+                    }
+
+                }
             }
         }
 
@@ -450,17 +522,37 @@ public class Visitor<Object> extends AbstractParseTreeVisitor<Object> implements
         SoarParser.Value_makeContext value = ctx.value_make();
         currentContext = variable;
         String val = (String)visit(value);
+
         if(val == null){
             return null;
         }
-
-
+        //System.out.println(val);
         if(val.startsWith("<") && val.endsWith(">")){
+            //System.out.println(variable);
             //System.out.println(val);
-            currentRule.addContext(val, variable);
+            /* If variable value is aready in the context map and its identifier differs
+                Then, treat it as an assignment statement.
+                Example (<s> ^value <val>)-->(<s> ^attribute <val>) is doing ^attribute := ^value
+            */
+            if(currentRule.contextMap.containsKey(val) && !currentRule.getContext(val).equals(variable)){
+                currentRule.addAttrValue(variable, currentRule.getContext(val));
+                rules.addVariableValue(variable, "^VAR"+currentRule.getContext(val));
+
+                String leftSide = variable;
+                String rightSide = currentRule.getContext(val);
+                //System.out.println(leftSide);
+                //System.out.println(rightSide);
+                rules.addTypeNode(leftSide, rightSide);
+                rules.addTypeNode(rightSide, leftSide);
+
+            }else{
+                currentRule.addContext(val, variable);
+            }
 
         }else{
-
+            if(currentRule.isElaboration && currentRule.guards.size() == 1 && currentRule.guards.get(0).equals("state_superstate = nil")){
+                rules.variables.get(variable).initialValue = val;
+            }
             currentRule.addAttrValue(variable, val);
             rules.addVariableValue(variable, val);
         }
@@ -485,18 +577,31 @@ public class Visitor<Object> extends AbstractParseTreeVisitor<Object> implements
         // get the value of the attribute Example: <o> in (<s> ^operator <o> +)
         value = (String)visit(ctx.value(0));
         String pref_specifier = null;
+        // visit the preference specifier Example = 0.0 in (<s> ^opetator <o> = 0.0)
         if(ctx.pref_specifier(0) != null){
             pref_specifier = (String)visit(ctx.pref_specifier(0));
+
+            // check for second preference specifier Example = in (<s> ^opetator <o> >,=)
+            if(ctx.pref_specifier(1) != null){
+                pref_specifier += ","+(String)visit(ctx.pref_specifier(1));
+            }
+
             //System.out.println(currentContext);
-            //System.out.println(pref_specifier);
+            //System.out.println(value +" " +pref_specifier);
 
 
         }
 
         if(currentContext.equals("state_operator") && pref_specifier != null){
             // Check if rule is a learning Rule (<s> ^operator <o> = 0.0)
+            //System.out.println(pref_specifier);
+            // check if rule is a learning rule
             if(pref_specifier.contains("=")){
                 currentRule.isLearningRule = true;
+            }
+            // if it is a learning rule, get the priority
+            if(pref_specifier.startsWith("=")){
+
 
                 // set priority value
                 try{
@@ -532,6 +637,11 @@ public class Visitor<Object> extends AbstractParseTreeVisitor<Object> implements
         if(ctx.value(1) != null){
             value = (String)visit(ctx.value(1));
         }
+        if(pref_specifier !=null && pref_specifier.equals("-")){
+            value = "nil";
+        }
+
+
         return (Object)value;
     }
 	/**

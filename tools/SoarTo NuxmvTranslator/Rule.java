@@ -10,6 +10,7 @@ public class Rule{
     LinkedHashMap<String, String> valueMap; // Stores the value to apply in the right side of the rule. Maps Variable name to new value
     boolean isLearningRule = false;
     double priority = 0.0;
+    boolean isElaboration = false;
     public Rule(String name, LinkedHashMap<String, Variable> map){
         this.ruleName = name;
         this.contextMap = new HashMap<String, String>();
@@ -37,7 +38,9 @@ public class Rule{
         }
         newRule.isLearningRule = this.isLearningRule;
         newRule.priority = this.priority;
+        newRule.isElaboration = this.isElaboration;
     }
+
 
 
     public String listVariables(){
@@ -65,11 +68,13 @@ public class Rule{
             int type = variableMap.get(variableName).varType;
             //System.out.println(type);
             if(type == Variable.INT){
-                guard = guard.replaceAll("!= nil", ">= 0");
-                guard = guard.replaceAll("= nil", "< 0");
+
+                guard = guard.replaceAll(" != nil", "_exists = yes");
+                guard = guard.replaceAll(" = nil", "_exists = no");
             }else if(type == Variable.FLOAT){
-                guard = guard.replaceAll("!= nil", ">= 0.0");
-                guard = guard.replaceAll("= nil", "< 0.0");
+
+                guard = guard.replaceAll(" != nil", "_exists = yes");
+                guard = guard.replaceAll(" = nil", "_exists = no");
             }
 
             if(!first){
@@ -79,8 +84,18 @@ public class Rule{
             }
             output += guard;
             newGuards.add(guard);
+
         }
+
         this.guards = newGuards;
+        // add the negation of the action side of the elaborations
+        if(this.isElaboration){
+
+            for(String var : valueMap.keySet()){
+                output += " & " + var + " != " + valueMap.get(var);
+            }
+
+        }
         return output;
     }
     public void addAttrValue(String var, String val){
