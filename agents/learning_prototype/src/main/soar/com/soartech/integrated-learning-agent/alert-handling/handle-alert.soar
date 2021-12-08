@@ -135,6 +135,54 @@ sp {record-changed-error*propose
          ^value <v>)
     }
 
+#######################
+### We do not want to propose warn and do-not-warn for all three error types at the same
+### time, because then some of the feedback reward for learning will get allocated to
+### operators that the user was not really giving feedback on.
+###
+### That is, we propose warn and do-not-warn for all three error types, but we only
+### "warn" for one at a time.  Based on that warning, we copute a reward signal based
+### and whether the user accepts or rejects the warning.  But that reward ideally would
+### only be allocated to the warn/do-not-warn operators for THAT error signal.  However,
+### because we also proposed warn/do-not-warn for other operators, they will get some of
+### the reward signal, as well.
+###
+### So instead we are going to try looking at just one error-type at a time.  A new
+### operator will set the "attention-error-type" attribute to one error-type at a time
+### (any error-type that is flagged with ^value-changed true).  Then we will only propose
+### warn/do-not-warn for the current ^attention-error-type value.  We will not allow
+### the selection of a new ^attention-error-type value until the warn/do-not-warn process
+### is complete for the "currently selected" ^attention-error-type.
+
+sp {set-attention-error-type*propose
+    (state <s> ^error-info <ei>
+              -^attention-error-type)
+    (<ei> ^value-changed true
+            ^warn-condition
+            ^error <et>)
+-->
+    (<s> ^operator <o> +,=)
+    (<o> ^name set-attention-error-type
+         ^error-type <et>)
+    }
+
+### If the current attention-error-type is not marked with ^value-changed true, then
+### it means we are done handling that error, so we remove the attention-error-type value.
+### This will allow a new attention-error-type value to be selected, if there is one
+### pending. We want this to happen immediately, so we use :o-support instead of
+### proposing and applying an operator, because that could lead to race conditions.
+
+sp {remove-attention-error-type*apply
+    :o-support
+    (state <s> ^error-info <ei>
+               ^attention-error-type <et>)
+    (<ei> ^error <et>
+         -^value-changed true)
+-->
+    (write (crlf) |Removing attention-error-type | <et> | because it has been processed|)
+    (<s> ^attention-error-type <et> -)
+    }
+
 ############################
 ### If the ^error-changed flag is set, then we need to (re-)decide whether to issue a warning.
 ### when we issue the warning, we also remove the ^error-changed  flag so we do not issue
@@ -149,11 +197,16 @@ sp {record-changed-error*propose
 
 ### The ^warning-issued value allows us to wait for the user response, and it will also prevent
 ### us from issuing more than one warning at a time
+
+### Changed the conditions of these operator proposals, so they only propose for
+### the current attention-error-type.  See the comments above for the explanation.
 sp {warn*propose
     (state <s> ^error-info <ei>
+               ^attention-error-type <et>
               -^warning-issued)
     (<ei> ^value-changed true
-             ^warn-condition)
+             ^warn-condition
+             ^error <et>)
 -->
     (<s> ^operator <o> +,=)
     (<o> ^name warn
@@ -161,9 +214,11 @@ sp {warn*propose
     }
 
 sp {do-not-warn*propose
-    (state <s> ^error-info <ei>)
+    (state <s> ^error-info <ei>
+               ^attention-error-type <et>)
     (<ei> ^value-changed true
-            ^warn-condition)
+            ^warn-condition
+            ^error <et>)
 -->
     (<s> ^operator <o> +,=)
     (<o> ^name do-not-warn

@@ -12,3 +12,5 @@ source "warn.soar"
 source "do-not-warn.soar"
 
 source "record-user-response.soar"
+
+source "set-attention-error-type.soar"

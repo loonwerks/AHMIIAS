@@ -12,24 +12,31 @@
 		<dependency>
 			<groupId>com.soartech</groupId>
 			<artifactId>jsoar-core</artifactId>
-			<version>4.0.3-SNAPSHOT</version>
+			<version>4.1.1-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.soartech</groupId>
 			<artifactId>jsoar-debugger</artifactId>
-			<version>4.0.3-SNAPSHOT</version>
+			<version>4.1.1-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.soartech</groupId>
 			<artifactId>jsoar-tcl</artifactId>
-			<version>4.0.3-SNAPSHOT</version>
+			<version>4.1.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-simple</artifactId>
 			<version>1.7.30</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.openjfx/javafx -->
+		<dependency>
+		    <groupId>org.openjfx</groupId>
+		    <artifactId>javafx-controls</artifactId>
+		    <version>17.0.1</version>
+		    <type>pom</type>
 		</dependency>
 	</dependencies>
 
@@ -48,6 +55,14 @@
 					<release>11</release>
 				</configuration>
 			</plugin>
+		    <plugin>
+		        <groupId>org.openjfx</groupId>
+		        <artifactId>javafx-maven-plugin</artifactId>
+		        <version>0.0.8</version>
+		        <configuration>
+		            <mainClass>com.soartech.simple.RlRuleGenerator</mainClass>
+		        </configuration>
+		    </plugin>
 		</plugins>
 	</build>
 

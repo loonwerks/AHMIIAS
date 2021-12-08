@@ -5,49 +5,6 @@
 
 echo "\nLoading handle-error.soar"
 
-### Original code commented out, refactored code below
-#sp {propose*detect*gps*error
-#    (state <s> ^flight-mode horizontal)
-#    (<s> ^sensor-unreliable no)
-#    (<s> ^io.input-link.flightdata <fd>)
-#    (<fd> ^gps-lidar-error <e1> > 10.0)
-#    (<fd> ^gps-imu-error <e2> > 10.0)
-#-->
-#    (write (crlf) |GPS is Unreliable!|)
-#    (write (crlf) |GPS - LIDAR error:| <e1>)
-#    (write (crlf) |GPS - IMU error:| <e2>)
-#    (<s> ^operator <o> + >)
-#    (<o> ^name gps-sensor-error-over-limit)
-#}
-#
-#sp {propose*detect*lidar*error
-#    (state <s> ^flight-mode horizontal)
-#    (<s> ^sensor-unreliable no)
-#    (<s> ^io.input-link.flightdata <fd>)
-#    (<fd> ^gps-lidar-error <e1> > 10.0)
-#    (<fd> ^lidar-imu-error <e2> > 10.0)
-#-->
-#    (write (crlf) |LIDAR is Unreliable!|)
-#    (write (crlf) |LIDAR - GPS error:| <e1>)
-#    (write (crlf) |LIDAR - IMU error:| <e2>)
-#    (<s> ^operator <o> + >)
-#    (<o> ^name lidar-sensor-error-over-limit)
-#}
-#
-#sp {propose*detect*imu*error
-#    (state <s> ^flight-mode horizontal)
-#    (<s> ^sensor-unreliable no)
-#    (<s> ^io.input-link.flightdata <fd>)
-#    (<fd> ^gps-imu-error <e1> > 10.0)
-#    (<fd> ^lidar-imu-error <e2> > 10.0)
-#-->
-#    (write (crlf) |IMU is Unreliable!|)
-#    (write (crlf) |IMU - GPS error:| <e1>)
-#    (write (crlf) |IMU - LIDAR error:| <e2>)
-#    (<s> ^operator <o> + >)
-#    (<o> ^name imu-sensor-error-over-limit)
-#}
-
 ### Note that we are not handling the case where all three error thresholds
 ### are violated
 sp {top-state*elaborate*sensor-error-detected*gps
