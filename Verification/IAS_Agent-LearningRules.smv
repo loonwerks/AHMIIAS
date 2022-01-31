@@ -1,0 +1,409 @@
+MODULE main
+
+VAR state_flight-mode : {nil,horizontal};
+VAR state_safety-error : real;
+VAR state_safety-error_exists : {yes,no};
+VAR state_error-info : {nil};
+VAR state_error-info_error : {nil,gps,imu,lidar};
+VAR state_error-info_current-value : real;
+VAR state_error-info_current-value_exists : {yes,no};
+VAR state_error-info_warn-condition : {safety,nil,high,low,normal};
+VAR state_high-low-warn-error : real;
+VAR state_high-low-warn-error_exists : {yes,no};
+VAR state_normal-error : real;
+VAR state_normal-error_exists : {yes,no};
+VAR state_superstate : {nil};
+VAR state_warning-issued : {nil,gps,imu,lidar};
+VAR state_error-info_value-changed : {nil,true};
+VAR state_operator_name : {warn,do-not-warn,nil,record-changed-error,combined-warn-propose-do-not-warn-propose};
+VAR state_operator_name_error-info : {nil};
+VAR state_operator_error-info : {nil};
+VAR state_operator_error-info_warn-condition : {nil,low};
+VAR state_operator_error-info_error : {nil,lidar};
+VAR state_io_alert-sensor-error : {nil,gps,imu,lidar};
+VAR state_io_alert-sensor-error-value : {nil};
+VAR state_error-info_old-value : real;
+VAR state_error-info_old-value_exists : {yes,no};
+VAR state_error-info_warning-accepted : {nil};
+VAR state_io_alert-sensor-error_alert-sensor-error-value : real;
+VAR state_io_alert-sensor-error_alert-sensor-error-value_exists : {yes,no};
+VAR state_value : real;
+VAR state_value_exists : {yes,no};
+
+
+ASSIGN
+    init (state_flight-mode) := nil;
+    init (state_safety-error) := 10.0;
+    init (state_safety-error_exists) := no;
+    init (state_error-info_error) := nil;
+    init (state_error-info_current-value) := 9.5;
+    init (state_error-info_current-value_exists) := yes;
+    init (state_error-info_warn-condition) := nil;
+    init (state_high-low-warn-error) := 9.0;
+    init (state_high-low-warn-error_exists) := no;
+    init (state_normal-error) := 8.0;
+    init (state_normal-error_exists) := no;
+    init (state_warning-issued) := nil;
+    init (state_error-info_value-changed) := nil;
+    init (state_operator_name) := nil;
+    init (state_operator_error-info_warn-condition) := nil;
+    init (state_operator_error-info_error) := nil;
+    init (state_io_alert-sensor-error) := nil;
+    init (state_error-info_old-value) := 0.0;
+    init (state_error-info_old-value_exists) := no;
+    init (state_io_alert-sensor-error_alert-sensor-error-value) := 0.0;
+    init (state_io_alert-sensor-error_alert-sensor-error-value_exists) := no;
+    init (state_value) := 0.0;
+    init (state_value_exists) := no;
+
+
+VAR soarAgent : soarRules(state_flight-mode,state_safety-error,state_safety-error_exists,state_error-info,state_error-info_error,state_error-info_current-value,state_error-info_current-value_exists,state_error-info_warn-condition,state_high-low-warn-error,state_high-low-warn-error_exists,state_normal-error,state_normal-error_exists,state_superstate,state_warning-issued,state_error-info_value-changed,state_operator_name,state_operator_name_error-info,state_operator_error-info,state_operator_error-info_warn-condition,state_operator_error-info_error,state_io_alert-sensor-error,state_io_alert-sensor-error-value,state_error-info_old-value,state_error-info_old-value_exists,state_error-info_warning-accepted,state_io_alert-sensor-error_alert-sensor-error-value,state_io_alert-sensor-error_alert-sensor-error-value_exists,state_value,state_value_exists);
+
+VAR inputModuleRule : inputModule(state_flight-mode,state_safety-error,state_safety-error_exists,state_error-info,state_error-info_error,state_error-info_current-value,state_error-info_current-value_exists,state_error-info_warn-condition,state_high-low-warn-error,state_high-low-warn-error_exists,state_normal-error,state_normal-error_exists,state_superstate,state_warning-issued,state_error-info_value-changed,state_operator_name,state_operator_name_error-info,state_operator_error-info,state_operator_error-info_warn-condition,state_operator_error-info_error,state_io_alert-sensor-error,state_io_alert-sensor-error-value,state_error-info_old-value,state_error-info_old-value_exists,state_error-info_warning-accepted,state_io_alert-sensor-error_alert-sensor-error-value,state_io_alert-sensor-error_alert-sensor-error-value_exists,state_value,state_value_exists);
+
+-- ********************************************************************************************************
+-- Property Verification
+-- ********************************************************************************************************
+
+
+-- If the sensor error is past the safety threshold, the agent shall issue a warning
+
+    --will prove
+    -- LTLSPEC F (X state_error-info_warn-condition = safety & state_operator_name = warn & inputModuleRule.counter_for_warn_do_not_warn = 0)
+    -- LTLSPEC F (X state_error-info_warn-condition = safety & state_operator_name = do-not-warn & inputModuleRule.counter_for_warn_do_not_warn != 0)
+    --
+    --will give counter example
+    -- LTLSPEC F (X state_error-info_warn-condition = safety & state_operator_name = do-not-warn & inputModuleRule.counter_for_warn_do_not_warn = 0)
+
+
+-- If error difference within the sensors is non zero, then the agent shall execute the error changed operator
+
+    -- -- will prove
+    -- LTLSPEC F (X (state_error-info_old-value != state_error-info_current-value) -> state_operator_name = record-changed-error)
+    --
+    -- -- will give counter exmaple
+    -- LTLSPEC F (X (state_error-info_old-value != state_error-info_current-value) -> G state_error-info_value-changed = nil)
+    --
+
+-- If the difference in error values hasn't changed, the agent shall not execute the error changed operator
+
+    -- -- will prove
+    -- LTLSPEC F (X (state_error-info_old-value = state_error-info_current-value ) -> state_operator_name != record-changed-error)
+    --
+    -- --will give counter exmaple
+    -- LTLSPEC F (X (state_error-info_old-value = state_error-info_current-value ) -> state_operator_name = record-changed-error)
+
+-- When a sensor is at fault, and warning level is low, the agent shall not warn
+    -- LTLSPEC F (X (state_error-info_error = gps & state_error-info_warn-condition = low) & state_operator_name = do-not-warn & G inputModuleRule.counter_for_warn_do_not_warn = 0) -- proves in 13 steps
+    -- LTLSPEC F (X (state_error-info_error = gps & state_error-info_warn-condition = low) & state_operator_name = warn  & G inputModuleRule.counter_for_warn_do_not_warn = 0) -- does not prove, generates a counterexample in 8 steps
+    -- LTLSPEC F (X (state_error-info_error = lidar & state_error-info_warn-condition = low) & state_operator_name = do-not-warn  & G inputModuleRule.counter_for_warn_do_not_warn = 0) -- proves in 14 steps
+    -- LTLSPEC F (X (state_error-info_error = lidar & state_error-info_warn-condition = low) & state_operator_name = warn  & G inputModuleRule.counter_for_warn_do_not_warn = 0) -- does not prove, generates a counterexample in 8 steps
+    -- LTLSPEC F (X (state_error-info_error = imu & state_error-info_warn-condition = low) & state_operator_name = do-not-warn  & G inputModuleRule.counter_for_warn_do_not_warn = 0) -- proves in 13 steps
+    -- LTLSPEC F (X (state_error-info_error = imu & state_error-info_warn-condition = low) & state_operator_name = warn  & G inputModuleRule.counter_for_warn_do_not_warn = 0) -- does not prove, generates a counterexample in 8 steps
+
+-- When a sensor is at fault, and warning level is high, the agent shall warn
+    -- LTLSPEC F (X (state_error-info_error = gps & state_error-info_warn-condition = high))
+    -- LTLSPEC F (X (state_error-info_error = gps & state_error-info_warn-condition = high) & state_operator_name = warn & inputModuleRule.counter_for_warn_do_not_warn = 0) -- proves in 13 steps
+    -- LTLSPEC F (X (state_error-info_error = gps & state_error-info_warn-condition = high) & state_operator_name = do-not-warn & inputModuleRule.counter_for_warn_do_not_warn = 0) -- does not prove, generates a counterexample in 12 steps
+
+-- When the sensor error difference is not learned the agent shall select an operator based on the order in which it is generated
+    -- order given (do-not-warn*high*lidar > do-not-warn*high*gps > do-not-warn*low*imu > do-not-warn*low*lidar > do-not-warn*low*gps
+    --              warn*high*imu > warn*high*lidar > do-not-warn*high*imu > warn*low*imu > warn*low*lidar )
+    -- LTLSPEC F (X (state_error-info_error = lidar & state_error-info_warn-condition = low) -> state_operator_name = warn) -- does not prove, generates a counterexample in 8 steps (correct as do-not-warn generated first)
+    -- LTLSPEC F (X (state_error-info_error = lidar & state_error-info_warn-condition = high) -> state_operator_name = do-not-warn) -- proves in 12 steps (correct as do-not-warn generated first)
+    -- LTLSPEC F (X (state_error-info_error = imu & state_error-info_warn-condition = low) -> state_operator_name = warn) -- does not prove, generates a counterexample in 8 steps (correct as do-not-warn generated first)
+    -- LTLSPEC F (X (state_error-info_error = imu & state_error-info_warn-condition = high) -> state_operator_name = do-not-warn) -- does not prove, generates a counterexample in 12 steps (correct as warn generated first)
+
+-- If the sensor error is within normal threshold, the agent shall not issue a warning.
+    -- LTLSPEC F (X state_error-info_warn-condition = normal & state_operator_name = do-not-warn & inputModuleRule.counter_for_warn_do_not_warn = 0) -- proves in 13 steps
+    -- LTLSPEC F (X state_error-info_warn-condition = normal & state_operator_name = warn & inputModuleRule.counter_for_warn_do_not_warn = 0) -- does not prove, generates a counterexample in 8 steps
+
+-- A learned rule with the lowest preference shall never fire
+    -- (in our case it would be warn*low*gps)
+    -- LTLSPEC F (X (state_error-info_error = gps & state_error-info_warn-condition = low) & state_operator_name = warn) -- does not prove, generated a counterexample in 8 steps
+
+-- If a warning has previously been issued, the agent shall not issue another warning
+      -- --will prove
+      -- LTLSPEC F (X state_warning-issued != nil & state_error-info_warn-condition != nil & state_operator_name = do-not-warn & inputModuleRule.counter_for_warn_do_not_warn != 0) -- proves in 8 steps
+      -- --will give counter example
+      -- LTLSPEC F (X state_warning-issued != nil & state_error-info_warn-condition != nil & state_operator_name = do-not-warn & inputModuleRule.counter_for_warn_do_not_warn != 0)
+      -- --proof for safety condition
+      -- LTLSPEC F (X (state_warning-issued != nil & state_error-info_warn-condition = safety) & state_operator_name = do-not-warn & inputModuleRule.counter_for_warn_do_not_warn != 0) -- proves in 8 steps
+
+-- The agent shall resolve an impasse in selecting learned rules
+    -- LTLSPEC F (X (state_error-info_error = gps & state_error-info_warn-condition = high) -> state_operator_name = combined-warn-propose-do-not-warn-propose) -- proves in 8 steps
+    -- LTLSPEC F (X (state_error-info_error = gps & state_error-info_warn-condition = low) -> state_operator_name = combined-warn-propose-do-not-warn-propose) -- proves in 8 steps
+
+-- The agent shall always follow the precedence order from the learned rules
+    --(in our case highest prefernce is for
+    -- do-not-warn*normal > warn*safety > warn*high*gps)
+    -- LTLSPEC F (X state_error-info_warn-condition = normal -> state_operator_name = do-not-warn)
+    -- LTLSPEC F (X state_error-info_warn-condition = safety -> state_operator_name = warn)
+    -- LTLSPEC F (X (state_error-info_warn-condition = gps & state_error-info_warn-condition = high) -> state_operator_name = warn)
+
+-- ********************************************************************************************************
+
+
+MODULE inputModule(state_flight-mode,state_safety-error,state_safety-error_exists,state_error-info,state_error-info_error,state_error-info_current-value,state_error-info_current-value_exists,state_error-info_warn-condition,state_high-low-warn-error,state_high-low-warn-error_exists,state_normal-error,state_normal-error_exists,state_superstate,state_warning-issued,state_error-info_value-changed,state_operator_name,state_operator_name_error-info,state_operator_error-info,state_operator_error-info_warn-condition,state_operator_error-info_error,state_io_alert-sensor-error,state_io_alert-sensor-error-value,state_error-info_old-value,state_error-info_old-value_exists,state_error-info_warning-accepted,state_io_alert-sensor-error_alert-sensor-error-value,state_io_alert-sensor-error_alert-sensor-error-value_exists,state_value,state_value_exists)
+
+VAR counter_for_warn_do_not_warn : integer; -- count is 2 for warn to do-not-warn
+ASSIGN
+
+    init (counter_for_warn_do_not_warn) := 0;
+    next (counter_for_warn_do_not_warn) :=
+        case
+            (state_operator_name = warn): counter_for_warn_do_not_warn + 1;
+            (state_operator_name = do-not-warn): counter_for_warn_do_not_warn;
+            TRUE: counter_for_warn_do_not_warn;
+        esac;
+    next (state_error-info_current-value) := -- current-value being set to 9.5 to verify warn on high value
+        case
+        (state_error-info_current-value != 9.5):9.5;
+        TRUE: state_error-info_current-value;
+        esac;
+    next (state_error-info_old-value) :=
+        case
+        (state_error-info_old-value != 13.5):13.5; -- old-value set to 13.5 to indicate a change between old-value and new-value
+        TRUE: state_error-info_old-value;
+        esac;
+    next (state_flight-mode) :=
+        case
+        (state_flight-mode != horizontal):horizontal;
+        TRUE: state_flight-mode;
+        esac;
+    next (state_error-info_error) :=
+        case
+        (state_error-info_error != gps):gps;
+        TRUE: state_error-info_error;
+        esac;
+    next (state_value) :=
+        case TRUE: state_value;
+        esac;
+
+
+MODULE soarRules(state_flight-mode,state_safety-error,state_safety-error_exists,state_error-info,state_error-info_error,state_error-info_current-value,state_error-info_current-value_exists,state_error-info_warn-condition,state_high-low-warn-error,state_high-low-warn-error_exists,state_normal-error,state_normal-error_exists,state_superstate,state_warning-issued,state_error-info_value-changed,state_operator_name,state_operator_name_error-info,state_operator_error-info,state_operator_error-info_warn-condition,state_operator_error-info_error,state_io_alert-sensor-error,state_io_alert-sensor-error-value,state_error-info_old-value,state_error-info_old-value_exists,state_error-info_warning-accepted,state_io_alert-sensor-error_alert-sensor-error-value,state_io_alert-sensor-error_alert-sensor-error-value_exists,state_value,state_value_exists)
+
+VAR state:{start, run};
+ASSIGN
+        init (state) := start;
+        next (state) :=
+            case
+        --do-not-warn*when-warning-issued*propose (state_error-info,state_warning-issued,state_error-info_value-changed,state_error-info_warn-condition)
+        state = start & (state_warning-issued != nil & state_error-info_value-changed = true & state_error-info_warn-condition != nil) : run;
+        --warn*best*safety-condition (state_operator_name,state_error-info_warn-condition)
+        state = start & (state_operator_name = combined-warn-propose-do-not-warn-propose & state_error-info_warn-condition = safety) : run;
+        --do-not-warn*best*normal-condition (state_operator_name,state_error-info_warn-condition)
+        state = start & (state_operator_name = combined-warn-propose-do-not-warn-propose & state_error-info_warn-condition = normal) : run;
+        --warn*select*low*gps (state_operator_name,state_error-info,state_error-info_warn-condition,state_error-info_error)
+        state = start & (state_operator_name = combined-warn-propose-do-not-warn-propose & state_error-info_warn-condition = low & state_error-info_error = gps) : run;
+        --warn*select*low*lidar (state_operator_name,state_operator_error-info,state_operator_error-info_warn-condition,state_operator_error-info_error)
+        state = start & (state_operator_name = combined-warn-propose-do-not-warn-propose & state_operator_error-info_warn-condition = low & state_operator_error-info_error = lidar) : run;
+        --warn*select*low*imu (state_operator_name,state_error-info,state_error-info_warn-condition,state_error-info_error)
+        state = start & (state_operator_name = combined-warn-propose-do-not-warn-propose & state_error-info_warn-condition = low & state_error-info_error = imu) : run;
+        --warn*select*high*gps (state_operator_name,state_error-info,state_error-info_warn-condition,state_error-info_error)
+        state = start & (state_operator_name = combined-warn-propose-do-not-warn-propose & state_error-info_warn-condition = high & state_error-info_error = gps) : run;
+        --warn*select*high*lidar (state_operator_name,state_error-info,state_error-info_warn-condition,state_error-info_error)
+        state = start & (state_operator_name = combined-warn-propose-do-not-warn-propose & state_error-info_warn-condition = high & state_error-info_error = lidar) : run;
+        --warn*select*high*imu (state_operator_name,state_error-info,state_error-info_warn-condition,state_error-info_error)
+        state = start & (state_operator_name = combined-warn-propose-do-not-warn-propose & state_error-info_warn-condition = high & state_error-info_error = imu) : run;
+        --do-not-warn*select*low*gps (state_operator_name,state_error-info,state_error-info_warn-condition,state_error-info_error)
+        state = start & (state_operator_name = combined-warn-propose-do-not-warn-propose & state_error-info_warn-condition = low & state_error-info_error = gps) : run;
+        --do-not-warn*select*low*lidar (state_operator_name,state_error-info,state_error-info_warn-condition,state_error-info_error)
+        state = start & (state_operator_name = combined-warn-propose-do-not-warn-propose & state_error-info_warn-condition = low & state_error-info_error = lidar) : run;
+        --do-not-warn*select*low*imu (state_operator_name,state_error-info,state_error-info_warn-condition,state_error-info_error)
+        state = start & (state_operator_name = combined-warn-propose-do-not-warn-propose & state_error-info_warn-condition = low & state_error-info_error = imu) : run;
+        --do-not-warn*select*high*gps (state_operator_name,state_error-info,state_error-info_warn-condition,state_error-info_error)
+        state = start & (state_operator_name = combined-warn-propose-do-not-warn-propose & state_error-info_warn-condition = high & state_error-info_error = gps) : run;
+        --do-not-warn*select*high*lidar (state_operator_name,state_error-info,state_error-info_warn-condition,state_error-info_error)
+        state = start & (state_operator_name = combined-warn-propose-do-not-warn-propose & state_error-info_warn-condition = high & state_error-info_error = lidar) : run;
+        --do-not-warn*select*high*imu (state_operator_name,state_error-info,state_error-info_warn-condition,state_error-info_error)
+        state = start & (state_operator_name = combined-warn-propose-do-not-warn-propose & state_error-info_warn-condition = high & state_error-info_error = imu) : run;
+        --warn*apply*issue-warning (state_warning-issued,state_io_alert-sensor-error,state_io_alert-sensor-error-value,state_operator_name,state_error-info,state_error-info_error,state_error-info_old-value,state_error-info_old-value_exists,state_error-info_value-changed,state_error-info_warning-accepted)
+        state = start & (state_warning-issued = nil & state_operator_name = warn & state_error-info_value-changed = true & state_error-info_warning-accepted = nil) : run;
+        --record-changed-error*propose (state_error-info,state_error-info_current-value,state_error-info_current-value_exists,state_error-info_old-value,state_error-info_old-value_exists,state_error-info_value-changed)
+        state = start & (state_error-info_old-value != state_error-info_current-value & state_error-info_value-changed = nil) : run;
+        --record-changed-error*apply*remove-old-value (state_operator_name,state_error-info,state_value,state_value_exists,state_error-info_error,state_error-info_old-value,state_error-info_old-value_exists,state_error-info_value-changed)
+        state = start & (state_operator_name = record-changed-error & state_error-info_value-changed = nil) : run;
+        --record-changed-error*apply*new-old-value (state_operator_name,state_error-info,state_value,state_value_exists,state_error-info_error,state_error-info_old-value,state_error-info_old-value_exists,state_error-info_value-changed)
+        state = start & (state_operator_name = record-changed-error & state_error-info_old-value_exists = no & state_error-info_value-changed = nil) : run;
+        --combined-warn-propose-do-not-warn-propose (state_error-info,state_warning-issued,state_error-info_value-changed,state_error-info_warn-condition)
+        state = start & (state_warning-issued = nil & state_error-info_value-changed = true & state_error-info_warn-condition != nil) : run;
+        state = run : start;
+            TRUE : state;
+            esac;
+TRANS
+        next (state_operator_name) =
+            case
+
+        -- 10000.0        --do-not-warn*best*normal-condition (state_operator_name,state_error-info_warn-condition)
+        (state = run & state_operator_name = combined-warn-propose-do-not-warn-propose & state_error-info_warn-condition = normal): do-not-warn;
+        -- 10000.0        --warn*best*safety-condition (state_operator_name,state_error-info_warn-condition)
+        (state = run & state_operator_name = combined-warn-propose-do-not-warn-propose & state_error-info_warn-condition = safety): warn;
+        -- 1.569174147        --warn*select*high*gps (state_operator_name,state_error-info,state_error-info_warn-condition,state_error-info_error)
+        (state = run & state_operator_name = combined-warn-propose-do-not-warn-propose & state_error-info_warn-condition = high & state_error-info_error = gps): warn;
+        --do-not-warn*select*high*lidar (state_operator_name,state_error-info,state_error-info_warn-condition,state_error-info_error)
+        (state = run & state_operator_name = combined-warn-propose-do-not-warn-propose & state_error-info_warn-condition = high & state_error-info_error = lidar): do-not-warn;
+        --do-not-warn*select*high*gps (state_operator_name,state_error-info,state_error-info_warn-condition,state_error-info_error)
+        (state = run & state_operator_name = combined-warn-propose-do-not-warn-propose & state_error-info_warn-condition = high & state_error-info_error = gps): do-not-warn;
+        --do-not-warn*select*low*imu (state_operator_name,state_error-info,state_error-info_warn-condition,state_error-info_error)
+        (state = run & state_operator_name = combined-warn-propose-do-not-warn-propose & state_error-info_warn-condition = low & state_error-info_error = imu): do-not-warn;
+        --do-not-warn*select*low*lidar (state_operator_name,state_error-info,state_error-info_warn-condition,state_error-info_error)
+        (state = run & state_operator_name = combined-warn-propose-do-not-warn-propose & state_error-info_warn-condition = low & state_error-info_error = lidar): do-not-warn;
+        --do-not-warn*select*low*gps (state_operator_name,state_error-info,state_error-info_warn-condition,state_error-info_error)
+        (state = run & state_operator_name = combined-warn-propose-do-not-warn-propose & state_error-info_warn-condition = low & state_error-info_error = gps): do-not-warn;
+        --warn*select*high*imu (state_operator_name,state_error-info,state_error-info_warn-condition,state_error-info_error)
+        (state = run & state_operator_name = combined-warn-propose-do-not-warn-propose & state_error-info_warn-condition = high & state_error-info_error = imu): warn;
+        --warn*select*high*lidar (state_operator_name,state_error-info,state_error-info_warn-condition,state_error-info_error)
+        (state = run & state_operator_name = combined-warn-propose-do-not-warn-propose & state_error-info_warn-condition = high & state_error-info_error = lidar): warn;
+        --do-not-warn*select*high*imu (state_operator_name,state_error-info,state_error-info_warn-condition,state_error-info_error)
+        (state = run & state_operator_name = combined-warn-propose-do-not-warn-propose & state_error-info_warn-condition = high & state_error-info_error = imu): do-not-warn;
+        --warn*select*low*imu (state_operator_name,state_error-info,state_error-info_warn-condition,state_error-info_error)
+        (state = run & state_operator_name = combined-warn-propose-do-not-warn-propose & state_error-info_warn-condition = low & state_error-info_error = imu): warn;
+        --warn*select*low*lidar (state_operator_name,state_operator_error-info,state_operator_error-info_warn-condition,state_operator_error-info_error)
+        (state = run & state_operator_name = combined-warn-propose-do-not-warn-propose & state_operator_error-info_warn-condition = low & state_operator_error-info_error = lidar): warn;
+        --combined-warn-propose-do-not-warn-propose (state_error-info,state_warning-issued,state_error-info_value-changed,state_error-info_warn-condition)
+        (state = run & state_warning-issued = nil & state_error-info_value-changed = true & state_error-info_warn-condition != nil): combined-warn-propose-do-not-warn-propose;
+        --record-changed-error*propose (state_error-info,state_error-info_current-value,state_error-info_current-value_exists,state_error-info_old-value,state_error-info_old-value_exists,state_error-info_value-changed)
+        (state = run & state_error-info_old-value != state_error-info_current-value & state_error-info_value-changed = nil): record-changed-error;
+        --do-not-warn*when-warning-issued*propose (state_error-info,state_warning-issued,state_error-info_value-changed,state_error-info_warn-condition)
+        (state = run & state_warning-issued != nil & state_error-info_value-changed = true & state_error-info_warn-condition != nil): do-not-warn;
+        -- -1.6409953320300001        --warn*select*low*gps (state_operator_name,state_error-info,state_error-info_warn-condition,state_error-info_error)
+        (state = run & state_operator_name = combined-warn-propose-do-not-warn-propose & state_error-info_warn-condition = low & state_error-info_error = gps): warn;
+            TRUE : state_operator_name;
+            esac;
+TRANS
+        next (state_safety-error) =
+            case
+
+        --top-state*elaborate*safety-error (state_superstate)
+        (state_superstate = nil & state_safety-error_exists != yes & state_safety-error != 10.0): 10.0;
+            TRUE : state_safety-error;
+                esac;
+TRANS
+        next (state_safety-error_exists) =
+            case
+
+        --top-state*elaborate*safety-error (state_superstate)
+        (state_superstate = nil & state_safety-error_exists != yes & state_safety-error != 10.0): yes;
+            TRUE : state_safety-error_exists;
+                esac;
+TRANS
+        next (state_error-info_warn-condition) =
+            case
+
+        --top-state*elaborate*error-info*warn-condition*safety (state_flight-mode,state_safety-error,state_safety-error_exists,state_error-info,state_error-info_error,state_error-info_current-value,state_error-info_current-value_exists)
+        (state_flight-mode = horizontal & state_error-info_current-value > state_safety-error & state_error-info_warn-condition != safety): safety;
+        --top-state*elaborate*error-info*warn-condition*high (state_flight-mode,state_high-low-warn-error,state_high-low-warn-error_exists,state_error-info,state_error-info_error,state_error-info_current-value,state_error-info_current-value_exists,state_error-info_warn-condition)
+        (state_flight-mode = horizontal & state_error-info_current-value > state_high-low-warn-error & state_error-info_warn-condition != safety & state_error-info_warn-condition != high): high;
+        --top-state*elaborate*error-info*warn-condition*low (state_flight-mode,state_normal-error,state_normal-error_exists,state_error-info,state_error-info_error,state_error-info_current-value,state_error-info_current-value_exists,state_error-info_warn-condition,state_error-info_warn-condition)
+        (state_flight-mode = horizontal & state_error-info_current-value > state_normal-error & state_error-info_warn-condition != safety & state_error-info_warn-condition != high & state_error-info_warn-condition != low): low;
+            TRUE : state_error-info_warn-condition;
+                esac;
+TRANS
+        next (state_high-low-warn-error) =
+            case
+
+        --top-state*elaborate*high-low-warn-error (state_superstate)
+        (state_superstate = nil & state_high-low-warn-error_exists != yes & state_high-low-warn-error != 9.0): 9.0;
+            TRUE : state_high-low-warn-error;
+                esac;
+TRANS
+        next (state_high-low-warn-error_exists) =
+            case
+
+        --top-state*elaborate*high-low-warn-error (state_superstate)
+        (state_superstate = nil & state_high-low-warn-error_exists != yes & state_high-low-warn-error != 9.0): yes;
+            TRUE : state_high-low-warn-error_exists;
+                esac;
+TRANS
+        next (state_normal-error) =
+            case
+
+        --top-state*elaborate*normal-error (state_superstate)
+        (state_superstate = nil & state_normal-error_exists != yes & state_normal-error != 8.0): 8.0;
+            TRUE : state_normal-error;
+                esac;
+TRANS
+        next (state_normal-error_exists) =
+            case
+
+        --top-state*elaborate*normal-error (state_superstate)
+        (state_superstate = nil & state_normal-error_exists != yes & state_normal-error != 8.0): yes;
+            TRUE : state_normal-error_exists;
+                esac;
+TRANS
+        next (state_warning-issued) =
+            case
+
+        --warn*apply*issue-warning (state_warning-issued,state_io_alert-sensor-error,state_io_alert-sensor-error-value,state_operator_name,state_error-info,state_error-info_error,state_error-info_old-value,state_error-info_old-value_exists,state_error-info_value-changed,state_error-info_warning-accepted)
+        (state = start & state_warning-issued = nil & state_operator_name = warn & state_error-info_value-changed = true & state_error-info_warning-accepted = nil): state_error-info_error;
+            TRUE : state_warning-issued;
+                esac;
+TRANS
+        next (state_error-info_value-changed) =
+            case
+
+        --warn*apply*issue-warning (state_warning-issued,state_io_alert-sensor-error,state_io_alert-sensor-error-value,state_operator_name,state_error-info,state_error-info_error,state_error-info_old-value,state_error-info_old-value_exists,state_error-info_value-changed,state_error-info_warning-accepted)
+        (state = start & state_warning-issued = nil & state_operator_name = warn & state_error-info_value-changed = true & state_error-info_warning-accepted = nil): nil;
+        --record-changed-error*apply*new-old-value (state_operator_name,state_error-info,state_value,state_value_exists,state_error-info_error,state_error-info_old-value,state_error-info_old-value_exists,state_error-info_value-changed)
+        (state = start & state_operator_name = record-changed-error & state_error-info_old-value_exists = no & state_error-info_value-changed = nil): true;
+            TRUE : state_error-info_value-changed;
+                esac;
+TRANS
+        next (state_operator_name_error-info) =
+            case
+
+        --combined-warn-propose-do-not-warn-propose (state_error-info,state_warning-issued,state_error-info_value-changed,state_error-info_warn-condition)
+        (state = start & state_warning-issued = nil & state_error-info_value-changed = true & state_error-info_warn-condition != nil): state_error-info;
+            TRUE : state_operator_name_error-info;
+                esac;
+TRANS
+        next (state_io_alert-sensor-error) =
+            case
+
+        --warn*apply*issue-warning (state_warning-issued,state_io_alert-sensor-error,state_io_alert-sensor-error-value,state_operator_name,state_error-info,state_error-info_error,state_error-info_old-value,state_error-info_old-value_exists,state_error-info_value-changed,state_error-info_warning-accepted)
+        (state = start & state_warning-issued = nil & state_operator_name = warn & state_error-info_value-changed = true & state_error-info_warning-accepted = nil): state_error-info_error;
+            TRUE : state_io_alert-sensor-error;
+                esac;
+TRANS
+        next (state_io_alert-sensor-error-value) =
+            case
+
+        --warn*apply*issue-warning (state_warning-issued,state_io_alert-sensor-error,state_io_alert-sensor-error-value,state_operator_name,state_error-info,state_error-info_error,state_error-info_old-value,state_error-info_old-value_exists,state_error-info_value-changed,state_error-info_warning-accepted)
+        (state = start & state_warning-issued = nil & state_operator_name = warn & state_error-info_value-changed = true & state_error-info_warning-accepted = nil): nil;
+            TRUE : state_io_alert-sensor-error-value;
+                esac;
+TRANS
+        next (state_error-info_old-value) =
+            case
+
+        --record-changed-error*apply*new-old-value (state_operator_name,state_error-info,state_value,state_value_exists,state_error-info_error,state_error-info_old-value,state_error-info_old-value_exists,state_error-info_value-changed)
+        (state = start & state_operator_name = record-changed-error & state_error-info_old-value_exists = no & state_error-info_value-changed = nil): state_value;
+            TRUE : state_error-info_old-value;
+                esac;
+TRANS
+        next (state_error-info_old-value_exists) =
+            case
+
+        --record-changed-error*apply*remove-old-value (state_operator_name,state_error-info,state_value,state_value_exists,state_error-info_error,state_error-info_old-value,state_error-info_old-value_exists,state_error-info_value-changed)
+        (state = start & state_operator_name = record-changed-error & state_error-info_value-changed = nil): no;
+        --record-changed-error*apply*new-old-value (state_operator_name,state_error-info,state_value,state_value_exists,state_error-info_error,state_error-info_old-value,state_error-info_old-value_exists,state_error-info_value-changed)
+        (state = start & state_operator_name = record-changed-error & state_error-info_old-value_exists = no & state_error-info_value-changed = nil): yes;
+            TRUE : state_error-info_old-value_exists;
+                esac;
+TRANS
+        next (state_io_alert-sensor-error_alert-sensor-error-value) =
+            case
+
+        --warn*apply*issue-warning (state_warning-issued,state_io_alert-sensor-error,state_io_alert-sensor-error-value,state_operator_name,state_error-info,state_error-info_error,state_error-info_old-value,state_error-info_old-value_exists,state_error-info_value-changed,state_error-info_warning-accepted)
+        (state = start & state_warning-issued = nil & state_operator_name = warn & state_error-info_value-changed = true & state_error-info_warning-accepted = nil): state_error-info_old-value;
+            TRUE : state_io_alert-sensor-error_alert-sensor-error-value;
+                esac;
+TRANS
+        next (state_io_alert-sensor-error_alert-sensor-error-value_exists) =
+            case
+
+        --warn*apply*issue-warning (state_warning-issued,state_io_alert-sensor-error,state_io_alert-sensor-error-value,state_operator_name,state_error-info,state_error-info_error,state_error-info_old-value,state_error-info_old-value_exists,state_error-info_value-changed,state_error-info_warning-accepted)
+        (state = start & state_warning-issued = nil & state_operator_name = warn & state_error-info_value-changed = true & state_error-info_warning-accepted = nil): yes;
+            TRUE : state_io_alert-sensor-error_alert-sensor-error-value_exists;
+                esac;
