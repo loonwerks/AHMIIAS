@@ -1,0 +1,11 @@
+sp{propose*initialize
+    (state <s> ^superstate nil
+               ^io.input-link.flightdata <fd>
+              -^name)
+    (<fd> ^throttle)
+-->
+    (<s> ^operator <o> + >,=)
+    (<o> ^name initialize)
+    (write (crlf) |Agent initializing...|)
+
+ }

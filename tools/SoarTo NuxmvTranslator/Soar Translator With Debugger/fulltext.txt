@@ -1,0 +1,1161 @@
+##!
+# @file
+#
+# @created rjones 20210118
+
+
+##!
+# @file
+#
+# @created rjones 20210118
+
+
+
+
+
+
+#decide indifferent-selection --boltzmann
+
+#decide indifferent-selection --temperature 1_0
+
+
+##!
+# @file
+#
+# @created rjones 20210118
+
+#sp{ (state }
+
+
+
+# Initialize agent
+sp{propose*initialize
+    (state<s>^superstate nil
+               ^io_flightdata <fd>
+              -^name)
+    (<fd> ^throttle)
+-->
+    (<s> ^operator <o> + >,=)
+    (<o> ^name initialize)
+
+ }
+
+# takeoff agent
+sp {propose*takeoff
+    (state <s> ^name takeoff
+               ^flight-mode vertical
+               ^io_flightdata <fd>)
+    (<fd> ^throttle <th> < 0_9)
+
+-->
+    (<s> ^operator <o> + >,=)
+    (<o> ^name takeoff)
+
+}
+
+# transition to horizontal
+sp {propose*transition
+    (state <s> ^name takeoff
+               ^flight-mode vertical
+               ^io_flightdata <fd>)
+    (<fd> ^throttle >= 0_9
+          ^altitude > 3200
+          ^airspeed >= 0)
+-->
+    (<s> ^operator <o> + >,=)
+    (<o> ^name transition)
+
+}
+
+# landing sequence
+sp {propose*start-landing
+    (state <s> ^flight-mode horizontal)
+    (<s> ^io_flightdata_initiate-landing yes)
+    (<s> ^landing no)
+-->
+    (<s> ^operator <o> + >,=)
+    (<o> ^name start-landing)
+}
+
+sp {propose*landing-phase-two
+    (state <s> ^flight-mode horizontal
+               ^landing phase-one
+               ^io_flightdata_altitude <= 4000)
+-->
+    (<s> ^operator <o> + >,=)
+    (<o> ^name landing-phase-two)
+}
+
+sp {propose*landing-phase-three
+    (state <s> ^flight-mode horizontal
+               ^landing phase-two
+               ^io_flightdata <fd>)
+    (<fd> ^altitude <= 4050
+          ^airspeed <= 180)
+-->
+    (<s> ^operator <o> + >,=)
+    (<o> ^name landing-phase-three)
+}
+
+sp {propose*landing-phase-four
+    (state <s> ^flight-mode horizontal
+               ^landing phase-three
+               ^io_flightdata <fd>)
+    (<fd> ^altitude < 3700
+          ^distance-to-target < 1_0)
+-->
+    (<s> ^operator <o> + =)
+    (<o> ^name landing-phase-four)
+}
+
+sp {propose*landing-finished
+    (state <s> ^flight-mode horizontal
+               ^landing phase-four
+               ^io_flightdata_airspeed <= 10)
+-->
+    (<s> ^operator <o> + >,=)
+    (<o> ^name landing-finished)
+}
+
+# Abort Landing
+sp {propose*abort-landing
+    (state <s> ^io_flightdata_abort-landing yes)
+-->
+    (<s> ^operator <o> + >,=)
+    (<o> ^name abort-landing)
+}
+
+sp {propose*transition-after-abort
+    (state <s> ^landing abort
+               ^io_flightdata <fd>
+               ^flight-mode vertical)
+    (<fd> ^altitude > 4200
+          ^pilot-selected-landing-zone yes)
+-->
+    (<s> ^operator <o> + >,=)
+    (<o> ^name transition-after-abort)
+}
+
+
+##!
+# @file:
+#
+# @created rjones 20210118
+
+
+##!
+# @file
+#
+# @created rjones 20210118
+
+
+sp {apply*initialize
+    (state <s> ^operator_name initialize
+               ^io_output-link <out>)
+-->
+    (<s> ^name takeoff)
+    (<s> ^flight-mode vertical)
+    (<s> ^sensor-unreliable no)
+    (<s> ^faulty-sensor none)
+    (<s> ^landing no)
+    (<s> ^notified-pilot no)
+    (<out> ^target-altitude 5000)
+    (<out> ^throttle 0)
+    (<out> ^autoflaps off)
+    (<out> ^air-brake 0_0)
+    (<out>  ^alert-sensor-error-value 0_0)
+    (<out> ^alert-sensor-error gps)
+
+}
+
+
+##!
+# @file
+#
+# @created rjones 20210118
+
+
+sp {apply*takeoff
+    (state <s> ^operator_name takeoff
+               ^io <io>)
+    (<io> ^flightdata_throttle <th>
+          ^output-link <out>)
+    (<out> ^throttle <tho>)
+
+-->
+
+    (<out> ^throttle <tho> -)
+    (<out> ^throttle (+ <th> 0_1))
+}
+
+
+##!
+# @file
+#
+# @created rjones 20210118
+
+
+sp {apply*transition
+    (state <s> ^operator_name transition
+               ^name takeoff
+               ^flight-mode <fm>
+               ^io_output-link <out>)
+
+-->
+    (<s> ^name takeoff -)
+    (<s> ^name flying +)
+    (<out> ^VTOLMode horizontal)
+    (<s> ^flight-mode <fm> -)
+    (<s> ^flight-mode horizontal +)
+}
+
+
+##!
+# @file
+#
+# @created rjones 20210121
+
+
+sp {apply*start-landing
+    (state <s> ^operator_name start-landing
+               ^landing no
+               ^io_output-link <out>)
+    (<out> ^target-altitude <ta>
+           ^throttle <tho>
+           ^air-brake <abo>)
+
+-->
+    (<out> ^throttle <tho> - 0_0 +)
+    (<out> ^target-altitude <ta> - 4000 +)
+    (<out> ^air-brake <abo> - 0_8 +)
+    (<s> ^landing no - phase-one +)
+}
+
+
+##!
+# @file
+#
+# @created rjones 20210121
+
+
+sp {apply*landing-phase-two
+    (state <s> ^operator_name landing-phase-two
+               ^io <io>
+               ^landing phase-one)
+    (<io> ^flightdata <fd>
+          ^output-link <out>)
+    (<out> ^throttle <tho>
+           ^autoflaps <afo>
+           ^air-brake <abo>)
+-->
+    (<out> ^throttle <tho> - 0_0 +)
+    (<out> ^autoflaps <afo> - on +)
+    (<out> ^air-brake <abo> - 1_0 +)
+    (<s> ^landing phase-one - phase-two +)
+}
+
+
+
+##!
+# @file
+#
+# @created rjones 20210121
+
+
+sp {apply*landing-phase-three
+    (state <s> ^operator_name landing-phase-three
+               ^io <io>
+               ^landing phase-two)
+    (<io> ^flightdata <fd>
+          ^output-link <out>)
+    (<out> ^VTOLMode <vmo>
+           ^throttle <tho>
+           ^target-altitude <ta>)
+-->
+    (<out> ^VTOLMode <vmo> - vertical +)
+    (<out> ^throttle <tho> - 0_31 +)
+    (<out> ^target-altitude <ta> - 3700 +)
+    (<s> ^landing phase-two - phase-three +)
+}
+
+##!
+# @file
+#
+# @created rjones 20210121
+
+
+sp {apply*landing-phase-four
+    (state <s> ^operator_name landing-phase-four
+               ^io_output-link <out>
+               ^landing phase-three)
+    (<out> ^throttle <tho>
+           ^target-altitude <ta>)
+-->
+    (<out> ^throttle <tho> - 0_195 +)
+    (<out> ^target-speed 0)
+    (<out> ^target-altitude <ta> - 2250 +)
+    (<s> ^landing phase-three - phase-four +)
+}
+
+##!
+# @file
+#
+# @created rjones 20210121
+
+
+sp {apply*landing-finished
+    (state <s> ^operator_name landing-finished
+               ^io_output-link <out>
+               ^landing phase-four)
+    (<out> ^throttle <tho>)
+-->
+    (<out> ^throttle <tho> - 0_23 +)
+    #(<out> ^rotor-pos 0_99)
+    (<s> ^landing phase-four - landed +)
+}
+
+
+##!
+# @file
+#
+# @created rjones 20210121
+
+
+sp {apply*abort-landing
+    (state <s> ^operator_name abort-landing
+               ^io_output-link <out>
+               ^landing <l>
+               ^flight-mode <fm>)
+    (<out> ^VTOLMode <vtol>
+           ^throttle <tho>
+           ^autoflaps <afo>
+           ^air-brake <abo>)
+    #(<out> ^target-speed <ts>)
+-->
+    (<s> ^landing <l> - abort +)
+    (<s> ^flight-mode <fm> - vertical +)
+    #(<out> ^target-speed <ts> -)
+    (<out> ^VTOLMode <vtol> - vertical +)
+    (<out> ^throttle <tho> - 0_9 +)
+    (<out> ^autoflaps <afo> - off +)
+    (<out> ^air-brake <abo> - 0_0 +)
+}
+
+
+##!
+# @file
+#
+# @created rjones 20210121
+
+
+sp {apply*transition*after*abort
+    (state <s> ^operator_name transition-after-abort
+               ^flight-mode <fm>
+               ^io_output-link <out>
+               ^landing abort)
+    (<out> ^VTOLMode <vm>
+           ^target-altitude <tao>)
+-->
+    (<out> ^VTOLMode <vm> - horizontal +)
+    (<out> ^target-altitude <tao> - 5000 +)
+    (<s> ^flight-mode <fm> - horizontal +)
+    (<s> ^landing abort - no +)
+}
+
+
+##!
+# @file:
+#
+# @created rjones 20210118
+
+
+##!
+# @file:
+#
+# @created rjones 20210118
+
+
+##!
+# @file
+#
+# @created rjones 20210118
+
+
+sp {sensor-error-over-limit*apply*gps
+    (state <s> ^operator <o>
+               ^io_output-link <out>
+              -^sensor-unreliable-command-sent gps)
+    (<o> ^name sensor-error-over-limit
+         ^sensor gps)
+-->
+    (<out> ^GPSUnreliable yes)
+    (<s> ^sensor-unreliable-command-sent gps)
+    }
+
+sp {sensor-error-over-limit*apply*lidar
+    (state <s> ^operator <o>
+               ^io_output-link <out>
+              -^sensor-unreliable-command-sent lidar)
+    (<o> ^name sensor-error-over-limit
+         ^sensor lidar)
+-->
+    (<out> ^LIDARUnreliable yes)
+    (<s> ^sensor-unreliable-command-sent lidar)
+    }
+
+sp {sensor-error-over-limit*apply*imu
+    (state <s> ^operator <o>
+               ^io_output-link <out>
+              -^sensor-unreliable-command-sent imu)
+    (<o> ^name sensor-error-over-limit
+         ^sensor imu)
+-->
+    (<out> ^IMUUnreliable yes)
+    (<s> ^sensor-unreliable-command-sent imu)
+    }
+
+sp {sensor-error-over-limit*apply
+    (state <s> ^sensor-unreliable no
+               ^sensor-unreliable-command-sent <sensor>
+               ^faulty-sensor <fs>
+               ^operator <o>)
+    (<o> ^name sensor-error-over-limit
+         ^sensor <sensor>)
+-->
+    (<s> ^sensor-unreliable no - yes +)
+    (<s> ^faulty-sensor <fs> - <sensor> +)
+    }
+
+
+
+##!
+# @file
+#
+# @created rjones 20210121
+
+
+sp {apply*pilot-agrees*gps-error
+    (state <s> ^operator_name pilot-agrees
+              -^error-handling-complete yes)
+    (<s> ^faulty-sensor gps)
+
+    (<s> ^io_output-link <out>)
+
+    -->
+    (<out> ^GPSUnreliable yes)
+    (<out> ^sensor-to-use lidar)
+    (<s> ^error-handling-complete yes)
+}
+
+sp {apply*pilot-agrees*lidar-error
+    (state <s> ^operator_name pilot-agrees
+              -^error-handling-complete yes)
+    (<s> ^faulty-sensor lidar)
+
+    (<s> ^io_output-link <out>)
+
+    -->
+    (<out> ^LIDARUnreliable yes)
+    (<out> ^sensor-to-use gps)
+    (<s> ^error-handling-complete yes)
+}
+
+sp {apply*pilot-agrees*imu-error
+    (state <s> ^operator_name pilot-agrees
+              -^error-handling-complete yes)
+    (<s> ^faulty-sensor imu)
+
+    (<s> ^io_output-link <out>)
+
+    -->
+    (<out> ^IMUUnreliable yes)
+    (<out> ^sensor-to-use gps)
+    (<s> ^error-handling-complete yes)
+}
+
+
+##!
+# @file
+#
+# @created rjones 20210121
+
+
+sp {apply*pilot-disagrees
+    (state <s> ^operator_name pilot-disagrees
+              -^error-handling-complete yes)
+    -->
+    (<s> ^error-handling-complete yes)
+}
+
+
+##!
+# @file
+#
+# @created rjones 20210118
+
+
+### Original code commented out, refactored code below
+#sp {propose*detect*gps*error
+#    (state <s> ^flight-mode horizontal)
+#    (<s> ^sensor-unreliable no)
+#    (<s> ^io_flightdata <fd>)
+#    (<fd> ^gps-lidar-error <e1> > 10_0)
+#    (<fd> ^gps-imu-error <e2> > 10_0)
+#-->
+#    (<s> ^operator <o> + >)
+#    (<o> ^name gps-sensor-error-over-limit)
+#}
+#
+#sp {propose*detect*lidar*error
+#    (state <s> ^flight-mode horizontal)
+#    (<s> ^sensor-unreliable no)
+#    (<s> ^io_flightdata <fd>)
+#    (<fd> ^gps-lidar-error <e1> > 10_0)
+#    (<fd> ^lidar-imu-error <e2> > 10_0)
+#-->
+#    (<s> ^operator <o> + >)
+#    (<o> ^name lidar-sensor-error-over-limit)
+#}
+#
+#sp {propose*detect*imu*error
+#    (state <s> ^flight-mode horizontal)
+#    (<s> ^sensor-unreliable no)
+#    (<s> ^io_flightdata <fd>)
+#    (<fd> ^gps-imu-error <e1> > 10_0)
+#    (<fd> ^lidar-imu-error <e2> > 10_0)
+#-->
+#    (<s> ^operator <o> + >)
+#    (<o> ^name imu-sensor-error-over-limit)
+#}
+
+### Note that we are not handling the case where all three error thresholds
+### are violated
+sp {top-state*elaborate*sensor-error-detected*gps
+    (state <s> ^flight-mode horizontal
+               ^sensor-unreliable no
+               ^error-info <gl> <gi>)
+    (<gl> ^error gps-lidar
+          ^warning-accepted yes)
+    (<gi> ^error gps-imu
+          ^warning-accepted yes)
+-->
+    (<s> ^sensor-error-detected gps)
+    }
+
+sp {top-state*elaborate*sensor-error-detected*lidar
+    (state <s> ^flight-mode horizontal
+               ^sensor-unreliable no
+               ^error-info <li> <gl>)
+    (<li> ^error lidar-imu
+          ^warning-accepted yes)
+    (<gl> ^error gps-lidar
+          ^warning-accepted yes)
+-->
+    (<s> ^sensor-error-detected lidar)
+    }
+
+sp {top-state*elaborate*sensor-error-detected*imu
+    (state <s> ^flight-mode horizontal
+               ^sensor-unreliable no
+               ^error-info <li> <gi>)
+    (<li> ^error lidar-imu
+          ^warning-accepted yes)
+    (<gi> ^error gps-imu
+          ^warning-accepted yes)
+-->
+    (<s> ^sensor-error-detected imu)
+    }
+
+sp {propose*sensor-error-over-limit
+    (state <s> ^sensor-unreliable no
+               ^sensor-error-detected <sensor>)
+-->
+    (<s> ^operator <o> + >,=)
+    (<o> ^name sensor-error-over-limit
+         ^sensor <sensor>)
+    }
+
+# pilot acknowledgement
+sp {propose*pilot-agrees
+    (state <s> ^flight-mode horizontal
+               ^sensor-unreliable yes
+              -^error-handling-complete yes)
+    (<s> ^io_flightdata <fd>)
+    (<fd> ^pilot_decision agree)
+-->
+
+    (<s> ^operator <o> + >,=)
+    (<o> ^name pilot-agrees)
+}
+
+# pilot disagrees
+sp {propose*pilot-disagrees
+    (state <s> ^flight-mode horizontal
+               ^sensor-unreliable yes
+              -^error-handling-complete yes)
+    (<s> ^io_flightdata <fd>)
+    (<fd> ^pilot_decision disagree)
+-->
+
+    (<s> ^operator <o> + >,=)
+    (<o> ^name pilot-disagrees)
+}
+
+
+
+
+##!
+# @file:
+#
+# @created rjones 20210118
+
+
+##!
+# @file:
+#
+# @created rjones 20210121
+
+
+##!
+# @file
+#
+# @created rjones 20210121
+
+
+sp {record-changed-error*apply*remove-old-value
+    (state <s> ^operator <o>)
+    (<o> ^name record-changed-error
+         ^error-info <ei>
+         ^value <> <v>)
+    (<ei> ^error <e>
+          ^old-value <v>
+         -^value-changed true)
+-->
+    #(<ei> ^value <v> -) Changed this!
+    (<ei> ^old-value <v> -)
+    }
+
+sp {record-changed-error*apply*new-old-value
+    (state <s> ^operator <o>)
+    (<o> ^name record-changed-error
+         ^error-info <ei>
+         ^value <v>)
+    (<ei> ^error <e>
+         -^old-value
+         -^value-changed true)
+-->
+    (<ei> ^old-value <v>
+          ^value-changed true)
+    }
+
+
+##!
+# @file
+#
+# @created rjones 20210121
+
+
+####################
+### Implementaton of the warn operator
+### Issue the warning and set a flag to await the response from the user
+
+#sp {warn*apply*message
+#    (state <s> ^operator <o>)
+#    (<o> ^name warn
+#         ^error-info_error <e>)
+#
+#-->
+#    }
+
+### Clear out any information from any previous warning we have given
+sp {warn*apply*warning-accepted*remove
+    :o-support
+    (state <s> ^operator <o>
+              -^warning-issued)
+    (<o> ^name warn
+         ^error-info <ei>)
+
+    (<ei> ^warning-accepted <x>)
+-->
+    (<ei> ^warning-accepted <x> -)
+    }
+
+### We need the :o-support flag on this operator because Soar wants ^warning-accepted to get o-support
+### but ^warning-issued to get i-support, and that causes Soar to go haywire
+sp {warn*apply*issue-warning
+    :o-support
+    (state <s> ^operator <o>
+               ^io_output-link <out>
+              -^warning-issued)
+    (<out> ^alert-sensor-error <se>)
+    (<out>  ^alert-sensor-error-value <sv>)
+    (<o> ^name warn
+         ^error-info <ei>)
+
+    (<ei>  ^error <e>
+           ## We use the "old-value" here because it is the value the triggeered the warning,
+           ## and we don't want things to mess up if the input value happens to change in
+           ## the middle of the warning process
+           ^old-value <v>
+           ^value-changed true
+          -^warning-accepted)
+-->
+    # Test to see if rule is fired
+    (<out> ^alert-sensor-error <se> -)
+    (<out>  ^alert-sensor-error-value <sv> -)
+    (<out> ^alert-sensor-error <e>
+           ^alert-sensor-error-value <v>)
+    (<s> ^warning-issued <e>)
+    (<ei> ^value-changed true -)
+    }
+
+
+##!
+# @file
+#
+# @created rjones 20210121
+
+
+sp {do-not-warn*apply*message
+    (state <s> ^operator <o>)
+    (<o> ^name do-not-warn
+         ^error-info_error <e>)
+          (<e>  ^warn-condition)
+-->
+    }
+
+### Clear out any information from any previous warning we have given
+sp {do-not-warn*apply*warning-accepted*remove
+    :o-support
+    (state <s> ^operator <o>
+              -^warning-issued)
+    (<o> ^name do-not-warn
+         ^error-info <ei>)
+     (<ei>  ^warn-condition)
+    (<ei> ^warning-accepted <x>)
+-->
+    (<ei> ^warning-accepted <x> -)
+    }
+
+### Don't do anything, but remove the record that the error value changed
+sp {do-not-warn*apply*value-changed*remove
+    :o-support
+    (state <s> ^operator <o>)
+    (<o> ^name do-not-warn
+         ^error-info <ei>)
+    (<ei>  ^error <e>
+           ^value-changed true)
+-->
+    (<ei> ^value-changed true -)
+    }
+
+
+##!
+# @file
+#
+# @created rjones 20210122
+
+
+sp {record-user-response*apply
+    (state <s> ^operator <o>
+               ^warning-issued <e>
+               ^io_output-link <out>)
+    (<o> ^name record-user-response
+         ^error-info <ei>
+         ^user-response <x>)
+    (<ei> ^error <e>
+         -^warning-accepted)
+-->
+    (<ei> ^warning-accepted <x>)
+    (<s> ^warning-issued <e> -)
+    (<out> ^clear-sensor-alert-response yes)
+    }
+
+##!
+# @file
+#
+# @created rjones 20210121
+
+
+#############
+### Create structures to keep information about each type of error
+sp {top-state*elaborate*error-info
+    (state <s> ^superstate nil)
+-->
+    (<s> ^error-info <gi> <gl> <li>)
+    (<gi> ^error gps)
+    (<gl> ^error lidar)
+    (<li> ^error imu)
+
+    }
+
+### Copy current error values from input to the error-info structures
+sp {top-state*elaborate*error-info*current-value*gps
+    (state <s> ^io_flightdata_gps-error <v>
+               ^error-info <ei>)
+    (<ei> ^error gps)
+-->
+    (<ei> ^current-value <v>)
+    }
+
+sp {top-state*elaborate*error-info*current-value*lidar
+    (state <s> ^io_flightdata_lidar-error <v>
+               ^error-info <ei>)
+    (<ei> ^error lidar)
+-->
+    (<ei> ^current-value <v>)
+    }
+
+sp {top-state*elaborate*error-info*current-value*imu
+    (state <s> ^io_flightdata_imu-error <v>
+               ^error-info <ei>)
+    (<ei> ^error imu)
+-->
+    (<ei> ^current-value <v>)
+    }
+
+#####################
+### Parameter values for the various warning conditions
+### Possible warn-condition values are normal, low, high, and safety
+### We never alert in a normal condition, always alert in a safety condition
+### and learn whether to alert in low or high conditions
+
+sp {top-state*elaborate*safety-error
+    (state <s> ^superstate nil)
+-->
+    (<s> ^safety-error 10_0)
+    }
+
+sp {top-state*elaborate*high-low-warn-error
+    (state <s> ^superstate nil)
+-->
+    (<s> ^high-low-warn-error 9_0)
+    }
+
+sp {top-state*elaborate*normal-error
+    (state <s> ^superstate nil)
+-->
+    (<s> ^normal-error 8_0)
+    }
+
+##########################
+### Detect safety condition for a sensor
+sp {top-state*elaborate*error-info*warn-condition*safety
+    (state <s> ^flight-mode horizontal
+               ^safety-error <v>
+               ^error-info <ei>)
+    (<ei> ^error <e>
+          ^current-value > <v>)
+-->
+    (<ei> ^warn-condition safety)
+    }
+
+##########################
+### Detect high warn-condition for a sensor
+sp {top-state*elaborate*error-info*warn-condition*high
+    (state <s> ^flight-mode horizontal
+               ^high-low-warn-error <v>
+               ^error-info <ei>)
+    (<ei> ^error <e>
+          ^current-value > <v>
+         -^warn-condition safety)
+-->
+    (<ei> ^warn-condition high)
+    }
+
+##########################
+### Detect low warn-condition for a sensor
+sp {top-state*elaborate*error-info*warn-condition*low
+    (state <s> ^flight-mode horizontal
+               ^normal-error <v>
+               ^error-info <ei>)
+    (<ei> ^error <e>
+          ^current-value > <v>
+         -^warn-condition safety
+         -^warn-condition high)
+-->
+    (<ei> ^warn-condition low)
+    }
+
+######################
+### Detect normal condition if none of the other conditions apply
+
+sp {top-state*elaborate*error-info*warn-condition*normal
+    (state <s> ^flight-mode horizontal
+               ^error-info <ei>)
+    (<ei> ^error <e>
+         -^warn-condition safety
+         -^warn-condition high
+         -^warn-condition low)
+-->
+    (<ei> ^warn-condition normal)
+    }
+
+########################
+### Any time one of the error values changes, record the change and set the ^error-changed flag
+### This flag will tell us that we have to decide whether to warn the user
+
+sp {record-changed-error*propose
+    (state <s> ^error-info <ei>)
+    (<ei> ^current-value <v>
+         -^old-value <v>
+         -^value-changed true)
+-->
+    (<s> ^operator <o> + =)
+    (<o> ^name record-changed-error
+         ^error-info <ei>
+         ^value <v>)
+    }
+
+############################
+### If the ^error-changed flag is set, then we need to (re-)decide whether to issue a warning_
+### when we issue the warning, we also remove the ^error-changed  flag so we do not issue
+### another warning until the error value changes again
+
+### To start, always propose the warn and do-not-warn operators
+### The warn operator will issue a warning and then we will wait for the user to
+### accept (or not) the warning
+### and then we will remove the ^error-changed  flag
+###
+### The do-not-warn operator will simply remove the flag
+
+### The ^warning-issued value allows us to wait for the user response, and it will also prevent
+### us from issuing more than one warning at a time
+sp {warn*propose
+    (state <s> ^error-info <ei>
+              -^warning-issued)
+    (<ei> ^value-changed true
+             ^warn-condition)
+-->
+    (<s> ^operator <o> +,=)
+    (<o> ^name warn
+         ^error-info <ei>)
+    }
+
+sp {do-not-warn*propose
+    (state <s> ^error-info <ei>)
+    (<ei> ^value-changed true
+            ^warn-condition)
+-->
+    (<s> ^operator <o> +,=)
+    (<o> ^name do-not-warn
+         ^error-info <ei>)
+    }
+
+####################
+### Record user's response to a warning
+sp {propose*record-user-resopnse
+    (state <s> ^flight-mode horizontal
+               ^warning-issued <e>
+               ^error-info <ei>
+              ^io_flightdata_sensor-alert-accepted <x> <> nil)
+   (<ei> ^error <e>
+         -^warning-accepted)
+-->
+    (<s> ^operator <o> + >,=)
+    (<o> ^name record-user-response
+         ^error-info <ei>
+         ^user-response <x>)
+}
+
+
+
+# Load Learning Rules
+##!
+# @file
+#
+# @created rjones 20210122
+
+
+##############################
+### Selection logic for the warn and do-not-warn operators
+
+### Always choose to warn in the safety condition
+sp {warn*best*safety-condition
+    (state <s> ^operator <o> +)
+    (<o> ^name warn
+         ^error-info_warn-condition safety)
+-->
+    (<s> ^operator <o> >,=)
+    }
+
+### Always choose NOT to warn in the normal condition
+sp {do-not-warn*best*normal-condition
+    (state <s> ^operator <o> +)
+    (<o> ^name do-not-warn
+         ^error-info_warn-condition normal)
+-->
+    (<s> ^operator <o> >,=)
+    }
+
+################################
+### Learning conditions
+
+### if the warn-condition is low or high, then we want to
+### learn the user's preferred thresholds for when to warn_
+### For this simple case, we will have one rule for each warn condition times one
+### rule for each error type, which allows us to learn different thresholds for each
+### error type, if we want_
+### If we wanted to just learn one threshold across all three error types, we would just
+### use two rules_
+### If we wanted to distinguish between even more cases (such as different thresholds during
+### different flight modes), we would add even more rules_
+
+sp {warn*select*low*gps
+    (state <s> ^operator <o> +)
+    (<o> ^name warn
+         ^error-info <ei>)
+    (<ei> ^error gps
+          ^warn-condition low)
+-->
+    (<s> ^operator <o> = 0_0)
+    }
+
+sp {warn*select*low*lidar
+    (state <s> ^operator <o> +)
+    (<o> ^name warn
+         ^error-info <ei>)
+    (<ei> ^error lidar
+          ^warn-condition low)
+-->
+    (<s> ^operator <o> = 0_0)
+    }
+
+sp {warn*select*low*imu
+    (state <s> ^operator <o> +)
+    (<o> ^name warn
+         ^error-info <ei>)
+    (<ei> ^error imu
+          ^warn-condition low)
+-->
+    (<s> ^operator <o> = 0_0)
+    }
+
+sp {warn*select*high*gps
+    (state <s> ^operator <o> +)
+    (<o> ^name warn
+         ^error-info <ei>)
+    (<ei> ^error gps
+          ^warn-condition high)
+-->
+    (<s> ^operator <o> = 0_0)
+    }
+
+sp {warn*select*high*lidar
+    (state <s> ^operator <o> +)
+    (<o> ^name warn
+         ^error-info <ei>)
+    (<ei> ^error lidar
+          ^warn-condition high)
+-->
+    (<s> ^operator <o> = 0_0)
+    }
+
+sp {warn*select*high*imu
+    (state <s> ^operator <o> +)
+    (<o> ^name warn
+         ^error-info <ei>)
+    (<ei> ^error imu
+          ^warn-condition high)
+-->
+    (<s> ^operator <o> = 0_0)
+    }
+
+### Then we have 6 similar rules for the do-not-warn operator
+### Although these are technically not necessary the way we are currently doing things_
+### We have no way to get any user feedback when we choose NOT to warn, so these rules
+### will never get any reward signal_  However, if we ever get to a point where we could
+### give them a reward signal, it would help speed up the learning
+
+sp {do-not-warn*select*low*gps
+    (state <s> ^operator <o> +)
+    (<o> ^name do-not-warn
+         ^error-info <ei>)
+    (<ei> ^error gps
+          ^warn-condition low)
+-->
+    (<s> ^operator <o> = 0_0)
+    }
+
+sp {do-not-warn*select*low*lidar
+    (state <s> ^operator <o> +)
+    (<o> ^name do-not-warn
+         ^error-info <ei>)
+    (<ei> ^error lidar
+          ^warn-condition low)
+-->
+    (<s> ^operator <o> = 0_0)
+    }
+
+sp {do-not-warn*select*low*imu
+    (state <s> ^operator <o> +)
+    (<o> ^name do-not-warn
+         ^error-info <ei>)
+    (<ei> ^error imu
+          ^warn-condition low)
+-->
+    (<s> ^operator <o> = 0_0)
+    }
+
+sp {do-not-warn*select*high*gps
+    (state <s> ^operator <o> +)
+    (<o> ^name do-not-warn
+         ^error-info <ei>)
+    (<ei> ^error gps
+          ^warn-condition high)
+-->
+    (<s> ^operator <o> = 0_0)
+    }
+
+sp {do-not-warn*select*high*lidar
+    (state <s> ^operator <o> +)
+    (<o> ^name do-not-warn
+         ^error-info <ei>)
+    (<ei> ^error lidar
+          ^warn-condition high)
+-->
+    (<s> ^operator <o> = 0_0)
+    }
+
+sp {do-not-warn*select*high*imu
+    (state <s> ^operator <o> +)
+    (<o> ^name do-not-warn
+         ^error-info <ei>)
+    (<ei> ^error imu
+          ^warn-condition high)
+-->
+    (<s> ^operator <o> = 0_0)
+    }
+
+
+##!
+# @file
+#
+# @created rjones 20210122
+
+
+######################
+### Learning rewards
+
+### Finally, we set reward values on the reward-link, depending on whether the user accepted our
+### warning or not_  For this simple example, we will give a reward of 1_0 if the user accepts
+### the warning and a reward of -1_0 if the user rejects the warning_
+
+### Note that we do not get any user feedback if we choose NOT to warn_  So for this example, we
+### only get reward signals when we have chosen to warn_
+
+sp {reward-link*elaborate*reward*accepted-warning
+    (state <s> ^reward-link <rl>
+               ^error-info_warning-accepted yes)
+-->
+    (<rl> ^reward <rr>)
+    (<rr> ^value 1_0)
+    }
+
+sp {reward-link*elaborate*reward*rejected-warning
+    (state <s> ^reward-link <rl>
+               ^error-info_warning-accepted no)
+-->
+    (<rl> ^reward <rr>)
+    (<rr> ^value -1_0)
+    }

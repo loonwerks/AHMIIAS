@@ -1,0 +1,290 @@
+
+C:\soar_translator>javac --release 8 -classpath .;C:/soar_translator/antlr-4.9.2-complete.jar main.java   && java -classpath .;./antlr-4.9.2-complete.jar main 
+"\nLoading load.soar"
+"\nLoading settings.soar"
+"\nLoading top-level.soar"
+"\nLoading operators/load.soar"
+"\nLoading initialize.soar"
+"\nLoading takeoff.soar"
+"\nLoading transition.soar"
+"\nLoading start-landing.soar"
+"\nLoading landing-phase-two.soar"
+"\nLoading landing-phase-three.soar"
+"\nLoading landing-phase-four.soar"
+"\nLoading landing-finished.soar"
+"\nLoading abort-landing.soar"
+"\nLoading transition-after-abort.soar"
+"\nLoading error-handling/load.soar"
+"\nLoading operators/load.soar"
+"\nLoading sensor-error-over-limit.soar"
+"\nLoading pilot-agrees.soar"
+"\nLoading pilot-disagrees.soar"
+"\nLoading handle-error.soar"
+"\nLoading alert-handling/load.soar"
+"\nLoading operators/load.soar"
+"\nLoading record-changed-error.soar"
+"\nLoading warn.soar"
+"\nLoading do-not-warn.soar"
+"\nLoading record-user-response.soar"
+"\nLoading handle-alert.soar"
+"\nLoading selection.soar"
+"\nLoading learning-rewards.soar"
+propose*initialize
+propose*takeoff
+propose*transition
+propose*start-landing
+propose*landing-phase-two
+propose*landing-phase-three
+propose*landing-phase-four
+propose*landing-finished
+propose*abort-landing
+propose*transition-after-abort
+apply*initialize
+apply*takeoff
+apply*transition
+apply*start-landing
+apply*landing-phase-two
+apply*landing-phase-three
+apply*landing-phase-four
+apply*landing-finished
+apply*abort-landing
+apply*transition*after*abort
+sensor-error-over-limit*apply*gps
+sensor-error-over-limit*apply*lidar
+sensor-error-over-limit*apply*imu
+sensor-error-over-limit*apply
+apply*pilot-agrees*gps-error
+apply*pilot-agrees*lidar-error
+apply*pilot-agrees*imu-error
+apply*pilot-disagrees
+propose*sensor-error-over-limit
+propose*pilot-agrees
+propose*pilot-disagrees
+record-changed-error*apply*remove-old-value
+record-changed-error*apply*new-old-value
+warn*apply*warning-accepted*remove
+warn*apply*issue-warning
+do-not-warn*apply*message
+do-not-warn*apply*warning-accepted*remove
+do-not-warn*apply*value-changed*remove
+record-user-response*apply
+record-changed-error*propose
+warn*propose
+do-not-warn*propose
+propose*record-user-resopnse
+warn*best*safety-condition
+do-not-warn*best*normal-condition
+warn*select*low*gps
+warn*select*low*lidar
+warn*select*low*imu
+warn*select*high*gps
+warn*select*high*lidar
+warn*select*high*imu
+do-not-warn*select*low*gps
+do-not-warn*select*low*lidar
+do-not-warn*select*low*imu
+do-not-warn*select*high*gps
+do-not-warn*select*high*lidar
+do-not-warn*select*high*imu
+MODULE main
+
+VAR state_superstate : {nil};
+VAR state_io_flightdata : {nil};
+VAR state_name : {nil,takeoff};
+VAR state_io_flightdata_throttle : {nil,>= 0.9};
+VAR state_flight-mode : {nil,vertical,horizontal};
+VAR state_io_flightdata_altitude : {nil,> 3200,<= 4000,<= 4050,< 3700,> 4200};
+VAR state_io_flightdata_airspeed : {nil,>= 0,<= 180,<= 10};
+VAR state_io_flightdata_initiate-landing : {nil,yes};
+VAR state_landing : {nil,no,phase-one,phase-two,phase-three,phase-four,abort};
+VAR state_io_flightdata_distance-to-target : {nil,< 1.0};
+VAR state_io_flightdata_abort-landing : {nil,yes};
+VAR state_io_flightdata_pilot-selected-landing-zone : {nil,yes};
+VAR state_operator_name : {nil,initialize,takeoff,transition,start-landing,landing-phase-two,landing-phase-three,landing-phase-four,landing-finished,abort-landing,transition-after-abort,sensor-error-over-limit,pilot-agrees,pilot-disagrees,record-changed-error,warn,do-not-warn,record-user-response};
+VAR state_io : {nil};
+VAR state_io_throttle : {nil};
+VAR state_io_target-altitude : {nil};
+VAR state_io_air-brake : {nil};
+VAR state_io_autoflaps : {nil};
+VAR state_io_VTOLMode : {nil};
+VAR state_operator : {nil};
+VAR state_sensor-unreliable-command-sent : {nil,gps,lidar,imu};
+VAR state_operator_sensor : {nil,gps,lidar,imu};
+VAR state_sensor-unreliable : {nil,no,yes};
+VAR state_faulty-sensor : {nil,gps,lidar,imu};
+VAR state_error-handling-complete : {nil,yes};
+VAR state_sensor-error-detected : {nil};
+VAR state_io_flightdata_pilot_decision : {nil,agree,disagree};
+VAR state_operator_error-info : {nil};
+VAR state_operator_value : {nil};
+VAR state_operator_error-info_error : {nil,gps,lidar,imu};
+VAR state_operator_error-info_old-value : {nil};
+VAR state_operator_error-info_value-changed : {nil,true};
+VAR state_warning-issued : {nil};
+VAR state_operator_error-info_warning-accepted : {nil};
+VAR state_io_alert-sensor-error : {nil};
+VAR state_io_alert-sensor-error-value : {nil};
+VAR state_operator_error-info_error_warn-condition : {nil};
+VAR state_operator_error-info_warn-condition : {nil,safety,normal,low,high};
+VAR state_operator_user-response : {nil};
+VAR state_error-info : {nil};
+VAR state_error-info_current-value : {nil};
+VAR state_error-info_old-value : {nil};
+VAR state_error-info_value-changed : {nil,true};
+VAR state_error-info_warn-condition : {nil};
+VAR state_io_flightdata_sensor-alert-accepted : {nil};
+VAR state_error-info_error : {nil};
+VAR state_error-info_warning-accepted : {nil};
+
+
+ASSIGN
+    init (state_name) := nil;
+    init (state_io_flightdata_throttle) := nil;
+    init (state_flight-mode) := nil;
+    init (state_io_flightdata_altitude) := nil;
+    init (state_io_flightdata_airspeed) := nil;
+    init (state_io_flightdata_initiate-landing) := nil;
+    init (state_landing) := nil;
+    init (state_io_flightdata_distance-to-target) := nil;
+    init (state_io_flightdata_abort-landing) := nil;
+    init (state_io_flightdata_pilot-selected-landing-zone) := nil;
+    init (state_operator_name) := nil;
+    init (state_sensor-unreliable-command-sent) := nil;
+    init (state_operator_sensor) := nil;
+    init (state_sensor-unreliable) := nil;
+    init (state_faulty-sensor) := nil;
+    init (state_error-handling-complete) := nil;
+    init (state_io_flightdata_pilot_decision) := nil;
+    init (state_operator_error-info_error) := nil;
+    init (state_operator_error-info_value-changed) := nil;
+    init (state_operator_error-info_warn-condition) := nil;
+    init (state_error-info_value-changed) := nil;
+
+
+VAR soarAgent : soarRules(state_superstate,state_io_flightdata,state_name,state_io_flightdata_throttle,state_flight-mode,state_io_flightdata_altitude,state_io_flightdata_airspeed,state_io_flightdata_initiate-landing,state_landing,state_io_flightdata_distance-to-target,state_io_flightdata_abort-landing,state_io_flightdata_pilot-selected-landing-zone,state_operator_name,state_io,state_io_throttle,state_io_target-altitude,state_io_air-brake,state_io_autoflaps,state_io_VTOLMode,state_operator,state_sensor-unreliable-command-sent,state_operator_sensor,state_sensor-unreliable,state_faulty-sensor,state_error-handling-complete,state_sensor-error-detected,state_io_flightdata_pilot_decision,state_operator_error-info,state_operator_value,state_operator_error-info_error,state_operator_error-info_old-value,state_operator_error-info_value-changed,state_warning-issued,state_operator_error-info_warning-accepted,state_io_alert-sensor-error,state_io_alert-sensor-error-value,state_operator_error-info_error_warn-condition,state_operator_error-info_warn-condition,state_operator_user-response,state_error-info,state_error-info_current-value,state_error-info_old-value,state_error-info_value-changed,state_error-info_warn-condition,state_io_flightdata_sensor-alert-accepted,state_error-info_error,state_error-info_warning-accepted);
+
+MODULE soarRules(state_superstate,state_io_flightdata,state_name,state_io_flightdata_throttle,state_flight-mode,state_io_flightdata_altitude,state_io_flightdata_airspeed,state_io_flightdata_initiate-landing,state_landing,state_io_flightdata_distance-to-target,state_io_flightdata_abort-landing,state_io_flightdata_pilot-selected-landing-zone,state_operator_name,state_io,state_io_throttle,state_io_target-altitude,state_io_air-brake,state_io_autoflaps,state_io_VTOLMode,state_operator,state_sensor-unreliable-command-sent,state_operator_sensor,state_sensor-unreliable,state_faulty-sensor,state_error-handling-complete,state_sensor-error-detected,state_io_flightdata_pilot_decision,state_operator_error-info,state_operator_value,state_operator_error-info_error,state_operator_error-info_old-value,state_operator_error-info_value-changed,state_warning-issued,state_operator_error-info_warning-accepted,state_io_alert-sensor-error,state_io_alert-sensor-error-value,state_operator_error-info_error_warn-condition,state_operator_error-info_warn-condition,state_operator_user-response,state_error-info,state_error-info_current-value,state_error-info_old-value,state_error-info_value-changed,state_error-info_warn-condition,state_io_flightdata_sensor-alert-accepted,state_error-info_error,state_error-info_warning-accepted)
+
+VAR state:{start, run};
+ASSIGN
+        init (state) := start;
+        next (state) :=
+            case
+        --propose*initialize (state_superstate,state_io_flightdata,state_name,state_io_flightdata_throttle)
+        state = start & (state_superstate = nil & state_name = nil & state_io_flightdata_throttle != nil) : run;
+        --propose*takeoff (state_name,state_flight-mode,state_io_flightdata,state_io_flightdata_throttle)
+        state = start & (state_name = takeoff & state_flight-mode = vertical) : run;
+        --propose*transition (state_name,state_flight-mode,state_io_flightdata,state_io_flightdata_throttle,state_io_flightdata_altitude,state_io_flightdata_airspeed)
+        state = start & (state_name = takeoff & state_flight-mode = vertical & state_io_flightdata_throttle >= 0.9 & state_io_flightdata_altitude > 3200 & state_io_flightdata_airspeed >= 0) : run;
+        --propose*start-landing (state_flight-mode,state_io_flightdata_initiate-landing,state_landing)
+        state = start & (state_flight-mode = horizontal & state_io_flightdata_initiate-landing = yes & state_landing = no) : run;
+        --propose*landing-phase-two (state_flight-mode,state_landing,state_io_flightdata_altitude)
+        state = start & (state_flight-mode = horizontal & state_landing = phase-one & state_io_flightdata_altitude <= 4000) : run;
+        --propose*landing-phase-three (state_flight-mode,state_landing,state_io_flightdata,state_io_flightdata_altitude,state_io_flightdata_airspeed)
+        state = start & (state_flight-mode = horizontal & state_landing = phase-two & state_io_flightdata_altitude <= 4050 & state_io_flightdata_airspeed <= 180) : run;
+        --propose*landing-phase-four (state_flight-mode,state_landing,state_io_flightdata,state_io_flightdata_altitude,state_io_flightdata_distance-to-target)
+        state = start & (state_flight-mode = horizontal & state_landing = phase-three & state_io_flightdata_altitude < 3700 & state_io_flightdata_distance-to-target < 1.0) : run;
+        --propose*landing-finished (state_flight-mode,state_landing,state_io_flightdata_airspeed)
+        state = start & (state_flight-mode = horizontal & state_landing = phase-four & state_io_flightdata_airspeed <= 10) : run;
+        --propose*abort-landing (state_io_flightdata_abort-landing)
+        state = start & (state_io_flightdata_abort-landing = yes) : run;
+        --propose*transition-after-abort (state_landing,state_io_flightdata,state_flight-mode,state_io_flightdata_altitude,state_io_flightdata_pilot-selected-landing-zone)
+        state = start & (state_landing = abort & state_flight-mode = vertical & state_io_flightdata_altitude > 4200 & state_io_flightdata_pilot-selected-landing-zone = yes) : run;
+        --apply*initialize (state_operator_name,state_io)
+        state = start & (state_operator_name = initialize) : run;
+        --apply*takeoff (state_operator_name,state_io,state_io_flightdata_throttle,state_io,state_io_throttle)
+        state = start & (state_operator_name = takeoff) : run;
+        --apply*transition (state_operator_name,state_name,state_flight-mode,state_io)
+        state = start & (state_operator_name = transition & state_name = takeoff) : run;
+        --apply*start-landing (state_operator_name,state_landing,state_io,state_io_target-altitude,state_io_throttle,state_io_air-brake)
+        state = start & (state_operator_name = start-landing & state_landing = no) : run;
+        --apply*landing-phase-two (state_operator_name,state_io,state_landing,state_io_flightdata,state_io,state_io_throttle,state_io_autoflaps,state_io_air-brake)
+        state = start & (state_operator_name = landing-phase-two & state_landing = phase-one) : run;
+        --apply*landing-phase-three (state_operator_name,state_io,state_landing,state_io_flightdata,state_io,state_io_VTOLMode,state_io_throttle,state_io_target-altitude)
+        state = start & (state_operator_name = landing-phase-three & state_landing = phase-two) : run;
+        --apply*landing-phase-four (state_operator_name,state_io,state_landing,state_io_throttle,state_io_target-altitude)
+        state = start & (state_operator_name = landing-phase-four & state_landing = phase-three) : run;
+        --apply*landing-finished (state_operator_name,state_io,state_landing,state_io_throttle)
+        state = start & (state_operator_name = landing-finished & state_landing = phase-four) : run;
+        --apply*abort-landing (state_operator_name,state_io,state_landing,state_flight-mode,state_io_VTOLMode,state_io_throttle,state_io_autoflaps,state_io_air-brake)
+        state = start & (state_operator_name = abort-landing) : run;
+        --apply*transition*after*abort (state_operator_name,state_flight-mode,state_io,state_landing,state_io_VTOLMode,state_io_target-altitude)
+        state = start & (state_operator_name = transition-after-abort & state_landing = abort) : run;
+        --sensor-error-over-limit*apply*gps (state_operator,state_io,state_sensor-unreliable-command-sent,state_operator_name,state_operator_sensor)
+        state = start & (state_sensor-unreliable-command-sent = gps & state_operator_name = sensor-error-over-limit & state_operator_sensor = gps) : run;
+        --sensor-error-over-limit*apply*lidar (state_operator,state_io,state_sensor-unreliable-command-sent,state_operator_name,state_operator_sensor)
+        state = start & (state_sensor-unreliable-command-sent = lidar & state_operator_name = sensor-error-over-limit & state_operator_sensor = lidar) : run;
+        --sensor-error-over-limit*apply*imu (state_operator,state_io,state_sensor-unreliable-command-sent,state_operator_name,state_operator_sensor)
+        state = start & (state_sensor-unreliable-command-sent = imu & state_operator_name = sensor-error-over-limit & state_operator_sensor = imu) : run;
+        --sensor-error-over-limit*apply (state_sensor-unreliable,state_sensor-unreliable-command-sent,state_faulty-sensor,state_operator,state_operator_name,state_operator_sensor)
+        state = start & (state_sensor-unreliable = no & state_operator_name = sensor-error-over-limit) : run;
+        --apply*pilot-agrees*gps-error (state_operator_name,state_error-handling-complete,state_faulty-sensor,state_io)
+        state = start & (state_operator_name = pilot-agrees & state_error-handling-complete = yes & state_faulty-sensor = gps) : run;
+        --apply*pilot-agrees*lidar-error (state_operator_name,state_error-handling-complete,state_faulty-sensor,state_io)
+        state = start & (state_operator_name = pilot-agrees & state_error-handling-complete = yes & state_faulty-sensor = lidar) : run;
+        --apply*pilot-agrees*imu-error (state_operator_name,state_error-handling-complete,state_faulty-sensor,state_io)
+        state = start & (state_operator_name = pilot-agrees & state_error-handling-complete = yes & state_faulty-sensor = imu) : run;
+        --apply*pilot-disagrees (state_operator_name,state_error-handling-complete)
+        state = start & (state_operator_name = pilot-disagrees & state_error-handling-complete = yes) : run;
+        --propose*sensor-error-over-limit (state_sensor-unreliable,state_sensor-error-detected)
+        state = start & (state_sensor-unreliable = no) : run;
+        --propose*pilot-agrees (state_flight-mode,state_sensor-unreliable,state_error-handling-complete,state_io_flightdata,state_io_flightdata_pilot_decision)
+        state = start & (state_flight-mode = horizontal & state_sensor-unreliable = yes & state_error-handling-complete = yes & state_io_flightdata_pilot_decision = agree) : run;
+        --propose*pilot-disagrees (state_flight-mode,state_sensor-unreliable,state_error-handling-complete,state_io_flightdata,state_io_flightdata_pilot_decision)
+        state = start & (state_flight-mode = horizontal & state_sensor-unreliable = yes & state_error-handling-complete = yes & state_io_flightdata_pilot_decision = disagree) : run;
+        --record-changed-error*apply*remove-old-value (state_operator,state_operator_name,state_operator_error-info,state_operator_value,state_operator_error-info_error,state_operator_error-info_old-value,state_operator_error-info_value-changed)
+        state = start & (state_operator_name = record-changed-error & state_operator_error-info_value-changed = true) : run;
+        --record-changed-error*apply*new-old-value (state_operator,state_operator_name,state_operator_error-info,state_operator_value,state_operator_error-info_error,state_operator_error-info_old-value,state_operator_error-info_value-changed)
+        state = start & (state_operator_name = record-changed-error & state_operator_error-info_old-value = nil & state_operator_error-info_value-changed = true) : run;
+        --warn*apply*warning-accepted*remove (state_operator,state_warning-issued,state_operator_name,state_operator_error-info,state_operator_error-info_warning-accepted)
+        state = start & (state_warning-issued = nil & state_operator_name = warn) : run;
+        --warn*apply*issue-warning (state_operator,state_io,state_warning-issued,state_io_alert-sensor-error,state_io_alert-sensor-error-value,state_operator_name,state_operator_error-info,state_operator_error-info_error,state_operator_error-info_old-value,state_operator_error-info_value-changed,state_operator_error-info_warning-accepted)
+        state = start & (state_warning-issued = nil & state_operator_name = warn & state_operator_error-info_value-changed = true & state_operator_error-info_warning-accepted = nil) : run;
+        --do-not-warn*apply*message (state_operator,state_operator_name,state_operator_error-info_error,state_operator_error-info_error_warn-condition)
+        state = start & (state_operator_name = do-not-warn & state_operator_error-info_error_warn-condition != nil) : run;
+        --do-not-warn*apply*warning-accepted*remove (state_operator,state_warning-issued,state_operator_name,state_operator_error-info,state_operator_error-info_warn-condition,state_operator_error-info_warning-accepted)
+        state = start & (state_warning-issued = nil & state_operator_name = do-not-warn & state_operator_error-info_warn-condition != nil) : run;
+        --do-not-warn*apply*value-changed*remove (state_operator,state_operator_name,state_operator_error-info,state_operator_error-info_error,state_operator_error-info_value-changed)
+        state = start & (state_operator_name = do-not-warn & state_operator_error-info_value-changed = true) : run;
+        --record-user-response*apply (state_operator,state_warning-issued,state_io,state_operator_name,state_operator_error-info,state_operator_user-response,state_operator_error-info_error,state_operator_error-info_warning-accepted)
+        state = start & (state_operator_name = record-user-response & state_operator_error-info_warning-accepted = nil) : run;
+        --record-changed-error*propose (state_error-info,state_error-info_current-value,state_error-info_old-value,state_error-info_value-changed)
+        state = start & (state_error-info_value-changed = true) : run;
+        --warn*propose (state_error-info,state_warning-issued,state_error-info_value-changed,state_error-info_warn-condition)
+        state = start & (state_warning-issued = nil & state_error-info_value-changed = true & state_error-info_warn-condition != nil) : run;
+        --do-not-warn*propose (state_error-info,state_error-info_value-changed,state_error-info_warn-condition)
+        state = start & (state_error-info_value-changed = true & state_error-info_warn-condition != nil) : run;
+        --propose*record-user-resopnse (state_flight-mode,state_warning-issued,state_error-info,state_io_flightdata_sensor-alert-accepted,state_error-info_error,state_error-info_warning-accepted)
+        state = start & (state_flight-mode = horizontal & state_error-info_warning-accepted = nil) : run;
+        --warn*best*safety-condition (state_operator,state_operator_name,state_operator_error-info_warn-condition)
+        state = start & (state_operator_name = warn & state_operator_error-info_warn-condition = safety) : run;
+        --do-not-warn*best*normal-condition (state_operator,state_operator_name,state_operator_error-info_warn-condition)
+        state = start & (state_operator_name = do-not-warn & state_operator_error-info_warn-condition = normal) : run;
+        --warn*select*low*gps (state_operator,state_operator_name,state_operator_error-info,state_operator_error-info_error,state_operator_error-info_warn-condition)
+        state = start & (state_operator_name = warn & state_operator_error-info_error = gps & state_operator_error-info_warn-condition = low) : run;
+        --warn*select*low*lidar (state_operator,state_operator_name,state_operator_error-info,state_operator_error-info_error,state_operator_error-info_warn-condition)
+        state = start & (state_operator_name = warn & state_operator_error-info_error = lidar & state_operator_error-info_warn-condition = low) : run;
+        --warn*select*low*imu (state_operator,state_operator_name,state_operator_error-info,state_operator_error-info_error,state_operator_error-info_warn-condition)
+        state = start & (state_operator_name = warn & state_operator_error-info_error = imu & state_operator_error-info_warn-condition = low) : run;
+        --warn*select*high*gps (state_operator,state_operator_name,state_operator_error-info,state_operator_error-info_error,state_operator_error-info_warn-condition)
+        state = start & (state_operator_name = warn & state_operator_error-info_error = gps & state_operator_error-info_warn-condition = high) : run;
+        --warn*select*high*lidar (state_operator,state_operator_name,state_operator_error-info,state_operator_error-info_error,state_operator_error-info_warn-condition)
+        state = start & (state_operator_name = warn & state_operator_error-info_error = lidar & state_operator_error-info_warn-condition = high) : run;
+        --warn*select*high*imu (state_operator,state_operator_name,state_operator_error-info,state_operator_error-info_error,state_operator_error-info_warn-condition)
+        state = start & (state_operator_name = warn & state_operator_error-info_error = imu & state_operator_error-info_warn-condition = high) : run;
+        --do-not-warn*select*low*gps (state_operator,state_operator_name,state_operator_error-info,state_operator_error-info_error,state_operator_error-info_warn-condition)
+        state = start & (state_operator_name = do-not-warn & state_operator_error-info_error = gps & state_operator_error-info_warn-condition = low) : run;
+        --do-not-warn*select*low*lidar (state_operator,state_operator_name,state_operator_error-info,state_operator_error-info_error,state_operator_error-info_warn-condition)
+        state = start & (state_operator_name = do-not-warn & state_operator_error-info_error = lidar & state_operator_error-info_warn-condition = low) : run;
+        --do-not-warn*select*low*imu (state_operator,state_operator_name,state_operator_error-info,state_operator_error-info_error,state_operator_error-info_warn-condition)
+        state = start & (state_operator_name = do-not-warn & state_operator_error-info_error = imu & state_operator_error-info_warn-condition = low) : run;
+        --do-not-warn*select*high*gps (state_operator,state_operator_name,state_operator_error-info,state_operator_error-info_error,state_operator_error-info_warn-condition)
+        state = start & (state_operator_name = do-not-warn & state_operator_error-info_error = gps & state_operator_error-info_warn-condition = high) : run;
+        --do-not-warn*select*high*lidar (state_operator,state_operator_name,state_operator_error-info,state_operator_error-info_error,state_operator_error-info_warn-condition)
+        state = start & (state_operator_name = do-not-warn & state_operator_error-info_error = lidar & state_operator_error-info_warn-condition = high) : run;
+        --do-not-warn*select*high*imu (state_operator,state_operator_name,state_operator_error-info,state_operator_error-info_error,state_operator_error-info_warn-condition)
+        state = start & (state_operator_name = do-not-warn & state_operator_error-info_error = imu & state_operator_error-info_warn-condition = high) : run;
+        state = run : start;
+            TRUE : state;
+            esac;
+
