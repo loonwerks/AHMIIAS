@@ -68,30 +68,30 @@ VAR inputModuleRule : inputModule(state_flight-mode,state_safety-error,state_saf
 
 -- If the sensor error is past the safety threshold, the agent shall issue a warning
 
-    --will prove
-    -- LTLSPEC F (X state_error-info_warn-condition = safety & state_operator_name = warn & inputModuleRule.counter_for_warn_do_not_warn = 0)
-    -- LTLSPEC F (X state_error-info_warn-condition = safety & state_operator_name = do-not-warn & inputModuleRule.counter_for_warn_do_not_warn != 0)
+    --will Prove
+    -- LTLSPEC F (X state_error-info_warn-condition = safety & state_operator_name = warn & inputModuleRule.counter_for_warn_do_not_warn = 0) --proves in 14 steps with current-value as 10.5
+    -- LTLSPEC F (X state_error-info_warn-condition = safety & state_operator_name = do-not-warn & inputModuleRule.counter_for_warn_do_not_warn != 0) -- proves in 14 steps with current-value as 10.5
     --
     --will give counter example
-    -- LTLSPEC F (X state_error-info_warn-condition = safety & state_operator_name = do-not-warn & inputModuleRule.counter_for_warn_do_not_warn = 0)
+    -- LTLSPEC F (X state_error-info_warn-condition = safety & state_operator_name = do-not-warn & inputModuleRule.counter_for_warn_do_not_warn = 0) --generates a counter example in 11 steps
 
 
 -- If error difference within the sensors is non zero, then the agent shall execute the error changed operator
 
     -- -- will prove
-    -- LTLSPEC F (X (state_error-info_old-value != state_error-info_current-value) -> state_operator_name = record-changed-error)
+    -- LTLSPEC F (X (state_error-info_old-value != state_error-info_current-value) -> state_operator_name = record-changed-error) --proves in 4 steps
     --
-    -- -- will give counter exmaple
-    -- LTLSPEC F (X (state_error-info_old-value != state_error-info_current-value) -> G state_error-info_value-changed = nil)
+    -- -- will give counter example
+    -- LTLSPEC F (X (state_error-info_old-value != state_error-info_current-value) -> G state_error-info_value-changed = nil) --generates a counterexample in 11 steps
     --
 
 -- If the difference in error values hasn't changed, the agent shall not execute the error changed operator
 
     -- -- will prove
-    -- LTLSPEC F (X (state_error-info_old-value = state_error-info_current-value ) -> state_operator_name != record-changed-error)
+    -- LTLSPEC F (X (state_error-info_old-value = state_error-info_current-value ) -> state_operator_name != record-changed-error) --proves in 2 steps
     --
-    -- --will give counter exmaple
-    -- LTLSPEC F (X (state_error-info_old-value = state_error-info_current-value ) -> state_operator_name = record-changed-error)
+    -- --will give counter example
+    -- LTLSPEC F (X (state_error-info_old-value = state_error-info_current-value ) -> state_operator_name = record-changed-error) --generates a counterexample in 3 steps
 
 -- When a sensor is at fault, and warning level is low, the agent shall not warn
     -- LTLSPEC F (X (state_error-info_error = gps & state_error-info_warn-condition = low) & state_operator_name = do-not-warn & G inputModuleRule.counter_for_warn_do_not_warn = 0) -- proves in 13 steps
@@ -135,13 +135,15 @@ VAR inputModuleRule : inputModule(state_flight-mode,state_safety-error,state_saf
     -- LTLSPEC F (X (state_error-info_error = gps & state_error-info_warn-condition = low) -> state_operator_name = combined-warn-propose-do-not-warn-propose) -- proves in 8 steps
 
 -- The agent shall always follow the precedence order from the learned rules
-    --(in our case highest prefernce is for
+    --(in our case highest preference is for
     -- do-not-warn*normal > warn*safety > warn*high*gps)
-    -- LTLSPEC F (X state_error-info_warn-condition = normal -> state_operator_name = do-not-warn)
-    -- LTLSPEC F (X state_error-info_warn-condition = safety -> state_operator_name = warn)
-    -- LTLSPEC F (X (state_error-info_warn-condition = gps & state_error-info_warn-condition = high) -> state_operator_name = warn)
+    -- LTLSPEC F (X state_error-info_warn-condition = normal -> state_operator_name = do-not-warn) --proves in 3 steps
+    -- LTLSPEC F (X state_error-info_warn-condition = safety -> state_operator_name = warn) --proves in 3 steps
+    -- LTLSPEC F (X (state_error-info_warn-condition = gps & state_error-info_warn-condition = high) -> state_operator_name = warn) --proves in 3 steps
 
 -- ********************************************************************************************************
+
+
 
 
 MODULE inputModule(state_flight-mode,state_safety-error,state_safety-error_exists,state_error-info,state_error-info_error,state_error-info_current-value,state_error-info_current-value_exists,state_error-info_warn-condition,state_high-low-warn-error,state_high-low-warn-error_exists,state_normal-error,state_normal-error_exists,state_superstate,state_warning-issued,state_error-info_value-changed,state_operator_name,state_operator_name_error-info,state_operator_error-info,state_operator_error-info_warn-condition,state_operator_error-info_error,state_io_alert-sensor-error,state_io_alert-sensor-error-value,state_error-info_old-value,state_error-info_old-value_exists,state_error-info_warning-accepted,state_io_alert-sensor-error_alert-sensor-error-value,state_io_alert-sensor-error_alert-sensor-error-value_exists,state_value,state_value_exists)
