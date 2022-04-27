@@ -1,0 +1,10 @@
+##!
+# @file: 
+#
+# @created rjones 20210118
+
+echo "\nLoading error-handling/load.soar"
+
+source "operators/load.soar"
+
+source "handle-error.soar"

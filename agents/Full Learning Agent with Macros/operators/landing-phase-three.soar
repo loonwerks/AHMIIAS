@@ -1,0 +1,23 @@
+##!
+# @file
+#
+# @created rjones 20210121
+
+echo "\nLoading landing-phase-three.soar"
+
+sp {apply*landing-phase-three
+    (state <s> ^operator.name landing-phase-three
+               ^io <io>
+               ^landing phase-two)
+    (<io> ^input-link.flightdata <fd>
+          ^output-link <out>)
+    (<out> ^VTOLMode <vmo>
+           ^throttle <tho>
+           ^target-altitude <ta>)
+-->
+    (<out> ^VTOLMode <vmo> - vertical +)
+    (<out> ^throttle <tho> - 0.31 +)
+    (<out> ^target-altitude <ta> - 3700 +)
+    (<s> ^landing phase-two - phase-three +)
+    (write (crlf) |Initiating Landing Phase 3|)
+}

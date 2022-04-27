@@ -1,0 +1,15 @@
+##!
+# @file
+#
+# @created rjones 20210118
+
+echo "\nLoading settings.soar"
+
+waitsnc --on
+
+rl --set learning on
+
+#decide indifferent-selection --boltzmann
+decide indifferent-selection --softmax
+#decide indifferent-selection --temperature 1.0
+

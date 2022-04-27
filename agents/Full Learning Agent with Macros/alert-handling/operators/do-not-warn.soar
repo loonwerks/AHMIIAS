@@ -1,0 +1,108 @@
+##!
+# @file
+#
+# @created rjones 20210121
+
+echo "\nLoading do-not-warn.soar"
+
+#sp {do-not-warn*apply*message*gps
+#    (state <s> ^operator <o>)
+#    (<o> ^name do-not-warn)
+#    (<s> ^gps-error-info.error <e>)
+#    (<e>  ^warn-condition)
+#-->
+#    (write (crlf) |Choosing NOT to issue a warning for gps error|)
+#    }
+
+#sp {do-not-warn*apply*message*lidar
+#    (state <s> ^operator <o>)
+#    (<o> ^name do-not-warn)
+#    (<s> ^lidar-error-info.error <e>)
+#    (<e>  ^warn-condition)
+#-->
+#    (write (crlf) |Choosing NOT to issue a warning for lidar error|)
+#    }
+
+#sp {do-not-warn*apply*message*gps
+#    (state <s> ^operator <o>)
+#    (<o> ^name do-not-warn)
+#    (<s> ^imu-error-info.error <e>)
+#    (<e>  ^warn-condition)
+#-->
+#    (write (crlf) |Choosing NOT to issue a warning for imu error|)
+#    }
+
+### Clear out any information from any previous warning we have given
+sp {do-not-warn*apply*warning-accepted*remove*gps
+    :o-support
+    (state <s> ^operator <o>
+              -^warning-issued)
+    (<o> ^name do-not-warn)
+    (<s> ^gps-error-info <ei>)
+     (<ei>  ^warn-condition)
+    (<ei> ^warning-accepted <x>)
+-->
+    (<ei> ^warning-accepted <x> -)
+    (<s> ^ready-to-decide yes -)
+    }
+
+sp {do-not-warn*apply*warning-accepted*remove*lidar
+    :o-support
+    (state <s> ^operator <o>
+              -^warning-issued)
+    (<o> ^name do-not-warn)
+    (<s> ^lidar-error-info <ei>)
+     (<ei>  ^warn-condition)
+    (<ei> ^warning-accepted <x>)
+-->
+    (<ei> ^warning-accepted <x> -)
+    (<s> ^ready-to-decide yes -)
+    }
+
+sp {do-not-warn*apply*warning-accepted*remove*imu
+    :o-support
+    (state <s> ^operator <o>)
+    (<s> -^warning-issued)
+    (<o> ^name do-not-warn)
+    (<s> ^imu-error-info <ei>)
+     (<ei>  ^warn-condition)
+    (<ei> ^warning-accepted <x>)
+-->
+    (<ei> ^warning-accepted <x> -)
+    (<s> ^ready-to-decide yes -)
+    }
+
+### Don't do anything, but remove the record that the error value changed
+sp {do-not-warn*apply*value-changed*remove*gps
+    :o-support
+    (state <s> ^operator <o>)
+    (<o> ^name do-not-warn)
+    (<s> ^gps-error-info <ei>)
+    (<ei> ^value-changed true)
+-->
+    (<ei> ^value-changed true -)
+    (<s> ^ready-to-decide yes -)
+
+    }
+
+sp {do-not-warn*apply*value-changed*remove*lidar
+    :o-support
+    (state <s> ^operator <o>)
+    (<o> ^name do-not-warn)
+    (<s> ^lidar-error-info <ei>)
+    (<ei> ^value-changed true)
+-->
+    (<ei> ^value-changed true -)
+    (<s> ^ready-to-decide yes -)
+    }
+
+sp {do-not-warn*apply*value-changed*remove*imu
+    :o-support
+    (state <s> ^operator <o>)
+    (<o> ^name do-not-warn)
+    (<s> ^imu-error-info <ei>)
+    (<ei> ^value-changed true)
+-->
+    (<ei> ^value-changed true -)
+    (<s> ^ready-to-decide yes -)
+    }

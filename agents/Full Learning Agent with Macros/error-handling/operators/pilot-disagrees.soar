@@ -1,0 +1,14 @@
+##!
+# @file
+#
+# @created rjones 20210121
+
+echo "\nLoading pilot-disagrees.soar"
+
+sp {apply*pilot-disagrees
+    (state <s> ^operator.name pilot-disagrees
+              -^error-handling-complete yes)
+    -->
+    (<s> ^error-handling-complete yes)
+}
+
