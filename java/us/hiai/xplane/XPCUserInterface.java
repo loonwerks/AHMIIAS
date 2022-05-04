@@ -6,7 +6,6 @@ import us.hiai.util.button;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.util.Random;
 
 import javax.swing.JFrame;
 
@@ -27,33 +26,22 @@ public class XPCUserInterface extends JFrame implements Runnable{
     private boolean errorInGPS = false, errorIsIncremental = false;
     public int SensorPossiblyUnreliable = -1;
     public int SensorUnreliable = -1;
-    public String faultySensorName = "none";
-    public String pilotDecision = "nil";
+    public String pilotDecision = "none";
     public boolean displayLandingButton = false, startedLandingProcedure = false, abortLanding = false;
     public int reroutedLandingZone = -1;
     public int planeAirspeed=0, planeAltitude=0;
     private int mx=0,my=0;
-    private boolean displayWarning = false;
+
 
     private button InduceErrorButton,InduceIncrementalErrorButton, AcknowledgeErrorButton, DenyErrorButton, LandButton, AbortLandingButton;
     private RadioButton landingOptions;
 
-    public void displayWarning(String faultySensorName){
-        this.faultySensorName = faultySensorName;
-        SensorPossiblyUnreliable = 0;
-        displayWarning = true;
-    }
 
     public void injectError(){
 
         errorInGPS = true;
-        if (new Random().nextBoolean()) {
-            errorLat = 0.06f;
-            errorLon = 0.06f;
-        }else{
-            errorLat = 0.065f;
-            errorLon = 0.065f;
-        }
+        errorLat = 0.1f;
+        errorLon = 0.1f;
 
     }
     public void injectIncrementalError(){
@@ -68,23 +56,13 @@ public class XPCUserInterface extends JFrame implements Runnable{
         SensorUnreliable = SensorPossiblyUnreliable;
         /*if(selectedSensor == SensorUnreliable)
             selectedSensor = (selectedSensor + 1) % 3;*/
-        pilotDecision = "yes";
+        pilotDecision = "agree";
     }
     public void denyError(){
         SensorPossiblyUnreliable = -1;
-        pilotDecision = "no";
+        pilotDecision = "disagree";
     }
-    public void reset(){
-        displayWarning = false;
-        errorInGPS = false;
-        errorIsIncremental = false;
-        errorLat=0;
-        errorLon=0;
-        SensorPossiblyUnreliable = -1;
-        SensorUnreliable = -1;
-        faultySensorName = "none";
-        pilotDecision = "nil";
-    }
+
 
 
     public void setGPSValue(float xPos, float yPos) {

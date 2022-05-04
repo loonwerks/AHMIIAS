@@ -23,14 +23,7 @@ public class VotingLogic {
         double LIDARvsIMUdistance = getDistanceBetweenTwoPoints(sensorPositions[1][0],sensorPositions[1][1],sensorPositions[2][0],sensorPositions[2][1]);
 
 
-        return new double[]{truncate(GPSvsLIDARdistance),truncate(GPSvsIMUdistance),truncate(LIDARvsIMUdistance)};
-    }
-    private double truncate(double a){
-        String num = ""+a+"   ";
-        num = num.substring(0,num.indexOf(".")+2);
-        return Double.parseDouble(num);
-
-
+        return new double[]{GPSvsLIDARdistance,GPSvsIMUdistance,LIDARvsIMUdistance};
     }
 
     private double calculateHorizontalThreshold(double altitude /*meters above ground*/){
@@ -85,7 +78,7 @@ public class VotingLogic {
         lon = Math.toRadians(lon);
         lon2 = Math.toRadians(lon2);
 
-
+        /* Haversine formula to calculate great-circle distance*/
         double distance = 0;
         distance = Math.pow(lon-lon2,2);
         distance += Math.pow(lat-lat2,2);

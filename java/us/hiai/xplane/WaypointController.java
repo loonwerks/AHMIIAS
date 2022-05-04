@@ -14,8 +14,8 @@ public class WaypointController {
         double startLat= 36.117820739746094, startLon=-115.17686462402344;
 
         waypoints = new Waypoint[7];
-        waypoints[0] = new Waypoint(36.30,-115.17);
-        waypoints[1] = new Waypoint(36.40,-115.17);
+        waypoints[0] = new Waypoint(36.30,-115.17, true);
+        waypoints[1] = new Waypoint(36.40,-115.17, true);
         waypoints[2] = new Waypoint(37.2,-115.17);
         waypoints[3] = new Waypoint(38.1,-115.17,true); // Default Landing zone
 
