@@ -36,9 +36,9 @@ public
 	
 	data implementation SensorErrorData.impl
 		subcomponents
-			sensorError:			data Base_Types::Float;
-			sensorErrorRange:		data SensorErrorRange;
-			sensorErrorAlert:		data Base_Types::Boolean;
+			error:			data Base_Types::Float;
+			errorRange:		data SensorErrorRange;
+			errorAlert:		data Base_Types::Boolean;
 	end SensorErrorData.impl;
 
 	-- NOTE: component "sensorErrorAlert" necessary due to the choice of having a data port, rather than an event data port, for denoting the  
@@ -48,8 +48,8 @@ public
 	
 	data implementation SensorAlertData.impl
 		subcomponents
-			sensorError:			data Base_Types::Float;
-			sensorErrorAlert:		data Base_Types::Boolean;
+			error:			data Base_Types::Float;
+			errorAlert:		data Base_Types::Boolean;
 	end SensorAlertData.impl;
 
 	-- NOTE: value "None" necessary due to the choice of having a data port, rather than an event data port, for denoting no response in absence of 

@@ -1,0 +1,275 @@
+package IAS
+public
+	with Types_Constants;
+	renames Types_Constants::all;
+	with Unreliable_Sensor_Lib;	
+	with Base_Types;
+	
+	-------------------------------------
+	-- IAS
+	-------------------------------------
+	system IAS
+		features
+			InputFromHuman : in data port H2I.impl;
+			InputFromSensor1 : in data port Sensor_Data.impl;
+			InputFromSensor2 : in data port Sensor_Data.impl;
+			InputFromSensor3 : in data port Sensor_Data.impl;
+			InputFromWOWSensor : in data port Base_Types::Boolean;
+			Output : out data port I2H.impl;
+			---------------------------------------------------------
+			-- S.F.R. 2022/05
+			s1AlertResponseFromHuman : in data port SensorAlertResponse;
+			s2AlertResponseFromHuman : in data port SensorAlertResponse;
+			s3AlertResponseFromHuman : in data port SensorAlertResponse;
+			s1AlertToHuman : out data port SensorAlertData.impl;
+			s2AlertToHuman : out data port SensorAlertData.impl;
+			s3AlertToHuman : out data port SensorAlertData.impl;
+			---------------------------------------------------------
+		annex agree {**
+			
+			-----------------------
+			--UNRELIABLE SENSOR SCENARIO
+			-----------------------
+
+			eq previous_active_sensor : int = prev(Output.Active_Sensor, 1);
+			
+			eq previous_recommended_sensor : int = prev(Output.Recommended_Sensor, 1);
+
+			eq previous_z_position : real = if (previous_active_sensor = 1) then 
+												prev(InputFromSensor1.Position.Z, 0.0)
+											else if (previous_active_sensor = 2) then
+													prev(InputFromSensor2.Position.Z, 0.0)
+												 else --(previous_active_sensor = 3)
+												 	prev(InputFromSensor3.Position.Z, 0.0);
+			
+			eq Horizontal_Threshold : real = Unreliable_Sensor_Lib::HAL(previous_z_position);
+			
+			eq Vertical_Threshold : real = Unreliable_Sensor_Lib::VAL(previous_z_position);
+							
+			eq Sensor1_Reliable: bool, Sensor2_Reliable: bool, Sensor3_Reliable: bool = Unreliable_Sensor_Lib::Sensor_Status(InputFromSensor1, InputFromSensor2, InputFromSensor3, Horizontal_Threshold, Vertical_Threshold);
+				
+			guarantee "Sensor status to operator":
+					(Output.Sensor1_Reliable = Sensor1_Reliable)
+				and (Output.Sensor2_Reliable = Sensor2_Reliable)
+				and (Output.Sensor3_Reliable = Sensor3_Reliable);			
+			
+			--Should we instead pick one of the three on some other criteria?
+			guarantee "Recommended sensor is NIL if and only if all sensors are unreliable":
+					Output.Recommended_Sensor = NIL <=> (not Sensor1_Reliable and not Sensor2_Reliable and not Sensor3_Reliable);
+			
+			guarantee "The recommended sensor is a reliable sensor, unless it is NIL":
+					not (Output.Recommended_Sensor = NIL) =>
+						(
+							   (Output.Recommended_Sensor = 1 and Sensor1_Reliable)
+							or (Output.Recommended_Sensor = 2 and Sensor2_Reliable)
+							or (Output.Recommended_Sensor = 3 and Sensor3_Reliable)
+						);
+						
+			guarantee "The recommended sensor is the active sensor unless the active sensor has become unreliable":			
+					(		(previous_active_sensor = 1 and Output.Sensor1_Reliable)
+						or 	(previous_active_sensor = 2 and Output.Sensor2_Reliable)
+						or 	(previous_active_sensor = 3 and Output.Sensor3_Reliable)
+					)
+						=> (Output.Recommended_Sensor = previous_active_sensor);
+ 
+			guarantee "The active sensor should stay the same unless the operator agrees that it is unreliable 
+						and there is another reliable sensor available.":
+				Output.Active_Sensor = 	
+					if (previous_recommended_sensor = NIL)
+						then previous_active_sensor
+					else if ((previous_active_sensor = 1 and InputFromHuman.Sensor1_Unreliable_Response = enum(Response, Agree))
+							  or (previous_active_sensor = 2 and InputFromHuman.Sensor2_Unreliable_Response = enum(Response, Agree))
+							  or (previous_active_sensor = 3 and InputFromHuman.Sensor3_Unreliable_Response = enum(Response, Agree)))
+						then previous_recommended_sensor
+					else previous_active_sensor;
+			
+--			guarantee "The active sensor should stay the same unless the operator agrees that it is unreliable 
+--						and there is another reliable sensor available.":
+--				Output.Active_Sensor = 	
+--					if (previous_recommended_sensor = NIL) 
+--						then previous_active_sensor
+--					else if (previous_active_sensor = 1 and InputFromHuman.Sensor1_Unreliable_Response = enum(Response, Agree)) 
+--							then previous_recommended_sensor
+--						 else if (previous_active_sensor = 2 and InputFromHuman.Sensor2_Unreliable_Response = enum(Response, Agree)) 
+--						 		then previous_recommended_sensor
+--							  else if (previous_active_sensor = 3 and InputFromHuman.Sensor3_Unreliable_Response = enum(Response, Agree)) 
+--							  			then previous_recommended_sensor
+--								   else	previous_active_sensor;
+
+			-----------------------
+			--FLIGHT PHASE STATE MACHINE
+			-----------------------
+
+			-------------------------------------------------------------
+			--State machine support macros
+									
+			eq previous_phase : Phase_Type = prev(Output.Phase, enum(Phase_Type, On_Ground));
+
+			eq some_transition: bool = T_Ground_to_Flight
+										or T_Flight_to_Landing
+										or T_Landing_to_Ground
+										or T_Landing_to_Flight
+										or T_Flight_to_Ground;
+			-------------------------------------------------------------
+			--State transition macros
+			
+			eq T_Ground_to_Flight: bool = 
+				false -> ((previous_phase = enum(Phase_Type, On_Ground)) and not InputFromWOWSensor);
+				
+			eq T_Flight_to_Landing: bool =
+				(previous_phase = enum(Phase_Type, In_Flight)) and InputFromHuman.Initiate_Landing;
+			
+			--This is not desirable. The pilot should initiate all landings before they occur, but it does seem to be a possible transition.	
+			eq T_Flight_to_Ground: bool =
+				(previous_phase = enum(Phase_Type, In_Flight)) and InputFromWOWSensor;
+				
+			eq T_Landing_to_Flight: bool =
+				(previous_phase = enum(Phase_Type, Landing)) and InputFromHuman.Abort_Landing;
+			
+			eq T_Landing_to_Ground: bool =
+				(previous_phase = enum(Phase_Type, Landing)) and InputFromWOWSensor;
+				
+			-------------------------------------------------------------	
+			--State machine guarantees	
+			
+			--This guarantee specifies the initial state.
+       		guarantee "Initial_State": (Output.Phase = enum(Phase_Type, On_Ground)) -> true;
+        
+	        --This guarantee captures all the "self loops" in shorthand form. 
+	        -- It is important to state what happens when no transition condition is satisfied.
+	        -- Otherwise the model checker will allow "spontaneous" transitions.
+	        guarantee "Self loops": not some_transition => (Output.Phase = previous_phase);
+        
+        	-- Now we write one guarantee for each transition.
+         
+	        guarantee "T_Ground_to_Flight_effect" : 	T_Ground_to_Flight 	=> (Output.Phase = enum(Phase_Type, In_Flight));
+	     
+	     	guarantee "T_Flight_to_Landing_effect" : 	T_Flight_to_Landing => (Output.Phase = enum(Phase_Type, Landing));  
+	     	
+	     	guarantee "T_Flight_to_Ground_effect" : 	T_Flight_to_Ground	=> (Output.Phase = enum(Phase_Type, On_Ground));
+	     	
+	     	guarantee "T_Landing_to_Flight_effect" :	T_Landing_to_Flight => (Output.Phase = enum(Phase_Type, In_Flight));
+	     	
+	     	guarantee "T_Landing_to_Ground_effect" : 	T_Landing_to_Ground => (Output.Phase = enum(Phase_Type, On_Ground));
+	     	
+	     	-----------------------
+			--ABORTED LANDING SCENARIO
+			-----------------------
+			
+			guarantee "Landing options should be distinct":
+					not (Output.Landing_Options.Option1 = Output.Landing_Options.Option2)
+				and not (Output.Landing_Options.Option1 = Output.Landing_Options.Option3)		 								
+				and not (Output.Landing_Options.Option2 = Output.Landing_Options.Option3);
+				
+			guarantee "Present landing options if and only if the landing is aborted":
+				T_Landing_to_Flight = Output.Landing_Options_Ready;
+				
+			guarantee "Destination changes if and only if the pilot selects a landing option":
+				true -> (Output.Destination = if pre(Output.Landing_Options_Ready) then 
+												InputFromHuman.Landing_Option_Selection 
+											  else 
+											  	pre(Output.Destination)
+				); 
+			
+			
+		**};
+
+	end IAS;
+	
+	---------------------------------------------------------
+	-- S.F.R. 2022/05
+	
+	-- System responsible for determining errors and ranges based on sensor readings, and for issuing alerts 
+	system SensorDataEvaluator
+		features
+			s1In: in data port  Sensor_Data.impl;
+			s2In: in data port  Sensor_Data.impl;
+			s3In: in data port  Sensor_Data.impl;
+			s1RespIn: in data port  SensorAlertResponse;
+			s2RespIn: in data port  SensorAlertResponse;
+			s3RespIn: in data port  SensorAlertResponse;
+			s1Out: out data port SensorErrorData.impl;
+			s2Out: out data port SensorErrorData.impl;
+			s3Out: out data port SensorErrorData.impl;
+
+		annex agree {**
+			-- QUESTION: is it possible to formulate properties about the likelihood of issuing an alert in range Level1 (resp.2) after an acceptance
+			--			 or a rejection by the operator, without technical details about the learning algorithm?
+			
+			guarantee g1 "If the sensor error is in Normal range, then no alert is issued":
+			 	(s1Out.errorRange = enum(Types_Constants::SensorErrorRange, Normal) => (not s1Out.errorAlert)) and
+			 	(s2Out.errorRange = enum(Types_Constants::SensorErrorRange, Normal) => (not s2Out.errorAlert)) and
+			 	(s3Out.errorRange = enum(Types_Constants::SensorErrorRange, Normal) => (not s3Out.errorAlert));
+			
+			guarantee g2 "If the sensor error is in Safety range, then an alert is issued":
+			 	(s1Out.errorRange = enum(Types_Constants::SensorErrorRange, Safety) => s1Out.errorAlert) and
+			 	(s2Out.errorRange = enum(Types_Constants::SensorErrorRange, Safety) => s2Out.errorAlert) and
+			 	(s3Out.errorRange = enum(Types_Constants::SensorErrorRange, Safety) => s3Out.errorAlert);
+			 
+		**};		
+	end SensorDataEvaluator;
+	
+	system implementation SensorDataEvaluator.impl
+		annex agree {**	
+				
+			-- NOTE: observers for the generation of counter-example traces of interest
+			 lemma l4 "Observer: if sensor 1 error is in Level1 range, then sometimes an alert is issued":
+			 	(s1Out.errorRange = enum(Types_Constants::SensorErrorRange, Level1) => (not s1Out.errorAlert));
+			 lemma l5 "Observer: if sensor 1 error is in Level1 range, then sometimes an alert is not issued":
+			 	(s1Out.errorRange = enum(Types_Constants::SensorErrorRange, Level1) => s1Out.errorAlert);
+			 lemma l6 "Observer: if sensor 1 error is in Level2 range, then sometimes an alert is issued":
+			 	(s1Out.errorRange = enum(Types_Constants::SensorErrorRange, Level2) => (not s1Out.errorAlert));
+			 lemma l7 "Observer: if sensor 1 error is in Level2 range, then sometimes an alert is not issued":
+			 	(s1Out.errorRange = enum(Types_Constants::SensorErrorRange, Level2) => s1Out.errorAlert);
+			 	
+			 lemma l8 "Observer: if sensor 2 error is in Level1 range, then sometimes an alert is issued":
+			 	(s2Out.errorRange = enum(Types_Constants::SensorErrorRange, Level1) => (not s2Out.errorAlert));
+			 lemma l9 "Observer: if sensor 2 error is in Level1 range, then sometimes an alert is not issued":
+			 	(s2Out.errorRange = enum(Types_Constants::SensorErrorRange, Level1) => s2Out.errorAlert);
+			 lemma l10 "Observer: if sensor 2 error is in Level2 range, then sometimes an alert is issued":
+			 	(s2Out.errorRange = enum(Types_Constants::SensorErrorRange, Level2) => (not s2Out.errorAlert));
+			 lemma l11 "Observer: if sensor 2 error is in Level2 range, then sometimes an alert is not issued":
+			 	(s2Out.errorRange = enum(Types_Constants::SensorErrorRange, Level2) => s2Out.errorAlert);
+			 	
+			 lemma l12 "Observer: if sensor 3 error is in Level1 range, then sometimes an alert is issued":
+			 	(s3Out.errorRange = enum(Types_Constants::SensorErrorRange, Level1) => (not s3Out.errorAlert));
+			 lemma l13 "Observer: if sensor 3 error is in Level1 range, then sometimes an alert is not issued":
+			 	(s3Out.errorRange = enum(Types_Constants::SensorErrorRange, Level1) => s3Out.errorAlert);
+			 lemma l14 "Observer: if sensor 3 error is in Level2 range, then sometimes an alert is issued":
+			 	(s3Out.errorRange = enum(Types_Constants::SensorErrorRange, Level2) => (not s3Out.errorAlert));
+			 lemma l15 "Observer: if sensor 3 error is in Level2 range, then sometimes an alert is not issued":
+			 	(s3Out.errorRange = enum(Types_Constants::SensorErrorRange, Level2) => s3Out.errorAlert);	
+		**};
+		
+	end SensorDataEvaluator.impl;
+	
+	system implementation IAS.impl
+		subcomponents
+			sensorDataEvaluator: system SensorDataEvaluator.impl;
+		connections
+			s1In: feature InputFromSensor1 -> sensorDataEvaluator.s1In;
+			s2In: feature InputFromSensor2 -> sensorDataEvaluator.s2In;
+			s3In: feature InputFromSensor3 -> sensorDataEvaluator.s3In;
+			s1RespIn: feature s1AlertResponseFromHuman -> sensorDataEvaluator.s1RespIn;
+			s2RespIn: feature s2AlertResponseFromHuman -> sensorDataEvaluator.s2RespIn;
+			s3RespIn: feature s3AlertResponseFromHuman -> sensorDataEvaluator.s3RespIn;
+		annex agree {**
+			 -- NOTE: should be a guarantee
+			 -- NOTE: arbitrary delays between alert issuing and communication to be tested 
+			 lemma l16 "If a sensor alert is issued, then it is communicated to the operator; 
+			 			if a sensor alert is not issued, then no sensor alert is communicated to the operator":
+			 	(sensorDataEvaluator.s1Out.errorAlert <=> s1AlertToHuman.errorAlert) and
+			 	(sensorDataEvaluator.s2Out.errorAlert <=> s2AlertToHuman.errorAlert) and
+			 	(sensorDataEvaluator.s3Out.errorAlert <=> s3AlertToHuman.errorAlert);
+			 	
+ 			-- NOTE: should be a guarantee
+ 			-- NOTE: equality between floats
+			 lemma l17 "The computed sensor error is communicated to the operator":
+				 	sensorDataEvaluator.s1Out.error = s1AlertToHuman.error and
+				 	sensorDataEvaluator.s2Out.error = s2AlertToHuman.error and
+				 	sensorDataEvaluator.s3Out.error = s3AlertToHuman.error;
+		**};
+	---------------------------------------------------------
+	end IAS.impl;
+	
+end IAS;
