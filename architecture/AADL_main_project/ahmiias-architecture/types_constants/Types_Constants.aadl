@@ -18,9 +18,16 @@ public
 	-- S.F.R. 2022/05
 	
 	-- NOTE: how does the notion of sensor error compare with that of reliability (Unreliable_Sensor_Lib)? 
-	--		 A sensor error is the deviation of the measured value from the actual value.
-	--       A position sensor is reliable iff its measured position is sufficiently close to that of at least another sensor.
-	--		 In principle, all sensors can be considered reliable, while being utterly erroneous (high precision vs low accuracy) 
+	--		 A sensor error is the deviation of the measured value from the actual value
+	--       A position sensor is classified reliable iff its measured position is sufficiently close to that of at least another sensor
+	--		 In principle, all sensors can be classified reliable, while being utterly erroneous (high precision vs low accuracy) 
+	
+	-- PROPERTIES TO BE VALIDATED (AND POSSIBLY ENFORCED):
+	--		 If a sensor error is zero (or below a threshold), then the sensor is classified reliable
+	--				NOTE: currently not holding, since the two other sensors positions might be equally distant from the only really reliable sensor
+	--		 If two sensors errors are zero (or below a threshold), then the two sensors are classified reliable	
+	--				NOTE: more in line with the current reliability pairwise evaluation approach
+	
 	-- NOTE: error computation, numerical thresholds and determination of error ranges for each sensor are deferred to SW processes (TODO model in AADL)
 	data SensorErrorRange
 		properties

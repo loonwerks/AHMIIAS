@@ -46,7 +46,8 @@ public
 			
 			eq Vertical_Threshold : real = Unreliable_Sensor_Lib::VAL(previous_z_position);
 							
-			eq Sensor1_Reliable: bool, Sensor2_Reliable: bool, Sensor3_Reliable: bool = Unreliable_Sensor_Lib::Sensor_Status(InputFromSensor1, InputFromSensor2, InputFromSensor3, Horizontal_Threshold, Vertical_Threshold);
+			eq Sensor1_Reliable: bool, Sensor2_Reliable: bool, Sensor3_Reliable: bool = 
+				Unreliable_Sensor_Lib::Sensor_Status(InputFromSensor1, InputFromSensor2, InputFromSensor3, Horizontal_Threshold, Vertical_Threshold);
 				
 			guarantee "Sensor status to operator":
 					(Output.Sensor1_Reliable = Sensor1_Reliable)
