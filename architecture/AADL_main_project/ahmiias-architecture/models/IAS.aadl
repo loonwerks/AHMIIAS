@@ -10,22 +10,28 @@ public
 	-------------------------------------
 	system IAS
 		features
-			InputFromHuman : in data port H2I.impl;
-			InputFromSensor1 : in data port Sensor_Data.impl;
-			InputFromSensor2 : in data port Sensor_Data.impl;
-			InputFromSensor3 : in data port Sensor_Data.impl;
-			InputFromWOWSensor : in data port Base_Types::Boolean;
-			Output : out data port I2H.impl;
+			InputFromHuman : 		in data port H2I.impl;
+			InputFromSensor1 : 		in data port Sensor_Data.impl;
+			InputFromSensor2 : 		in data port Sensor_Data.impl;
+			InputFromSensor3 : 		in data port Sensor_Data.impl;
+			InputFromWOWSensor : 	in data port Base_Types::Boolean;
+			Output : 				out data port I2H.impl;
+		annex agree {**								
 			---------------------------------------------------------
-			-- S.F.R. 2022/05
-			s1AlertResponseFromHuman : in data port SensorAlertResponse;
-			s2AlertResponseFromHuman : in data port SensorAlertResponse;
-			s3AlertResponseFromHuman : in data port SensorAlertResponse;
-			s1AlertToHuman : out data port SensorAlertData.impl;
-			s2AlertToHuman : out data port SensorAlertData.impl;
-			s3AlertToHuman : out data port SensorAlertData.impl;
+			-- S.F.R. 2022/05	
+								
+			-- QUESTION: is it possible to formulate properties about the likelihood of issuing an alert in range Level1 (resp.2) after an acceptance
+			--			 or a rejection by the operator, without technical details about the learning algorithm?		
+			guarantee g1 "If the sensor error is in Normal range, then no alert is issued":
+			 	(Output.sensor1ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Normal) => (not Output.sensor1ErrorData.errorAlert)) and
+			 	(Output.sensor2ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Normal) => (not Output.sensor2ErrorData.errorAlert)) and
+			 	(Output.sensor3ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Normal) => (not Output.sensor3ErrorData.errorAlert));
+			
+			guarantee g2 "If the sensor error is in Safety range, then an alert is issued":
+			 	(Output.sensor1ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Safety) => Output.sensor1ErrorData.errorAlert) and
+			 	(Output.sensor2ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Safety) => Output.sensor2ErrorData.errorAlert) and
+			 	(Output.sensor3ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Safety) => Output.sensor3ErrorData.errorAlert);			
 			---------------------------------------------------------
-		annex agree {**
 			
 			-----------------------
 			--UNRELIABLE SENSOR SCENARIO
@@ -171,8 +177,6 @@ public
 											  else 
 											  	pre(Output.Destination)
 				); 
-			
-			
 		**};
 
 	end IAS;
@@ -180,95 +184,62 @@ public
 	---------------------------------------------------------
 	-- S.F.R. 2022/05
 	
-	-- System responsible for determining errors and ranges based on sensor readings, and for issuing alerts 
-	system SensorDataEvaluator
-		features
-			s1In: in data port  Sensor_Data.impl;
-			s2In: in data port  Sensor_Data.impl;
-			s3In: in data port  Sensor_Data.impl;
-			s1RespIn: in data port  SensorAlertResponse;
-			s2RespIn: in data port  SensorAlertResponse;
-			s3RespIn: in data port  SensorAlertResponse;
-			s1Out: out data port SensorErrorData.impl;
-			s2Out: out data port SensorErrorData.impl;
-			s3Out: out data port SensorErrorData.impl;
-
+	system implementation IAS.impl
 		annex agree {**
-			-- QUESTION: is it possible to formulate properties about the likelihood of issuing an alert in range Level1 (resp.2) after an acceptance
-			--			 or a rejection by the operator, without technical details about the learning algorithm?
-			
-			guarantee g1 "If the sensor error is in Normal range, then no alert is issued":
-			 	(s1Out.errorRange = enum(Types_Constants::SensorErrorRange, Normal) => (not s1Out.errorAlert)) and
-			 	(s2Out.errorRange = enum(Types_Constants::SensorErrorRange, Normal) => (not s2Out.errorAlert)) and
-			 	(s3Out.errorRange = enum(Types_Constants::SensorErrorRange, Normal) => (not s3Out.errorAlert));
-			
-			guarantee g2 "If the sensor error is in Safety range, then an alert is issued":
-			 	(s1Out.errorRange = enum(Types_Constants::SensorErrorRange, Safety) => s1Out.errorAlert) and
-			 	(s2Out.errorRange = enum(Types_Constants::SensorErrorRange, Safety) => s2Out.errorAlert) and
-			 	(s3Out.errorRange = enum(Types_Constants::SensorErrorRange, Safety) => s3Out.errorAlert);
-			 
-		**};		
-	end SensorDataEvaluator;
-	
-	system implementation SensorDataEvaluator.impl
-		annex agree {**	
-				
+			 			
 			-- NOTE: observers for the generation of counter-example traces of interest
 			 lemma l4 "Observer: if sensor 1 error is in Level1 range, then sometimes an alert is issued":
-			 	(s1Out.errorRange = enum(Types_Constants::SensorErrorRange, Level1) => (not s1Out.errorAlert));
+			 	(Output.sensor1ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Level1) => (not Output.sensor1ErrorData.errorAlert));
 			 lemma l5 "Observer: if sensor 1 error is in Level1 range, then sometimes an alert is not issued":
-			 	(s1Out.errorRange = enum(Types_Constants::SensorErrorRange, Level1) => s1Out.errorAlert);
+			 	(Output.sensor1ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Level1) => Output.sensor1ErrorData.errorAlert);
 			 lemma l6 "Observer: if sensor 1 error is in Level2 range, then sometimes an alert is issued":
-			 	(s1Out.errorRange = enum(Types_Constants::SensorErrorRange, Level2) => (not s1Out.errorAlert));
+			 	(Output.sensor1ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Level2) => (not Output.sensor1ErrorData.errorAlert));
 			 lemma l7 "Observer: if sensor 1 error is in Level2 range, then sometimes an alert is not issued":
-			 	(s1Out.errorRange = enum(Types_Constants::SensorErrorRange, Level2) => s1Out.errorAlert);
+			 	(Output.sensor1ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Level2) => Output.sensor1ErrorData.errorAlert);
 			 	
 			 lemma l8 "Observer: if sensor 2 error is in Level1 range, then sometimes an alert is issued":
-			 	(s2Out.errorRange = enum(Types_Constants::SensorErrorRange, Level1) => (not s2Out.errorAlert));
+			 	(Output.sensor2ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Level1) => (not Output.sensor2ErrorData.errorAlert));
 			 lemma l9 "Observer: if sensor 2 error is in Level1 range, then sometimes an alert is not issued":
-			 	(s2Out.errorRange = enum(Types_Constants::SensorErrorRange, Level1) => s2Out.errorAlert);
+			 	(Output.sensor2ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Level1) => Output.sensor2ErrorData.errorAlert);
 			 lemma l10 "Observer: if sensor 2 error is in Level2 range, then sometimes an alert is issued":
-			 	(s2Out.errorRange = enum(Types_Constants::SensorErrorRange, Level2) => (not s2Out.errorAlert));
+			 	(Output.sensor2ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Level2) => (not Output.sensor2ErrorData.errorAlert));
 			 lemma l11 "Observer: if sensor 2 error is in Level2 range, then sometimes an alert is not issued":
-			 	(s2Out.errorRange = enum(Types_Constants::SensorErrorRange, Level2) => s2Out.errorAlert);
+			 	(Output.sensor2ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Level2) => Output.sensor2ErrorData.errorAlert);
 			 	
 			 lemma l12 "Observer: if sensor 3 error is in Level1 range, then sometimes an alert is issued":
-			 	(s3Out.errorRange = enum(Types_Constants::SensorErrorRange, Level1) => (not s3Out.errorAlert));
+			 	(Output.sensor3ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Level1) => (not Output.sensor3ErrorData.errorAlert));
 			 lemma l13 "Observer: if sensor 3 error is in Level1 range, then sometimes an alert is not issued":
-			 	(s3Out.errorRange = enum(Types_Constants::SensorErrorRange, Level1) => s3Out.errorAlert);
+			 	(Output.sensor3ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Level1) => Output.sensor3ErrorData.errorAlert);
 			 lemma l14 "Observer: if sensor 3 error is in Level2 range, then sometimes an alert is issued":
-			 	(s3Out.errorRange = enum(Types_Constants::SensorErrorRange, Level2) => (not s3Out.errorAlert));
+			 	(Output.sensor3ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Level2) => (not Output.sensor3ErrorData.errorAlert));
 			 lemma l15 "Observer: if sensor 3 error is in Level2 range, then sometimes an alert is not issued":
-			 	(s3Out.errorRange = enum(Types_Constants::SensorErrorRange, Level2) => s3Out.errorAlert);	
-		**};
-		
-	end SensorDataEvaluator.impl;
-	
-	system implementation IAS.impl
-		subcomponents
-			sensorDataEvaluator: system SensorDataEvaluator.impl;
-		connections
-			s1In: feature InputFromSensor1 -> sensorDataEvaluator.s1In;
-			s2In: feature InputFromSensor2 -> sensorDataEvaluator.s2In;
-			s3In: feature InputFromSensor3 -> sensorDataEvaluator.s3In;
-			s1RespIn: feature s1AlertResponseFromHuman -> sensorDataEvaluator.s1RespIn;
-			s2RespIn: feature s2AlertResponseFromHuman -> sensorDataEvaluator.s2RespIn;
-			s3RespIn: feature s3AlertResponseFromHuman -> sensorDataEvaluator.s3RespIn;
-		annex agree {**
-			 -- NOTE: should be a guarantee
-			 -- NOTE: arbitrary delays between alert issuing and communication to be tested 
-			 lemma l16 "If a sensor alert is issued, then it is communicated to the operator; 
-			 			if a sensor alert is not issued, then no sensor alert is communicated to the operator":
-			 	(sensorDataEvaluator.s1Out.errorAlert <=> s1AlertToHuman.errorAlert) and
-			 	(sensorDataEvaluator.s2Out.errorAlert <=> s2AlertToHuman.errorAlert) and
-			 	(sensorDataEvaluator.s3Out.errorAlert <=> s3AlertToHuman.errorAlert);
+			 	(Output.sensor3ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Level2) => Output.sensor3ErrorData.errorAlert);
 			 	
- 			-- NOTE: should be a guarantee
- 			-- NOTE: equality between floats
-			 lemma l17 "The computed sensor error is communicated to the operator":
-				 	sensorDataEvaluator.s1Out.error = s1AlertToHuman.error and
-				 	sensorDataEvaluator.s2Out.error = s2AlertToHuman.error and
-				 	sensorDataEvaluator.s3Out.error = s3AlertToHuman.error;
+			 -- NOTE: multiple sensors can be arbitrarily erroneous at the same step
+			 lemma l16 "Observer: alerts are issued for all sensors at the same step":
+			 	not( Output.sensor1ErrorData.errorAlert and
+			 		 Output.sensor2ErrorData.errorAlert and
+			 		 Output.sensor3ErrorData.errorAlert);
+			 		 	
+			-- NOTE: how does the notion of sensor error compare with that of reliability (Unreliable_Sensor_Lib)? 
+			--		 A sensor error is the deviation of the measured value from the actual value
+			--       A position sensor is classified reliable iff its measured position is sufficiently close to that of at least another sensor
+			--		 In principle, all sensors can be classified reliable, while being utterly erroneous (high precision vs low accuracy) 
+			
+			-- PROPERTIES TO BE VALIDATED (AND POSSIBLY ENFORCED):
+			--		 If a sensor error is zero (or below a threshold), then the sensor is classified reliable
+			--				NOTE: currently not holding, since the two other sensors positions might be equally distant from the only really reliable sensor
+			--		 If two sensors errors are zero (or below a threshold), then the two sensors are classified reliable	
+			--				NOTE: more in line with the current reliability pairwise evaluation approach
+			lemma l17 "Observer: an alert is issued for a sensor classified reliable":
+				not( Output.sensor1ErrorData.errorAlert and
+					 Output.Sensor1_Reliable );
+	
+			-- NOTE: currently, a sensor error can arbitrarily fluctuate between Normal and Safety ranges in consecutive steps	
+			lemma l18 "Observer: a sensor error range moves from Normal to Safety to Normal in consecutive steps":
+				not( prev(prev(Output.sensor1ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Normal), false), false) and
+					 prev(Output.sensor1ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Safety), false) and
+					 Output.sensor1ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Normal) );
 		**};
 	---------------------------------------------------------
 	end IAS.impl;

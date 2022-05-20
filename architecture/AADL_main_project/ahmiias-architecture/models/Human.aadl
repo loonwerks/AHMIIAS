@@ -10,21 +10,12 @@ public
 	
 	system Human
 		features
-			InputFromIAS : in data port I2H.impl;
-			InputFromSensor1 : in data port Sensor_Data.impl;
-			InputFromSensor2 : in data port Sensor_Data.impl;
-			InputFromSensor3 : in data port Sensor_Data.impl;
-			InputFromWOWSensor : in data port Base_Types::Boolean;
-			Output : out data port H2I.impl;
-			---------------------------------------------------------
-			-- S.F.R. 2022/05
-			s1AlertFromIAS : in data port SensorAlertData.impl;
-			s2AlertFromIAS : in data port SensorAlertData.impl;
-			s3AlertFromIAS : in data port SensorAlertData.impl;
-			s1AlertResponseToIAS : out data port SensorAlertResponse;
-			s2AlertResponseToIAS : out data port SensorAlertResponse;
-			s3AlertResponseToIAS : out data port SensorAlertResponse;
-			---------------------------------------------------------
+			InputFromIAS : 			in data port I2H.impl;
+			InputFromSensor1 : 		in data port Sensor_Data.impl;
+			InputFromSensor2 : 		in data port Sensor_Data.impl;
+			InputFromSensor3 : 		in data port Sensor_Data.impl;
+			InputFromWOWSensor : 	in data port Base_Types::Boolean;
+			Output : 				out data port H2I.impl;
 		annex agree {**
 			---------------------------------------------------------
 			-- S.F.R. 2022/05
@@ -32,31 +23,31 @@ public
 			-- NOTE: arbitrary delays between alert reception and response to be tested
 			-- NOTE: at least one step to avoid the presence of an algebraic loop in the communication between system and operator
 			guarantee g1 "If a sensor 1 alert is received by operator, then an alert response is communicated by the operator at the next step":
-				(prev(s1AlertFromIAS.errorAlert, false))
-				<=> (s1AlertResponseToIAS = enum(Types_Constants::SensorAlertResponse, Accept) or 
-					 s1AlertResponseToIAS = enum(Types_Constants::SensorAlertResponse, Reject)
+				(prev(InputFromIAS.sensor1ErrorData.errorAlert, false))
+				<=> (Output.sensor1AlertResponse = enum(Types_Constants::SensorAlertResponse, Accept) or 
+					 Output.sensor1AlertResponse = enum(Types_Constants::SensorAlertResponse, Reject)
 				);
 			guarantee g2 "If no sensor 1 alert is received by the operator, then no alert response is communicated by the operator at the next step":
-			(prev(not s1AlertFromIAS.errorAlert, true))
-				<=> (s1AlertResponseToIAS = enum(Types_Constants::SensorAlertResponse, None));
+			(prev(not InputFromIAS.sensor1ErrorData.errorAlert, true))
+				<=> (Output.sensor1AlertResponse = enum(Types_Constants::SensorAlertResponse, None));
 				
 			guarantee g3 "If a sensor 2 alert is received by the operator, then an alert response is communicated by the operator at the next step":
-				(prev(s2AlertFromIAS.errorAlert, false))
-				<=> (s2AlertResponseToIAS = enum(Types_Constants::SensorAlertResponse, Accept) or 
-					 s1AlertResponseToIAS = enum(Types_Constants::SensorAlertResponse, Reject)
+				(prev(InputFromIAS.sensor2ErrorData.errorAlert, false))
+				<=> (Output.sensor2AlertResponse = enum(Types_Constants::SensorAlertResponse, Accept) or 
+					 Output.sensor2AlertResponse = enum(Types_Constants::SensorAlertResponse, Reject)
 				);
 			guarantee g4 "If no sensor 2 alert is received by the operator, then no alert response is communicated by the operator at the next step":
-			(prev(not s2AlertFromIAS.errorAlert, true))
-				<=> (s2AlertResponseToIAS = enum(Types_Constants::SensorAlertResponse, None));
+			(prev(not InputFromIAS.sensor2ErrorData.errorAlert, true))
+				<=> (Output.sensor2AlertResponse = enum(Types_Constants::SensorAlertResponse, None));
 				
 			guarantee g5 "If a sensor 3 alert is received by the operator, then an alert response is communicated by the operator at the next step":
-				(prev(s3AlertFromIAS.errorAlert, false))
-				<=> (s3AlertResponseToIAS = enum(Types_Constants::SensorAlertResponse, Accept) or 
-					 s1AlertResponseToIAS = enum(Types_Constants::SensorAlertResponse, Reject)
+				(prev(InputFromIAS.sensor3ErrorData.errorAlert, false))
+				<=> (Output.sensor3AlertResponse = enum(Types_Constants::SensorAlertResponse, Accept) or 
+					 Output.sensor3AlertResponse = enum(Types_Constants::SensorAlertResponse, Reject)
 				);
 			guarantee g6 "If no sensor 3 alert is received by the operator, then no alert response is communicated by the operator at the next step":
-			(prev(not s3AlertFromIAS.errorAlert, true))
-				<=> (s3AlertResponseToIAS = enum(Types_Constants::SensorAlertResponse, None));
+			(prev(not InputFromIAS.sensor3ErrorData.errorAlert, true))
+				<=> (Output.sensor3AlertResponse = enum(Types_Constants::SensorAlertResponse, None));
 			---------------------------------------------------------
 			
 			-----------------------

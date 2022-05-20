@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="ASCII"?>
+<diagram:Diagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:diagram="http://osate.org/diagram" formatVersion="7">
+  <element uuid="baf15867-037a-4db5-9938-6b7f42bafd57" manual="true">
+    <element uuid="861a5465-bb16-4b1a-a203-8fe8c6417218" manual="true">
+      <element uuid="591e8500-4865-402f-ad2f-5cc435282fdc" manual="true">
+        <bo>
+          <seg>tag</seg>
+          <seg>unidirectional</seg>
+        </bo>
+      </element>
+      <bo>
+        <seg>connection</seg>
+        <seg>Top_impl_new_connection</seg>
+      </bo>
+    </element>
+    <element uuid="e8b1b6b9-c38c-4d3f-b8f9-64a999c17f24" manual="true">
+      <element uuid="1494f189-00d6-4898-b0ce-9676ea9d0bd8" manual="true">
+        <bo>
+          <seg>tag</seg>
+          <seg>unidirectional</seg>
+        </bo>
+      </element>
+      <bo>
+        <seg>connection</seg>
+        <seg>Top_impl_new_connection10</seg>
+      </bo>
+    </element>
+    <element uuid="22dc52d0-5ad4-439d-8242-173c26819826" manual="true">
+      <element uuid="eab3ad00-6006-40eb-bcf7-dc8cf5684a88" manual="true">
+        <bo>
+          <seg>tag</seg>
+          <seg>unidirectional</seg>
+        </bo>
+      </element>
+      <bo>
+        <seg>connection</seg>
+        <seg>Top_impl_new_connection2</seg>
+      </bo>
+    </element>
+    <element uuid="bc154030-ddec-4bd7-9318-742156e3b1ba" manual="true">
+      <element uuid="110897f6-3834-4b15-8823-4a70029c5f20" manual="true">
+        <bo>
+          <seg>tag</seg>
+          <seg>unidirectional</seg>
+        </bo>
+      </element>
+      <bo>
+        <seg>connection</seg>
+        <seg>Top_impl_new_connection3</seg>
+      </bo>
+      <bendpoints>
+        <point x="736.0" y="302.0"/>
+      </bendpoints>
+    </element>
+    <element uuid="62ec09db-69bb-4451-82f5-c204f7dbfa53" manual="true">
+      <element uuid="614b4538-820e-4e2e-8463-3f37480a0af8" manual="true">
+        <bo>
+          <seg>tag</seg>
+          <seg>unidirectional</seg>
+        </bo>
+      </element>
+      <bo>
+        <seg>connection</seg>
+        <seg>Top_impl_new_connection4</seg>
+      </bo>
+    </element>
+    <element uuid="855eea75-18ef-45eb-8c71-44a76fd26385" manual="true">
+      <element uuid="1bc6ddd8-bee3-4136-858c-89990043e4d2" manual="true">
+        <bo>
+          <seg>tag</seg>
+          <seg>unidirectional</seg>
+        </bo>
+      </element>
+      <bo>
+        <seg>connection</seg>
+        <seg>Top_impl_new_connection5</seg>
+      </bo>
+    </element>
+    <element uuid="1e9cf65d-d7f4-475c-9e61-27755b30d00e" manual="true">
+      <element uuid="7996f53e-cb6d-46bc-b272-a302a56fc24f" manual="true">
+        <bo>
+          <seg>tag</seg>
+          <seg>unidirectional</seg>
+        </bo>
+      </element>
+      <bo>
+        <seg>connection</seg>
+        <seg>Top_impl_new_connection6</seg>
+      </bo>
+    </element>
+    <element uuid="53175c90-6db1-4561-beef-86bddbc1f18f" manual="true">
+      <element uuid="32104b10-397c-4a27-80e3-8640336473f7" manual="true">
+        <bo>
+          <seg>tag</seg>
+          <seg>unidirectional</seg>
+        </bo>
+      </element>
+      <bo>
+        <seg>connection</seg>
+        <seg>Top_impl_new_connection7</seg>
+      </bo>
+      <bendpoints>
+        <point x="471.0" y="303.0"/>
+      </bendpoints>
+    </element>
+    <element uuid="6083e444-c499-4599-b58e-ffa8d6050804" manual="true">
+      <element uuid="df5de665-baa5-4b22-a264-927582f10520" manual="true">
+        <bo>
+          <seg>tag</seg>
+          <seg>unidirectional</seg>
+        </bo>
+      </element>
+      <bo>
+        <seg>connection</seg>
+        <seg>Top_impl_new_connection8</seg>
+      </bo>
+    </element>
+    <element uuid="ba745457-788e-47eb-85f8-e2138abe0e0b" manual="true">
+      <element uuid="89a84908-c373-4ada-8814-c58eda10ab17" manual="true">
+        <bo>
+          <seg>tag</seg>
+          <seg>unidirectional</seg>
+        </bo>
+      </element>
+      <bo>
+        <seg>connection</seg>
+        <seg>Top_impl_new_connection9</seg>
+      </bo>
+    </element>
+    <element uuid="344762ca-273e-480e-a96f-db2b0c1fc54e" manual="true">
+      <element uuid="ed711adc-99e6-443f-b317-c91aff471f64" manual="true" dockArea="right">
+        <bo>
+          <seg>feature</seg>
+          <seg>InputFromIAS</seg>
+        </bo>
+        <position x="135.74740600585938" y="290.0"/>
+      </element>
+      <element uuid="bb3e9cb5-a863-422f-a687-46af5e851ca5" manual="true" dockArea="right">
+        <bo>
+          <seg>feature</seg>
+          <seg>InputFromSensor1</seg>
+        </bo>
+        <position x="107.57682037353516" y="110.0"/>
+      </element>
+      <element uuid="9b9837df-9614-4302-9b49-9cf4d3ebfdcd" manual="true" dockArea="right">
+        <bo>
+          <seg>feature</seg>
+          <seg>InputFromSensor2</seg>
+        </bo>
+        <position x="107.57682037353516" y="170.0"/>
+      </element>
+      <element uuid="613fadd5-44c0-48d1-9c47-d486cc349f9a" manual="true" dockArea="right">
+        <bo>
+          <seg>feature</seg>
+          <seg>InputFromSensor3</seg>
+        </bo>
+        <position x="107.57682037353516" y="230.0"/>
+      </element>
+      <element uuid="b062e895-4f6c-4007-bd7a-07e23911b61a" manual="true" dockArea="right">
+        <bo>
+          <seg>feature</seg>
+          <seg>InputFromWOWSensor</seg>
+        </bo>
+        <position x="79.45182800292969" y="50.0"/>
+      </element>
+      <element uuid="ecf5ca83-d25f-4781-bc8f-ccb07c72c4a2" manual="true" dockArea="right">
+        <bo>
+          <seg>feature</seg>
+          <seg>Output</seg>
+        </bo>
+        <position x="177.97396087646484"/>
+      </element>
+      <bo>
+        <seg>subcomponent</seg>
+        <seg>Human</seg>
+      </bo>
+      <position x="10.0" y="10.0"/>
+      <size width="230.0" height="340.0"/>
+    </element>
+    <element uuid="144cf959-a788-47e5-9352-3c0ff4dd45dd" manual="true">
+      <element uuid="4c7f3a4f-492e-4f09-84f2-a9a4ac055af0" manual="true" dockArea="left">
+        <bo>
+          <seg>feature</seg>
+          <seg>InputFromHuman</seg>
+        </bo>
+        <position/>
+      </element>
+      <element uuid="61003df9-b21a-4074-82ad-8bdd9dc40fdc" manual="true" dockArea="left">
+        <bo>
+          <seg>feature</seg>
+          <seg>InputFromSensor1</seg>
+        </bo>
+        <position y="110.0"/>
+      </element>
+      <element uuid="45ef9048-cc9b-43b4-81da-8b3ea5a65dd1" manual="true" dockArea="left">
+        <bo>
+          <seg>feature</seg>
+          <seg>InputFromSensor2</seg>
+        </bo>
+        <position y="170.0"/>
+      </element>
+      <element uuid="eb4fb3b5-324d-4b93-8e64-15614ed2fe24" manual="true" dockArea="left">
+        <bo>
+          <seg>feature</seg>
+          <seg>InputFromSensor3</seg>
+        </bo>
+        <position y="230.0"/>
+      </element>
+      <element uuid="bf5801bd-4227-452a-b649-2b6ee92ddb59" manual="true" dockArea="left">
+        <bo>
+          <seg>feature</seg>
+          <seg>InputFromWOWSensor</seg>
+        </bo>
+        <position y="50.0"/>
+      </element>
+      <element uuid="5d62a57e-c989-4d10-a6b1-93022c077f27" manual="true" dockArea="left">
+        <bo>
+          <seg>feature</seg>
+          <seg>Output</seg>
+        </bo>
+        <position y="290.0"/>
+      </element>
+      <bo>
+        <seg>subcomponent</seg>
+        <seg>IAS</seg>
+      </bo>
+      <position x="640.0" y="10.0"/>
+      <size width="300.0" height="340.0"/>
+    </element>
+    <element uuid="d41bf129-6eee-475a-b50e-e7f910203c2d" manual="true">
+      <element uuid="7e29d4b7-e4a4-4816-bd4b-a34278a926b8" manual="true" dockArea="right">
+        <bo>
+          <seg>feature</seg>
+          <seg>Output</seg>
+        </bo>
+        <position x="158.8762969970703"/>
+      </element>
+      <bo>
+        <seg>subcomponent</seg>
+        <seg>Sensor1</seg>
+      </bo>
+      <position x="330.0" y="120.0"/>
+      <size width="210.90233612060547" height="50.0"/>
+    </element>
+    <element uuid="6512f90d-941e-494c-b205-a636aa4082fa" manual="true">
+      <element uuid="8ab4ec0e-bc44-49f3-a5c4-ec10c647cd08" manual="true" dockArea="right">
+        <bo>
+          <seg>feature</seg>
+          <seg>Output</seg>
+        </bo>
+        <position x="158.8762969970703"/>
+      </element>
+      <bo>
+        <seg>subcomponent</seg>
+        <seg>Sensor2</seg>
+      </bo>
+      <position x="330.0" y="180.0"/>
+      <size width="210.90233612060547" height="50.0"/>
+    </element>
+    <element uuid="5056194c-abf2-4ee8-9d42-785966186019" manual="true">
+      <element uuid="e3bab388-3fbc-4e5e-ba73-da40bd95b1f1" manual="true" dockArea="right">
+        <bo>
+          <seg>feature</seg>
+          <seg>Output</seg>
+        </bo>
+        <position x="158.8762969970703"/>
+      </element>
+      <bo>
+        <seg>subcomponent</seg>
+        <seg>Sensor3</seg>
+      </bo>
+      <position x="330.0" y="240.0"/>
+      <size width="210.90233612060547" height="50.0"/>
+    </element>
+    <element uuid="9a40b24b-fc18-4c85-8154-76120e74091f" manual="true">
+      <element uuid="c65885e7-5f29-499a-ab9b-bc60e4af31b1" manual="true" dockArea="right">
+        <bo>
+          <seg>feature</seg>
+          <seg>Output</seg>
+        </bo>
+        <position x="157.97396087646484"/>
+      </element>
+      <bo>
+        <seg>subcomponent</seg>
+        <seg>WOW_Sensor</seg>
+      </bo>
+      <position x="330.0" y="60.0"/>
+      <size width="210.0" height="50.0"/>
+    </element>
+    <bo>
+      <seg>classifier</seg>
+      <seg>Team.impl</seg>
+    </bo>
+    <position x="160.0" y="90.0"/>
+    <size width="950.0" height="360.0"/>
+  </element>
+  <config type="structure" connectionPrimaryLabelsVisible="false">
+    <enabledAadlProperties/>
+    <context>
+      <seg>classifier</seg>
+      <seg>Human_IAS_Team::Team.impl</seg>
+    </context>
+  </config>
+</diagram:Diagram>

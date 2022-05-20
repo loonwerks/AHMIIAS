@@ -16,48 +16,27 @@ public
 	
 	---------------------------------------------------------
 	-- S.F.R. 2022/05
-	
-	-- NOTE: how does the notion of sensor error compare with that of reliability (Unreliable_Sensor_Lib)? 
-	--		 A sensor error is the deviation of the measured value from the actual value
-	--       A position sensor is classified reliable iff its measured position is sufficiently close to that of at least another sensor
-	--		 In principle, all sensors can be classified reliable, while being utterly erroneous (high precision vs low accuracy) 
-	
-	-- PROPERTIES TO BE VALIDATED (AND POSSIBLY ENFORCED):
-	--		 If a sensor error is zero (or below a threshold), then the sensor is classified reliable
-	--				NOTE: currently not holding, since the two other sensors positions might be equally distant from the only really reliable sensor
-	--		 If two sensors errors are zero (or below a threshold), then the two sensors are classified reliable	
-	--				NOTE: more in line with the current reliability pairwise evaluation approach
-	
-	-- NOTE: error computation, numerical thresholds and determination of error ranges for each sensor are deferred to SW processes (TODO model in AADL)
+
+	-- NOTE: numerical thresholds and determination of error ranges for each sensor are deferred to SW processes
 	data SensorErrorRange
 		properties
 			Data_Model::Data_Representation => Enum;
 			Data_Model::Enumerators => ("Normal", "Level1", "Level2", "Safety");
 	end SensorErrorRange;
-		
-	-- ASSUMPTION: multiple sensors can be arbitrarily erroneous at the same step
-	-- ASSUMPTION: the error can also be negative
-	-- QUESTION: can a sensor error arbitrarily fluctuate between Normal and Safety ranges?	
+
+	
+	-- NOTE: the error is assumed to be possibly negative
+	-- NOTE: component "errorAlert" necessary due to the choice of having a data port, rather than an event data port, for denoting the  
+	--       presence/absence of an alert communication to the operator		
 	data SensorErrorData
 	end SensorErrorData;
-	
+
 	data implementation SensorErrorData.impl
 		subcomponents
 			error:			data Base_Types::Float;
 			errorRange:		data SensorErrorRange;
 			errorAlert:		data Base_Types::Boolean;
 	end SensorErrorData.impl;
-
-	-- NOTE: component "sensorErrorAlert" necessary due to the choice of having a data port, rather than an event data port, for denoting the  
-	--       presence/absence of an alert communication to the operator
-	data SensorAlertData
-	end SensorAlertData;
-	
-	data implementation SensorAlertData.impl
-		subcomponents
-			error:			data Base_Types::Float;
-			errorAlert:		data Base_Types::Boolean;
-	end SensorAlertData.impl;
 
 	-- NOTE: value "None" necessary due to the choice of having a data port, rather than an event data port, for denoting no response in absence of 
 	--       an alert communication to the operator
@@ -85,6 +64,12 @@ public
 	
 	data implementation H2I.impl
 		subcomponents
+			---------------------------------------------------------
+			-- S.F.R. 2022/05
+			sensor1AlertResponse:			data SensorAlertResponse;
+			sensor2AlertResponse:			data SensorAlertResponse;
+			sensor3AlertResponse:			data SensorAlertResponse;
+			---------------------------------------------------------
 			Sensor1_Unreliable_Response: 	data Response;
 			Sensor2_Unreliable_Response: 	data Response;
 			Sensor3_Unreliable_Response: 	data Response;	
@@ -98,6 +83,12 @@ public
 	
 	data implementation I2H.impl
 		subcomponents
+			---------------------------------------------------------
+			-- S.F.R. 2022/05
+			sensor1ErrorData:  			data SensorErrorData.impl;
+			sensor2ErrorData:  			data SensorErrorData.impl;
+			sensor3ErrorData:  			data SensorErrorData.impl;
+			---------------------------------------------------------
 			Sensor1_Reliable: 			data Base_Types::Boolean;
 			Sensor2_Reliable: 			data Base_Types::Boolean;
 			Sensor3_Reliable: 			data Base_Types::Boolean;

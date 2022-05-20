@@ -38,38 +38,32 @@ public
 			Top_impl_new_connection8: feature Sensor3.Output -> Human.InputFromSensor3;
 			Top_impl_new_connection9: feature WOW_Sensor.Output -> IAS.InputFromWOWSensor;
 			Top_impl_new_connection10: feature WOW_Sensor.Output -> Human.InputFromWOWSensor;
-			---------------------------------------------------------
-			-- S.F.R. 2022/05
-			-- NOTE: arbitrary delays in communication from the system to the human to be tested
-			s1AlertResponseConnection: feature Human.s1AlertResponseToIAS -> IAS.s1AlertResponseFromHuman;	
-			s2AlertResponseConnection: feature Human.s2AlertResponseToIAS -> IAS.s2AlertResponseFromHuman;
-			s3AlertResponseConnection: feature Human.s3AlertResponseToIAS -> IAS.s3AlertResponseFromHuman;
-			-- NOTE: arbitrary delays in communication from the human to the system to be tested
-			s1AlertConnection: feature IAS.s1AlertToHuman -> Human.s1AlertFromIAS;
-			s2AlertConnection: feature IAS.s2AlertToHuman -> Human.s2AlertFromIAS;
-			s3AlertConnection: feature IAS.s3AlertToHuman -> Human.s3AlertFromIAS;
-		---------------------------------------------------------
 		
 		annex agree {**
 			---------------------------------------------------------
 			-- S.F.R. 2022/05	
 			
-			lemma l18 "Observer: alerts from all sensors are received by the operator at the same step":
-				not( Human.s1AlertFromIAS.errorAlert and  
-				     Human.s2AlertFromIAS.errorAlert and 
-				     Human.s3AlertFromIAS.errorAlert );
-			
+			-- NOTE: observers for the generation of counter-example traces of interest
 			lemma l19 "Observer: a sensor 1 error alert is communicated by the system to the operator and 
 					             an acceptance response is received back at the next step":
-				not( prev(IAS.s1AlertToHuman.errorAlert, false) and
-				     prev(Human.s1AlertFromIAS.errorAlert, false) and  
-				     Human.s1AlertResponseToIAS = enum(Types_Constants::SensorAlertResponse, Accept) and
-				     IAS.s1AlertResponseFromHuman = enum(Types_Constants::SensorAlertResponse, Accept) );
-			
-			lemma l20 "Observer: a sensor 2 error alert is received by the operator, while sensor 2 is considered reliable":
-				not( Human.s2AlertFromIAS.errorAlert and
-					 Human.Output.Sensor1_Unreliable_Response = enum(Response, Agree) );
-			 
+				not( prev(IAS.Output.sensor1ErrorData.errorAlert, false) and
+				     prev(Human.InputFromIAS.sensor1ErrorData.errorAlert, false) and  
+				     Human.Output.sensor1AlertResponse = enum(Types_Constants::SensorAlertResponse, Accept) and
+				     IAS.InputFromHuman.sensor1AlertResponse = enum(Types_Constants::SensorAlertResponse, Accept) );	
+				     
+ 			lemma l20 "Observer: a sensor 2 error alert is communicated by the system to the operator and 
+             a reject response is received back at the next step":
+				not( prev(IAS.Output.sensor2ErrorData.errorAlert, false) and
+				     prev(Human.InputFromIAS.sensor2ErrorData.errorAlert, false) and  
+				     Human.Output.sensor2AlertResponse = enum(Types_Constants::SensorAlertResponse, Reject) and
+				     IAS.InputFromHuman.sensor2AlertResponse = enum(Types_Constants::SensorAlertResponse, Reject) ); 
+				     
+			lemma l21 "Observer: no sensor 3 error alert is communicated by the system to the operator and 
+              no response is received back at the next step":
+				not( prev(not IAS.Output.sensor3ErrorData.errorAlert, false) and
+				     prev(not Human.InputFromIAS.sensor3ErrorData.errorAlert, false) and  
+				     Human.Output.sensor3AlertResponse = enum(Types_Constants::SensorAlertResponse, None) and
+				     IAS.InputFromHuman.sensor3AlertResponse = enum(Types_Constants::SensorAlertResponse, None) );
 			---------------------------------------------------------	
 			
 			--------------------------------------------
