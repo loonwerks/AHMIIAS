@@ -15,14 +15,14 @@ public
 	
 	system Team
 		annex agree {**
-			guarantee "Placeholder gaurantee to get AGREE to run": true;
+			guarantee "Placeholder guarantee to get AGREE to run": true;
 		**};
 	end Team;
 
 	system implementation Team.impl
 		subcomponents
 			Human: system Human;
-			IAS: system IAS.impl; -- S.F.R. 2022/05 changed from IAS to IAS.impl
+			IAS: system IAS;
 			Sensor1: system Sensor1;
 			Sensor2: system Sensor2;
 			Sensor3: system Sensor3;
@@ -43,28 +43,99 @@ public
 			---------------------------------------------------------
 			-- S.F.R. 2022/05	
 			
-			-- NOTE: observers for the generation of counter-example traces of interest
-			lemma l19 "Observer: a sensor 1 error alert is communicated by the system to the operator and 
+			-- NOTE: observers for the generation of counter-example traces of interest in the operator-system interaction
+			lemma l01 "Observer: a sensor 1 error alert is communicated by the system to the operator and 
 					             an acceptance response is received back at the next step":
 				not( prev(IAS.Output.sensor1ErrorData.errorAlert, false) and
 				     prev(Human.InputFromIAS.sensor1ErrorData.errorAlert, false) and  
 				     Human.Output.sensor1AlertResponse = enum(Types_Constants::SensorAlertResponse, Accept) and
 				     IAS.InputFromHuman.sensor1AlertResponse = enum(Types_Constants::SensorAlertResponse, Accept) );	
 				     
- 			lemma l20 "Observer: a sensor 2 error alert is communicated by the system to the operator and 
+ 			lemma l02 "Observer: a sensor 2 error alert is communicated by the system to the operator and 
              a reject response is received back at the next step":
 				not( prev(IAS.Output.sensor2ErrorData.errorAlert, false) and
 				     prev(Human.InputFromIAS.sensor2ErrorData.errorAlert, false) and  
 				     Human.Output.sensor2AlertResponse = enum(Types_Constants::SensorAlertResponse, Reject) and
 				     IAS.InputFromHuman.sensor2AlertResponse = enum(Types_Constants::SensorAlertResponse, Reject) ); 
 				     
-			lemma l21 "Observer: no sensor 3 error alert is communicated by the system to the operator and 
+			lemma l03 "Observer: no sensor 3 error alert is communicated by the system to the operator and 
               no response is received back at the next step":
 				not( prev(not IAS.Output.sensor3ErrorData.errorAlert, false) and
 				     prev(not Human.InputFromIAS.sensor3ErrorData.errorAlert, false) and  
 				     Human.Output.sensor3AlertResponse = enum(Types_Constants::SensorAlertResponse, None) and
 				     IAS.InputFromHuman.sensor3AlertResponse = enum(Types_Constants::SensorAlertResponse, None) );
 			---------------------------------------------------------	
+					
+			---------------------------------------------------------
+			-- S.F.R. 2022/05
+			
+			-- NOTE: observers for the generation of counter-example traces of interest in the system
+			 lemma l04 "Observer: if sensor 1 error is in Level1 range, then sometimes an alert is issued":
+			 	(IAS.Output.sensor1ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Level1) => (not IAS.Output.sensor1ErrorData.errorAlert));
+			 lemma l05 "Observer: if sensor 1 error is in Level1 range, then sometimes an alert is not issued":
+			 	(IAS.Output.sensor1ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Level1) => IAS.Output.sensor1ErrorData.errorAlert);
+			 lemma l06 "Observer: if sensor 1 error is in Level2 range, then sometimes an alert is issued":
+			 	(IAS.Output.sensor1ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Level2) => (not IAS.Output.sensor1ErrorData.errorAlert));
+			 lemma l07 "Observer: if sensor 1 error is in Level2 range, then sometimes an alert is not issued":
+			 	(IAS.Output.sensor1ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Level2) => IAS.Output.sensor1ErrorData.errorAlert);
+			 	
+			 lemma l08 "Observer: if sensor 2 error is in Level1 range, then sometimes an alert is issued":
+			 	(IAS.Output.sensor2ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Level1) => (not IAS.Output.sensor2ErrorData.errorAlert));
+			 lemma l09 "Observer: if sensor 2 error is in Level1 range, then sometimes an alert is not issued":
+			 	(IAS.Output.sensor2ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Level1) => IAS.Output.sensor2ErrorData.errorAlert);
+			 lemma l10 "Observer: if sensor 2 error is in Level2 range, then sometimes an alert is issued":
+			 	(IAS.Output.sensor2ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Level2) => (not IAS.Output.sensor2ErrorData.errorAlert));
+			 lemma l11 "Observer: if sensor 2 error is in Level2 range, then sometimes an alert is not issued":
+			 	(IAS.Output.sensor2ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Level2) => IAS.Output.sensor2ErrorData.errorAlert);
+			 	
+			 lemma l12 "Observer: if sensor 3 error is in Level1 range, then sometimes an alert is issued":
+			 	(IAS.Output.sensor3ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Level1) => (not IAS.Output.sensor3ErrorData.errorAlert));
+			 lemma l13 "Observer: if sensor 3 error is in Level1 range, then sometimes an alert is not issued":
+			 	(IAS.Output.sensor3ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Level1) => IAS.Output.sensor3ErrorData.errorAlert);
+			 lemma l14 "Observer: if sensor 3 error is in Level2 range, then sometimes an alert is issued":
+			 	(IAS.Output.sensor3ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Level2) => (not IAS.Output.sensor3ErrorData.errorAlert));
+			 lemma l15 "Observer: if sensor 3 error is in Level2 range, then sometimes an alert is not issued":
+			 	(IAS.Output.sensor3ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Level2) => IAS.Output.sensor3ErrorData.errorAlert);
+			 	
+			 -- NOTE: multiple sensors can be arbitrarily erroneous at the same step
+			 lemma l16 "Observer: alerts are issued for all sensors at the same step":
+			 	not( IAS.Output.sensor1ErrorData.errorAlert and
+			 		 IAS.Output.sensor2ErrorData.errorAlert and
+			 		 IAS.Output.sensor3ErrorData.errorAlert);
+			 		 	
+			-- NOTE: how does the notion of sensor error compare with that of reliability (Unreliable_Sensor_Lib)? 
+			--		 A sensor error is defined as the deviation of the measured value from the actual value 
+			--		 In this context, the actual value is unavailable, and the error of a sensor s1 is given by 
+			--		 	min(d(s1,s2), d(s1,s3))
+			--		 where si for simplicity denotes the position measured by sensor si, and d a distance function
+			--
+			--       A position sensor is classified reliable iff its measured position is sufficiently close to that of at least another sensor,
+			--		 based on thresholds that are piecewise linear functions of the z coordinate (possibly returned by any of the three sensors) 
+			--		 at the previous step. Sensor s1 is classified reliable iff:
+			--		 	((|s1.x - s2.x| < hor_thr) and (|s1.y - s2.y| < hor_thr) and (|s1.z - s2.z| < ver_thr)) or 
+			--			((|s1.x - s3.x| < hor_thr) and (|s1.y - s3.y| < hor_thr) and (|s1.z - s3.z| < ver_thr))
+			--
+			--		 The distance function "closest" to this notion of reliability is the Manhattan distance:
+			--			d(p(s1),p(s2)) = |s1.x - s2.x| + |s1.y - s2.y| + |s1.z - s2.z|
+			--		 In fact, this yields an upper bound on the distance between a reliable sensor and the other sensor at minimum distance (let it be s2):
+			--			|s1.x - s2.x| + |s1.y - s2.y| + |s1.z - s2.z| < 2*hor_thr + ver_thr
+			--
+			--		 Reliability does not guarantee accuracy: all sensors can be classified reliable, while the measured values are far from the actual ones
+			--
+			--		 It is possible to define the thresholds that determine the error ranges as functions, rather than as constants, in such a way that, 
+			--		 if a sensor is reliable, then the error range is normal and no alert is ever issued:  
+			--		 	it is sufficient to set the Normal->Level1 threshold to 2*hor_thr + ver_thr 
+
+			lemma l17 "Observer: an alert is issued for a sensor classified reliable":
+				not( IAS.Output.sensor1ErrorData.errorAlert and
+					 IAS.Output.Sensor1_Reliable );
+	
+			-- NOTE: currently, a sensor error can arbitrarily fluctuate between Normal and Safety ranges in consecutive steps	
+			lemma l18 "Observer: a sensor error range moves from Normal to Safety to Normal in consecutive steps":
+				not( prev(prev(IAS.Output.sensor1ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Normal), false), false) and
+					 prev(IAS.Output.sensor1ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Safety), false) and
+					 IAS.Output.sensor1ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Normal) );
+			---------------------------------------------------------
 			
 			--------------------------------------------
 			-- EQ (STATE VARIABLES)
@@ -108,9 +179,15 @@ public
 			-- LEMMAS (These should be true based on the guarantees of the subcomponents.)
 			------------------------------------------------------------------------------
 			lemma "Operator responds to unreliable sensor alerts": 
-					(prev(not IAS.Output.Sensor1_Reliable, false) <=> ((Human.Output.Sensor1_Unreliable_Response = enum(Response, Agree)) or (Human.Output.Sensor1_Unreliable_Response = enum(Response, Disagree))))
-				and (prev(not IAS.Output.Sensor2_Reliable, false) <=> ((Human.Output.Sensor2_Unreliable_Response = enum(Response, Agree)) or (Human.Output.Sensor2_Unreliable_Response = enum(Response, Disagree))))
-				and (prev(not IAS.Output.Sensor3_Reliable, false) <=> ((Human.Output.Sensor3_Unreliable_Response = enum(Response, Agree)) or (Human.Output.Sensor3_Unreliable_Response = enum(Response, Disagree))));
+					(prev(not IAS.Output.Sensor1_Reliable, false) <=> 
+						((Human.Output.Sensor1_Unreliable_Response = enum(Response, Agree)) or (Human.Output.Sensor1_Unreliable_Response = enum(Response, Disagree)))
+					)
+				and (prev(not IAS.Output.Sensor2_Reliable, false) <=> 
+					((Human.Output.Sensor2_Unreliable_Response = enum(Response, Agree)) or (Human.Output.Sensor2_Unreliable_Response = enum(Response, Disagree)))
+				)
+				and (prev(not IAS.Output.Sensor3_Reliable, false) <=> 
+					((Human.Output.Sensor3_Unreliable_Response = enum(Response, Agree)) or (Human.Output.Sensor3_Unreliable_Response = enum(Response, Disagree)))
+				);
 			
 			lemma "We can't have just Sensor 1 reliable":
 					not (	 IAS.Output.Sensor1_Reliable and not IAS.Output.Sensor2_Reliable and not IAS.Output.Sensor3_Reliable);
