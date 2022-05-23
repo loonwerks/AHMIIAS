@@ -8,6 +8,7 @@ import com.google.common.collect.Lists;
 import gov.nasa.xpc.XPlaneConnect;
 import org.jsoar.kernel.Agent;
 import org.jsoar.kernel.DecisionCycle;
+import org.jsoar.kernel.SoarException;
 import org.jsoar.runtime.ThreadedAgent;
 import org.jsoar.util.adaptables.Adaptables;
 import us.hiai.StartAgents;
@@ -40,6 +41,13 @@ public abstract class XPlaneAgent implements AutoCloseable, Runnable
         underlyingSoarAgent.setName(name());
         underlyingSoarAgent.getPrinter().pushWriter(new OutputStreamWriter(System.out));
         underlyingSoarAgent.initialize();
+        try {
+            if(this.runOnStartup())   underlyingSoarAgent.openDebuggerAndWait();
+        } catch (SoarException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         //underlyingSoarAgent.runForever();
     }
 
