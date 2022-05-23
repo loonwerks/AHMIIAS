@@ -116,7 +116,7 @@ public
 			--			((|s1.x - s3.x| < hor_thr) and (|s1.y - s3.y| < hor_thr) and (|s1.z - s3.z| < ver_thr))
 			--
 			--		 The distance function "closest" to this notion of reliability is the Manhattan distance:
-			--			d(p(s1),p(s2)) = |s1.x - s2.x| + |s1.y - s2.y| + |s1.z - s2.z|
+			--			d(s1,s2) = |s1.x - s2.x| + |s1.y - s2.y| + |s1.z - s2.z|
 			--		 In fact, this yields an upper bound on the distance between a reliable sensor and the other sensor at minimum distance (let it be s2):
 			--			|s1.x - s2.x| + |s1.y - s2.y| + |s1.z - s2.z| < 2*hor_thr + ver_thr
 			--
