@@ -43,22 +43,22 @@ public
 			---------------------------------------------------------
 			-- S.F.R. 2022/05	
 			
-			-- NOTE: observers for the generation of counter-example traces of interest in the operator-system interaction
-			lemma l01 "Observer: a sensor 1 error alert is communicated by the system to the operator and 
+			-- NOTE: observers for the generation of counter-example traces of interest in the operator-IAS interaction
+			lemma l01 "Observer: a sensor 1 error alert is communicated by the IAS to the operator and 
 					             an acceptance response is received back at the next step":
 				not( prev(IAS.Output.sensor1ErrorData.errorAlert, false) and
 				     prev(Human.InputFromIAS.sensor1ErrorData.errorAlert, false) and  
 				     Human.Output.sensor1AlertResponse = enum(Types_Constants::SensorAlertResponse, Accept) and
 				     IAS.InputFromHuman.sensor1AlertResponse = enum(Types_Constants::SensorAlertResponse, Accept) );	
 				     
- 			lemma l02 "Observer: a sensor 2 error alert is communicated by the system to the operator and 
+ 			lemma l02 "Observer: a sensor 2 error alert is communicated by the IAS to the operator and 
              a reject response is received back at the next step":
 				not( prev(IAS.Output.sensor2ErrorData.errorAlert, false) and
 				     prev(Human.InputFromIAS.sensor2ErrorData.errorAlert, false) and  
 				     Human.Output.sensor2AlertResponse = enum(Types_Constants::SensorAlertResponse, Reject) and
 				     IAS.InputFromHuman.sensor2AlertResponse = enum(Types_Constants::SensorAlertResponse, Reject) ); 
 				     
-			lemma l03 "Observer: no sensor 3 error alert is communicated by the system to the operator and 
+			lemma l03 "Observer: no sensor 3 error alert is communicated by the IAS to the operator and 
               no response is received back at the next step":
 				not( prev(not IAS.Output.sensor3ErrorData.errorAlert, false) and
 				     prev(not Human.InputFromIAS.sensor3ErrorData.errorAlert, false) and  
@@ -69,33 +69,45 @@ public
 			---------------------------------------------------------
 			-- S.F.R. 2022/05
 			
-			-- NOTE: observers for the generation of counter-example traces of interest in the system
+			-- NOTE: observers for the generation of counter-example traces of interest in the IAS
 			 lemma l04 "Observer: if sensor 1 error is in Level1 range, then sometimes an alert is issued":
-			 	(IAS.Output.sensor1ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Level1) => (not IAS.Output.sensor1ErrorData.errorAlert));
+			 	(IAS.Output.sensor1ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Level1) 
+			 		=> (not IAS.Output.sensor1ErrorData.errorAlert));
 			 lemma l05 "Observer: if sensor 1 error is in Level1 range, then sometimes an alert is not issued":
-			 	(IAS.Output.sensor1ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Level1) => IAS.Output.sensor1ErrorData.errorAlert);
+			 	(IAS.Output.sensor1ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Level1) 
+			 		=> IAS.Output.sensor1ErrorData.errorAlert);
 			 lemma l06 "Observer: if sensor 1 error is in Level2 range, then sometimes an alert is issued":
-			 	(IAS.Output.sensor1ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Level2) => (not IAS.Output.sensor1ErrorData.errorAlert));
+			 	(IAS.Output.sensor1ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Level2) 
+			 		=> (not IAS.Output.sensor1ErrorData.errorAlert));
 			 lemma l07 "Observer: if sensor 1 error is in Level2 range, then sometimes an alert is not issued":
-			 	(IAS.Output.sensor1ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Level2) => IAS.Output.sensor1ErrorData.errorAlert);
+			 	(IAS.Output.sensor1ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Level2) 
+			 		=> IAS.Output.sensor1ErrorData.errorAlert);
 			 	
 			 lemma l08 "Observer: if sensor 2 error is in Level1 range, then sometimes an alert is issued":
-			 	(IAS.Output.sensor2ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Level1) => (not IAS.Output.sensor2ErrorData.errorAlert));
+			 	(IAS.Output.sensor2ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Level1) 
+			 		=> (not IAS.Output.sensor2ErrorData.errorAlert));
 			 lemma l09 "Observer: if sensor 2 error is in Level1 range, then sometimes an alert is not issued":
-			 	(IAS.Output.sensor2ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Level1) => IAS.Output.sensor2ErrorData.errorAlert);
+			 	(IAS.Output.sensor2ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Level1) 
+			 		=> IAS.Output.sensor2ErrorData.errorAlert);
 			 lemma l10 "Observer: if sensor 2 error is in Level2 range, then sometimes an alert is issued":
-			 	(IAS.Output.sensor2ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Level2) => (not IAS.Output.sensor2ErrorData.errorAlert));
+			 	(IAS.Output.sensor2ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Level2) 
+			 		=> (not IAS.Output.sensor2ErrorData.errorAlert));
 			 lemma l11 "Observer: if sensor 2 error is in Level2 range, then sometimes an alert is not issued":
-			 	(IAS.Output.sensor2ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Level2) => IAS.Output.sensor2ErrorData.errorAlert);
+			 	(IAS.Output.sensor2ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Level2) 
+			 		=> IAS.Output.sensor2ErrorData.errorAlert);
 			 	
 			 lemma l12 "Observer: if sensor 3 error is in Level1 range, then sometimes an alert is issued":
-			 	(IAS.Output.sensor3ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Level1) => (not IAS.Output.sensor3ErrorData.errorAlert));
+			 	(IAS.Output.sensor3ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Level1) 
+			 		=> (not IAS.Output.sensor3ErrorData.errorAlert));
 			 lemma l13 "Observer: if sensor 3 error is in Level1 range, then sometimes an alert is not issued":
-			 	(IAS.Output.sensor3ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Level1) => IAS.Output.sensor3ErrorData.errorAlert);
+			 	(IAS.Output.sensor3ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Level1) 
+			 		=> IAS.Output.sensor3ErrorData.errorAlert);
 			 lemma l14 "Observer: if sensor 3 error is in Level2 range, then sometimes an alert is issued":
-			 	(IAS.Output.sensor3ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Level2) => (not IAS.Output.sensor3ErrorData.errorAlert));
+			 	(IAS.Output.sensor3ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Level2) 
+			 		=> (not IAS.Output.sensor3ErrorData.errorAlert));
 			 lemma l15 "Observer: if sensor 3 error is in Level2 range, then sometimes an alert is not issued":
-			 	(IAS.Output.sensor3ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Level2) => IAS.Output.sensor3ErrorData.errorAlert);
+			 	(IAS.Output.sensor3ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Level2) 
+			 		=> IAS.Output.sensor3ErrorData.errorAlert);
 			 	
 			 -- NOTE: multiple sensors can be arbitrarily erroneous at the same step
 			 lemma l16 "Observer: alerts are issued for all sensors at the same step":

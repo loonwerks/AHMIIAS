@@ -23,14 +23,20 @@ public
 			-- QUESTION: is it possible to formulate properties about the likelihood of issuing an alert in range Level1 (resp.2) after an acceptance
 			--			 or a rejection by the operator, without technical details about the learning algorithm?		
 			guarantee g1 "If the sensor error is in Normal range, then no alert is issued":
-			 	(Output.sensor1ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Normal) => (not Output.sensor1ErrorData.errorAlert)) and
-			 	(Output.sensor2ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Normal) => (not Output.sensor2ErrorData.errorAlert)) and
-			 	(Output.sensor3ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Normal) => (not Output.sensor3ErrorData.errorAlert));
+			 	(Output.sensor1ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Normal) 
+			 		=> (not Output.sensor1ErrorData.errorAlert)) and
+			 	(Output.sensor2ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Normal) 
+			 		=> (not Output.sensor2ErrorData.errorAlert)) and
+			 	(Output.sensor3ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Normal) 
+			 		=> (not Output.sensor3ErrorData.errorAlert));
 			
 			guarantee g2 "If the sensor error is in Safety range, then an alert is issued":
-			 	(Output.sensor1ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Safety) => Output.sensor1ErrorData.errorAlert) and
-			 	(Output.sensor2ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Safety) => Output.sensor2ErrorData.errorAlert) and
-			 	(Output.sensor3ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Safety) => Output.sensor3ErrorData.errorAlert);			
+			 	(Output.sensor1ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Safety) 
+			 		=> Output.sensor1ErrorData.errorAlert) and
+			 	(Output.sensor2ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Safety) 
+			 		=> Output.sensor2ErrorData.errorAlert) and
+			 	(Output.sensor3ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Safety) 
+			 		=> Output.sensor3ErrorData.errorAlert);			
 			---------------------------------------------------------
 			
 			-----------------------
