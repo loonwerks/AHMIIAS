@@ -4,6 +4,7 @@ public
 	renames Types_Constants::all;
 	with Unreliable_Sensor_Lib;	
 	with Base_Types;
+	with Faults;
 	
 	-------------------------------------
 	-- IAS
@@ -16,6 +17,22 @@ public
 			InputFromSensor3 : 		in data port Sensor_Data.impl;
 			InputFromWOWSensor : 	in data port Base_Types::Boolean;
 			Output : 				out data port I2H.impl;
+		
+		---------------------------------------------------------
+		-- S.F.R. 2022/05
+		annex safety {**
+			
+			-- NOTE: no fault analysis at this level, due to missing IAS implementation 
+			fault nondet_sensor1_alert "Sensor 1 nondeterministically issues an alert" : Faults::fail_sensor1_alert {
+				eq nondet_val : bool;
+				inputs: i2h_in <- Output, alt_val <- nondet_val; 
+				outputs: Output <- i2h_out;    
+				duration: permanent;
+				--disable: true;	
+			}
+		**};
+		---------------------------------------------------------
+		
 		annex agree {**								
 			---------------------------------------------------------
 			-- S.F.R. 2022/05	

@@ -1,0 +1,28 @@
+package Faults
+public
+	with Types_Constants;
+	
+	annex agree {**	
+	
+		node fail_sensor1_alert(i2h_in: Types_Constants::I2H.impl, alt_val: bool, trigger: bool) 
+			returns (i2h_out: Types_Constants::I2H.impl); 
+		var aux : Types_Constants::SensorErrorData.impl;
+		let
+			aux = i2h_in.sensor1ErrorData{errorAlert := alt_val};
+		  	i2h_out = if (trigger) 
+		   			  then i2h_in{sensor1ErrorData := aux} 
+		   			  else i2h_in;
+		tel;
+		
+		node fail_sensor1_alert_response(h2i_in: Types_Constants::H2I.impl, trigger: bool) 
+			returns (h2i_out: Types_Constants::H2I.impl); 
+		let
+		  	h2i_out = if (trigger) 
+		   			  then h2i_in{sensor1AlertResponse := enum(Types_Constants::SensorAlertResponse, None)} 
+		   			  else h2i_in;
+		tel;
+		
+	**};	
+	
+end faults;
+

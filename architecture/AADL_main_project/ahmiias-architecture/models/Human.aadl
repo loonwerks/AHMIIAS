@@ -3,6 +3,7 @@ public
 	with Types_Constants;
 	renames Types_Constants::all;
 	with Base_Types;
+	with Faults;
 	
 	-------------------------------------
 	-- Human
@@ -16,6 +17,21 @@ public
 			InputFromSensor3 : 		in data port Sensor_Data.impl;
 			InputFromWOWSensor : 	in data port Base_Types::Boolean;
 			Output : 				out data port H2I.impl;
+			
+		---------------------------------------------------------
+		-- S.F.R. 2022/05
+		annex safety {**
+			
+			-- NOTE: no fault analysis at this level, due to missing Human implementation 	
+			fault no_sensor1_alert_response "The operator does not communicate an alert response to a sensor 1 alert" : Faults::fail_sensor1_alert_response {
+				inputs: h2i_in <- Output; 
+				outputs: Output <- h2i_out;    
+				duration: permanent;
+				--disable: true;	
+			}
+		**};
+		---------------------------------------------------------
+		
 		annex agree {**
 			---------------------------------------------------------
 			-- S.F.R. 2022/05
@@ -94,9 +110,9 @@ public
 							or  (Output.Landing_Option_Selection = pre(InputFromIAS.Landing_Options.Option2))
 							or  (Output.Landing_Option_Selection = pre(InputFromIAS.Landing_Options.Option3))
 							)
-						); 
-						
+						); 						
 		**};
+		
 	end Human;
 	
 end Human;
