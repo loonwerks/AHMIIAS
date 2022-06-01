@@ -20,14 +20,24 @@ public
 			
 		---------------------------------------------------------
 		-- S.F.R. 2022/05
-		annex safety {**
-			
-			-- NOTE: no fault analysis at this level, due to missing Human implementation 	
-			fault no_sensor1_alert_response "The operator does not communicate an alert response to a sensor 1 alert" : Faults::fail_sensor1_alert_response {
+		
+		-- NOTE: no fault analysis at this level, due to missing Human implementation
+		annex safety {**		
+			 	
+			fault no_sensor1_alert_response 
+			"The operator does not communicate an alert response to a sensor 1 alert" : Faults::fail_sensor1_alert_response {
 				inputs: h2i_in <- Output; 
 				outputs: Output <- h2i_out;    
 				duration: permanent;
-				--disable: true;	
+				disable: true;	
+			}
+			
+			fault no_sensor1_unreliability_response 
+			"The operator does not communicate a response to a sensor 1 unreliability message" : Faults::fail_sensor1_unreliability_response {
+				inputs: h2i_in <- Output; 
+				outputs: Output <- h2i_out;    
+				duration: permanent;
+				disable: true;	
 			}
 		**};
 		---------------------------------------------------------

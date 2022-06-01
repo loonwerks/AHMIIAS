@@ -50,36 +50,33 @@ public
 			---------------------------------------------------------
 			-- S.F.R. 2022/05	
 			
-			-- NOTE: lemmata falsified in presence of faults
-			lemma l19 "If a sensor 1 error alert is communicated by the IAS to the operator, 
+			 -- NOTE: lemma falsifiable in presence of fault no_sensor1_alert_response (see Human.aadl)
+			 lemma l19 "If a sensor 1 error alert is communicated by the IAS to the operator, 
 					   then a response is communicated by the operator at the next step":
 				prev(IAS.Output.sensor1ErrorData.errorAlert, false) =>
 				(Human.Output.sensor1AlertResponse = enum(Types_Constants::SensorAlertResponse, Accept) or
 				 Human.Output.sensor1AlertResponse = enum(Types_Constants::SensorAlertResponse, Reject));
 			
-			lemma l20 "If sensor 1 error is in Normal range, then no sensor 1 alert is issued":
+			 -- NOTE: lemma falsifiable in presence of fault nondet_sensor1_alert (see IAS.aadl)
+			 lemma l20 "If sensor 1 error is in Normal range, then no sensor 1 alert is issued":
 			 	(IAS.Output.sensor1ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Normal) 
 			 		=> (not IAS.Output.sensor1ErrorData.errorAlert));
 			
-			-- NOTE: observers for the generation of counter-example traces of interest in the operator-IAS interaction
-			lemma l01 "Observer: a sensor 1 error alert is communicated by the IAS to the operator and 
+			 -- NOTE: observers for the generation of counter-example traces of interest in the operator-IAS interaction
+			 lemma l01 "Observer: a sensor 1 error alert is communicated by the IAS to the operator and 
 					   an acceptance response is communicated by the operator at the next step":
 				not( prev(IAS.Output.sensor1ErrorData.errorAlert, false) and
 				     Human.Output.sensor1AlertResponse = enum(Types_Constants::SensorAlertResponse, Accept) );	
 				     
- 			lemma l02 "Observer: a sensor 2 error alert is communicated by the IAS to the operator and 
+ 			 lemma l02 "Observer: a sensor 2 error alert is communicated by the IAS to the operator and 
              		   a reject response is communicated by the operator at the next step":
 				not( prev(IAS.Output.sensor2ErrorData.errorAlert, false) and
 				     Human.Output.sensor2AlertResponse = enum(Types_Constants::SensorAlertResponse, Reject) ); 
 				     
-			lemma l03 "Observer: no sensor 3 error alert is communicated by the IAS to the operator and 
+			 lemma l03 "Observer: no sensor 3 error alert is communicated by the IAS to the operator and 
               		   no response is communicated by the operator at the next step":
 				not( prev(not IAS.Output.sensor3ErrorData.errorAlert, false) and 
 				     Human.Output.sensor3AlertResponse = enum(Types_Constants::SensorAlertResponse, None) );
-			---------------------------------------------------------	
-					
-			---------------------------------------------------------
-			-- S.F.R. 2022/05
 			
 			-- NOTE: observers for the generation of counter-example traces of interest in the IAS
 			 lemma l04 "Observer: if sensor 1 error is in Level1 range, then sometimes an alert is issued":
@@ -202,6 +199,7 @@ public
 			------------------------------------------------------------------------------
 			-- LEMMAS (These should be true based on the guarantees of the subcomponents.)
 			------------------------------------------------------------------------------
+			-- NOTE: lemma falsifiable in presence of fault no_sensor1_unreliability_response (see Human.aadl)
 			lemma "Operator responds to unreliable sensor alerts": 
 					(prev(not IAS.Output.Sensor1_Reliable, false) <=> 
 						((Human.Output.Sensor1_Unreliable_Response = enum(Response, Agree)) or (Human.Output.Sensor1_Unreliable_Response = enum(Response, Disagree)))
@@ -271,6 +269,8 @@ public
 								or not prev(reliable_sensor_available, true)
 							);
 			
+			-- NOTE: lemma falsifiable in presence of fault no_sensor1_unreliability_response (see Human.aadl), but
+			--		 made valid again by refining IAS guarantee g7 into g8 (see IAS.aadl) 
 			lemma "If Sensor 1 is both the active sensor and unreliable, it must be the case that either
 				the pilot disagreed with the IAS assessment 
 				or the sensor just became unreliable on this timestep 

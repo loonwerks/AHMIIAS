@@ -22,6 +22,23 @@ public
 		   			  else h2i_in;
 		tel;
 		
+		
+		node fail_sensor1_unreliability(i2h_in: Types_Constants::I2H.impl, alt_val: bool, trigger: bool) 
+			returns (i2h_out: Types_Constants::I2H.impl); 
+		let
+		  	i2h_out = if (trigger and not i2h_in.Sensor1_Reliable)
+		   			  then i2h_in{Sensor1_Reliable := alt_val} 
+		   			  else i2h_in;
+		tel;
+		
+		node fail_sensor1_unreliability_response(h2i_in: Types_Constants::H2I.impl, trigger: bool) 
+			returns (h2i_out: Types_Constants::H2I.impl); 
+		let
+		  	h2i_out = if (trigger) 
+		   			  then h2i_in{Sensor1_Unreliable_Response := enum(Types_Constants::Response, Neutral)} 
+		   			  else h2i_in;
+		tel;
+		
 	**};	
 	
 end faults;

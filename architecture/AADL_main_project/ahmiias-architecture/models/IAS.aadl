@@ -20,15 +20,25 @@ public
 		
 		---------------------------------------------------------
 		-- S.F.R. 2022/05
+		-- NOTE: no fault analysis at this level, due to missing IAS implementation 
+		
 		annex safety {**
 			
-			-- NOTE: no fault analysis at this level, due to missing IAS implementation 
-			fault nondet_sensor1_alert "Sensor 1 nondeterministically issues an alert" : Faults::fail_sensor1_alert {
+			fault nondet_sensor1_alert "The IAS nondeterministically issues an alert for sensor 1" : Faults::fail_sensor1_alert {
 				eq nondet_val : bool;
 				inputs: i2h_in <- Output, alt_val <- nondet_val; 
 				outputs: Output <- i2h_out;    
 				duration: permanent;
-				--disable: true;	
+				disable: true;	
+			}
+			
+			-- NOTE: the human operator currently handles false positives, not false negatives
+			fault nondet_sensor1_unreliability "The IAS nondeterministically reports sensor 1 as reliable, when unreliable" : Faults::fail_sensor1_unreliability {
+				eq nondet_val : bool;
+				inputs: i2h_in <- Output, alt_val <- nondet_val; 
+				outputs: Output <- i2h_out;    
+				duration: permanent;
+				disable: true;	
 			}
 		**};
 		---------------------------------------------------------
@@ -41,18 +51,18 @@ public
 			--			 or a rejection by the operator, without technical details about the learning algorithm?		
 			guarantee g1 "If the sensor error is in Normal range, then no alert is issued":
 			 	(Output.sensor1ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Normal) 
-			 		=> (not Output.sensor1ErrorData.errorAlert)) and
-			 	(Output.sensor2ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Normal) 
-			 		=> (not Output.sensor2ErrorData.errorAlert)) and
-			 	(Output.sensor3ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Normal) 
+			 		=> (not Output.sensor1ErrorData.errorAlert))
+		    and (Output.sensor2ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Normal) 
+			 		=> (not Output.sensor2ErrorData.errorAlert)) 
+			and	(Output.sensor3ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Normal) 
 			 		=> (not Output.sensor3ErrorData.errorAlert));
 			
 			guarantee g2 "If the sensor error is in Safety range, then an alert is issued":
 			 	(Output.sensor1ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Safety) 
-			 		=> Output.sensor1ErrorData.errorAlert) and
-			 	(Output.sensor2ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Safety) 
-			 		=> Output.sensor2ErrorData.errorAlert) and
-			 	(Output.sensor3ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Safety) 
+			 		=> Output.sensor1ErrorData.errorAlert) 
+			and (Output.sensor2ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Safety) 
+			 		=> Output.sensor2ErrorData.errorAlert)
+			and (Output.sensor3ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Safety) 
 			 		=> Output.sensor3ErrorData.errorAlert);			
 			---------------------------------------------------------
 			
@@ -78,16 +88,16 @@ public
 			eq Sensor1_Reliable: bool, Sensor2_Reliable: bool, Sensor3_Reliable: bool = 
 				Unreliable_Sensor_Lib::Sensor_Status(InputFromSensor1, InputFromSensor2, InputFromSensor3, Horizontal_Threshold, Vertical_Threshold);
 				
-			guarantee "Sensor status to operator":
+			guarantee g3 "Sensor status to operator":
 					(Output.Sensor1_Reliable = Sensor1_Reliable)
 				and (Output.Sensor2_Reliable = Sensor2_Reliable)
 				and (Output.Sensor3_Reliable = Sensor3_Reliable);			
 			
 			--Should we instead pick one of the three on some other criteria?
-			guarantee "Recommended sensor is NIL if and only if all sensors are unreliable":
+			guarantee g4 "Recommended sensor is NIL if and only if all sensors are unreliable":
 					Output.Recommended_Sensor = NIL <=> (not Sensor1_Reliable and not Sensor2_Reliable and not Sensor3_Reliable);
 			
-			guarantee "The recommended sensor is a reliable sensor, unless it is NIL":
+			guarantee g5 "The recommended sensor is a reliable sensor, unless it is NIL":
 					not (Output.Recommended_Sensor = NIL) =>
 						(
 							   (Output.Recommended_Sensor = 1 and Sensor1_Reliable)
@@ -95,36 +105,44 @@ public
 							or (Output.Recommended_Sensor = 3 and Sensor3_Reliable)
 						);
 						
-			guarantee "The recommended sensor is the active sensor unless the active sensor has become unreliable":			
+			guarantee g6 "The recommended sensor is the active sensor unless the active sensor has become unreliable":			
 					(		(previous_active_sensor = 1 and Output.Sensor1_Reliable)
 						or 	(previous_active_sensor = 2 and Output.Sensor2_Reliable)
 						or 	(previous_active_sensor = 3 and Output.Sensor3_Reliable)
 					)
 						=> (Output.Recommended_Sensor = previous_active_sensor);
  
-			guarantee "The active sensor should stay the same unless the operator agrees that it is unreliable 
-						and there is another reliable sensor available.":
+			guarantee g7 "The active sensor should stay the same unless the operator agrees that it is unreliable 
+						and there is another reliable sensor available":
 				Output.Active_Sensor = 	
 					if (previous_recommended_sensor = NIL)
 						then previous_active_sensor
-					else if ((previous_active_sensor = 1 and InputFromHuman.Sensor1_Unreliable_Response = enum(Response, Agree))
+					else if ((    previous_active_sensor = 1 and InputFromHuman.Sensor1_Unreliable_Response = enum(Response, Agree))
 							  or (previous_active_sensor = 2 and InputFromHuman.Sensor2_Unreliable_Response = enum(Response, Agree))
 							  or (previous_active_sensor = 3 and InputFromHuman.Sensor3_Unreliable_Response = enum(Response, Agree)))
 						then previous_recommended_sensor
-					else previous_active_sensor;
+					else previous_active_sensor;				
+					
+			---------------------------------------------------------
+			-- S.F.R. 2022/05	
 			
---			guarantee "The active sensor should stay the same unless the operator agrees that it is unreliable 
---						and there is another reliable sensor available.":
+			-- NOTE: added as refinement of g7 in presence of fault no_sensor1_unreliability_response (see Human.aadl) consisting in 
+			--		 a missing operator response to an unreliable sensor message
+--			guarantee g8 "The active sensor should stay the same unless (i) it is unreliable, (ii) the operator agrees or does not respond after one step
+--						and (iii) there is another reliable sensor available":
 --				Output.Active_Sensor = 	
---					if (previous_recommended_sensor = NIL) 
+--					if (previous_recommended_sensor = NIL)
 --						then previous_active_sensor
---					else if (previous_active_sensor = 1 and InputFromHuman.Sensor1_Unreliable_Response = enum(Response, Agree)) 
---							then previous_recommended_sensor
---						 else if (previous_active_sensor = 2 and InputFromHuman.Sensor2_Unreliable_Response = enum(Response, Agree)) 
---						 		then previous_recommended_sensor
---							  else if (previous_active_sensor = 3 and InputFromHuman.Sensor3_Unreliable_Response = enum(Response, Agree)) 
---							  			then previous_recommended_sensor
---								   else	previous_active_sensor;
+--					else if (	 (previous_active_sensor = 1 and (InputFromHuman.Sensor1_Unreliable_Response = enum(Response, Agree)
+--															      or (prev(not Sensor1_Reliable, false) and InputFromHuman.Sensor1_Unreliable_Response = enum(Response, Neutral))))
+--							  or (previous_active_sensor = 2 and (InputFromHuman.Sensor2_Unreliable_Response = enum(Response, Agree)
+--							  									  or (prev(not Sensor1_Reliable, false) and InputFromHuman.Sensor2_Unreliable_Response = enum(Response, Neutral))))
+--							  or (previous_active_sensor = 3 and (InputFromHuman.Sensor3_Unreliable_Response = enum(Response, Agree)
+--							  									  or (prev(not Sensor1_Reliable, false) and InputFromHuman.Sensor2_Unreliable_Response = enum(Response, Neutral))))
+--							  	)
+--						then previous_recommended_sensor
+--					else previous_active_sensor;
+			---------------------------------------------------------
 
 			-----------------------
 			--FLIGHT PHASE STATE MACHINE
