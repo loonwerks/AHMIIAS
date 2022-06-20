@@ -1,6 +1,6 @@
 package xplane;
 
-import scala.Predef;
+//import scala.Predef;
 
 import java.awt.*;
 
