@@ -71,7 +71,7 @@ public class CopilotTakeoffAgent extends XPlaneAgent
 
     @Override
     public void start()  {
-        //System.setProperty("jsoar.agent.interpreter","tcl");
+        System.setProperty("jsoar.agent.interpreter","tcl");
         System.err.println("Started");
         sagt = getAgent();
 
