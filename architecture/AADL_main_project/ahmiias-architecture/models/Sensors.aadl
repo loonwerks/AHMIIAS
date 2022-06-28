@@ -1,0 +1,31 @@
+package Sensors
+public
+	with Types_Constants;
+	renames Types_Constants::all;
+	with Base_Types;
+	
+	-------------------------------------
+	-- Sensors
+	-------------------------------------
+		
+	system Sensor1
+		features
+			Output : out data port Sensor_Data.impl;
+	end Sensor1;
+	
+	system Sensor2
+		features
+			Output : out data port Sensor_Data.impl;
+	end Sensor2;
+	
+	system Sensor3
+		features
+			Output : out data port Sensor_Data.impl;
+	end Sensor3;
+	
+	system WOW_Sensor
+		features
+			Output : out data port Base_Types::Boolean;
+	end WOW_Sensor;
+	
+end Sensors;

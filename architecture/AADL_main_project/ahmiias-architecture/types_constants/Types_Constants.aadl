@@ -13,6 +13,39 @@ public
 	-------------------------------------
 	-- Data Types
 	-------------------------------------
+	
+	---------------------------------------------------------
+	-- S.F.R. 2022/05
+
+	-- NOTE: numerical thresholds and determination of error ranges for each sensor are deferred to SW processes
+	data SensorErrorRange
+		properties
+			Data_Model::Data_Representation => Enum;
+			Data_Model::Enumerators => ("Normal", "Level1", "Level2", "Safety");
+	end SensorErrorRange;
+
+	
+	-- NOTE: the error is assumed to be possibly negative
+	-- NOTE: component "errorAlert" necessary due to the choice of having a data port, rather than an event data port, for denoting the  
+	--       presence/absence of an alert communication to the operator		
+	data SensorErrorData
+	end SensorErrorData;
+
+	data implementation SensorErrorData.impl
+		subcomponents
+			error:			data Base_Types::Float;
+			errorRange:		data SensorErrorRange;
+			errorAlert:		data Base_Types::Boolean;
+	end SensorErrorData.impl;
+
+	-- NOTE: value "None" necessary due to the choice of having a data port, rather than an event data port, for denoting no response in absence of 
+	--       an alert communication to the operator
+	data SensorAlertResponse
+		properties
+			Data_Model::Data_Representation => Enum;
+			Data_Model::Enumerators => ("Accept", "Reject", "None");
+	end SensorAlertResponse;
+	---------------------------------------------------------
 
 	data Response
 		properties
@@ -31,6 +64,12 @@ public
 	
 	data implementation H2I.impl
 		subcomponents
+			---------------------------------------------------------
+			-- S.F.R. 2022/05
+			sensor1AlertResponse:			data SensorAlertResponse;
+			sensor2AlertResponse:			data SensorAlertResponse;
+			sensor3AlertResponse:			data SensorAlertResponse;
+			---------------------------------------------------------
 			Sensor1_Unreliable_Response: 	data Response;
 			Sensor2_Unreliable_Response: 	data Response;
 			Sensor3_Unreliable_Response: 	data Response;	
@@ -44,6 +83,12 @@ public
 	
 	data implementation I2H.impl
 		subcomponents
+			---------------------------------------------------------
+			-- S.F.R. 2022/05
+			sensor1ErrorData:  			data SensorErrorData.impl;
+			sensor2ErrorData:  			data SensorErrorData.impl;
+			sensor3ErrorData:  			data SensorErrorData.impl;
+			---------------------------------------------------------
 			Sensor1_Reliable: 			data Base_Types::Boolean;
 			Sensor2_Reliable: 			data Base_Types::Boolean;
 			Sensor3_Reliable: 			data Base_Types::Boolean;
