@@ -1,0 +1,458 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="5cc7d8ef-6a58-449d-ad44-646e2a28810e" name="Default Changelist" comment="Restructuring">
+      <change beforePath="$PROJECT_DIR$/Verification/IAS_Agent-LearningRules.smv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/agents/Full Learning Agent with Macros/Soar Agent.zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/agents/Full Learning Agent with Macros/alert-handling/handle-alert.soar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/agents/Full Learning Agent with Macros/alert-handling/learning-rewards.soar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/agents/Full Learning Agent with Macros/alert-handling/load.soar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/agents/Full Learning Agent with Macros/alert-handling/operators/do-not-warn.soar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/agents/Full Learning Agent with Macros/alert-handling/operators/load.soar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/agents/Full Learning Agent with Macros/alert-handling/operators/record-changed-error.soar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/agents/Full Learning Agent with Macros/alert-handling/operators/record-user-response.soar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/agents/Full Learning Agent with Macros/alert-handling/operators/warn.soar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/agents/Full Learning Agent with Macros/alert-handling/selection.soar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/agents/Full Learning Agent with Macros/alert-handling/selection_copy.soar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/agents/Full Learning Agent with Macros/alert-handling/selection_single_donot_warn.soar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/agents/Full Learning Agent with Macros/error-handling/handle-error.soar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/agents/Full Learning Agent with Macros/error-handling/load.soar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/agents/Full Learning Agent with Macros/error-handling/operators/load.soar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/agents/Full Learning Agent with Macros/error-handling/operators/pilot-agrees.soar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/agents/Full Learning Agent with Macros/error-handling/operators/pilot-disagrees.soar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/agents/Full Learning Agent with Macros/error-handling/operators/sensor-error-over-limit.soar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/agents/Full Learning Agent with Macros/integrated-learning-agent.soaragent" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/agents/Full Learning Agent with Macros/load.soar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/agents/Full Learning Agent with Macros/operators/abort-landing.soar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/agents/Full Learning Agent with Macros/operators/initialize.soar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/agents/Full Learning Agent with Macros/operators/landing-finished.soar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/agents/Full Learning Agent with Macros/operators/landing-phase-four.soar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/agents/Full Learning Agent with Macros/operators/landing-phase-three.soar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/agents/Full Learning Agent with Macros/operators/landing-phase-two.soar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/agents/Full Learning Agent with Macros/operators/load.soar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/agents/Full Learning Agent with Macros/operators/start-landing.soar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/agents/Full Learning Agent with Macros/operators/takeoff.soar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/agents/Full Learning Agent with Macros/operators/transition-after-abort.soar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/agents/Full Learning Agent with Macros/operators/transition.soar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/agents/Full Learning Agent with Macros/settings.soar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/agents/Full Learning Agent with Macros/top-level.soar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/agents/Learning Agent with macros/Learning Rules.soar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator With Debugger/IAS_Agent.soar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator With Debugger/Input.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator With Debugger/Learning Rules.soar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator With Debugger/Output.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator With Debugger/Rule.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator With Debugger/SoarRules.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator With Debugger/Variable.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator With Debugger/Visitor.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator With Debugger/antlr-4.9.2-complete.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator With Debugger/compile.bat" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator With Debugger/copilot.soar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator With Debugger/main.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator With Debugger/output.smv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator With Debugger/parser/Soar.interp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator With Debugger/parser/Soar.tokens" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator With Debugger/parser/SoarBaseListener.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator With Debugger/parser/SoarBaseVisitor.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator With Debugger/parser/SoarLexer.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator With Debugger/parser/SoarLexer.interp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator With Debugger/parser/SoarLexer.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator With Debugger/parser/SoarLexer.tokens" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator With Debugger/parser/SoarListener.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator With Debugger/parser/SoarListener.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator With Debugger/parser/SoarParser$ActionContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator With Debugger/parser/SoarParser$Action_sideContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator With Debugger/parser/SoarParser$Attr_testContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator With Debugger/parser/SoarParser$Attr_value_makeContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator With Debugger/parser/SoarParser$Attr_value_testsContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator With Debugger/parser/SoarParser$CondContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator With Debugger/parser/SoarParser$Condition_sideContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator With Debugger/parser/SoarParser$Conds_for_one_idContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator With Debugger/parser/SoarParser$Conjunctive_testContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator With Debugger/parser/SoarParser$ConstantContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator With Debugger/parser/SoarParser$Disjunction_testContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator With Debugger/parser/SoarParser$FlagsContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator With Debugger/parser/SoarParser$Func_callContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator With Debugger/parser/SoarParser$Func_nameContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator With Debugger/parser/SoarParser$Id_testContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator With Debugger/parser/SoarParser$Multi_value_testContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator With Debugger/parser/SoarParser$Positive_condContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator With Debugger/parser/SoarParser$Pref_specifierContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator With Debugger/parser/SoarParser$PrintContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator With Debugger/parser/SoarParser$RelationContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator With Debugger/parser/SoarParser$Relational_testContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator With Debugger/parser/SoarParser$Simple_testContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator With Debugger/parser/SoarParser$Single_testContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator With Debugger/parser/SoarParser$SoarContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator With Debugger/parser/SoarParser$Soar_productionContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator With Debugger/parser/SoarParser$State_imp_condContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator With Debugger/parser/SoarParser$Sym_constantContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator With Debugger/parser/SoarParser$TestContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator With Debugger/parser/SoarParser$Unary_or_binary_prefContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator With Debugger/parser/SoarParser$Unary_prefContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator With Debugger/parser/SoarParser$ValueContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator With Debugger/parser/SoarParser$Value_makeContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator With Debugger/parser/SoarParser$Value_testContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator With Debugger/parser/SoarParser$VariableContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator With Debugger/parser/SoarParser$Variable_or_sym_constantContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator With Debugger/parser/SoarParser.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator With Debugger/parser/SoarParser.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator With Debugger/parser/SoarVisitor.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator With Debugger/parser/SoarVisitor.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator With Debugger/pom.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator With Debugger/soar_translator.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator without Debugger/Learning Rules.soar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator without Debugger/Output.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator without Debugger/Rule.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator without Debugger/SoarRules.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator without Debugger/Variable.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator without Debugger/Visitor.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator without Debugger/antlr-4.9.2-complete.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator without Debugger/compile.bat" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator without Debugger/copilot.soar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator without Debugger/main.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator without Debugger/parser/Soar.interp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator without Debugger/parser/Soar.tokens" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator without Debugger/parser/SoarBaseListener.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator without Debugger/parser/SoarBaseListener.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator without Debugger/parser/SoarBaseVisitor.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator without Debugger/parser/SoarBaseVisitor.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator without Debugger/parser/SoarLexer.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator without Debugger/parser/SoarLexer.interp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator without Debugger/parser/SoarLexer.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator without Debugger/parser/SoarLexer.tokens" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator without Debugger/parser/SoarListener.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator without Debugger/parser/SoarListener.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator without Debugger/parser/SoarParser$ActionContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator without Debugger/parser/SoarParser$Action_sideContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator without Debugger/parser/SoarParser$Attr_testContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator without Debugger/parser/SoarParser$Attr_value_makeContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator without Debugger/parser/SoarParser$Attr_value_testsContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator without Debugger/parser/SoarParser$CondContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator without Debugger/parser/SoarParser$Condition_sideContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator without Debugger/parser/SoarParser$Conds_for_one_idContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator without Debugger/parser/SoarParser$Conjunctive_testContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator without Debugger/parser/SoarParser$ConstantContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator without Debugger/parser/SoarParser$Disjunction_testContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator without Debugger/parser/SoarParser$FlagsContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator without Debugger/parser/SoarParser$Func_callContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator without Debugger/parser/SoarParser$Func_nameContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator without Debugger/parser/SoarParser$Id_testContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator without Debugger/parser/SoarParser$Multi_value_testContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator without Debugger/parser/SoarParser$Positive_condContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator without Debugger/parser/SoarParser$Pref_specifierContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator without Debugger/parser/SoarParser$PrintContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator without Debugger/parser/SoarParser$RelationContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator without Debugger/parser/SoarParser$Relational_testContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator without Debugger/parser/SoarParser$Simple_testContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator without Debugger/parser/SoarParser$Single_testContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator without Debugger/parser/SoarParser$SoarContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator without Debugger/parser/SoarParser$Soar_productionContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator without Debugger/parser/SoarParser$State_imp_condContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator without Debugger/parser/SoarParser$Sym_constantContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator without Debugger/parser/SoarParser$TestContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator without Debugger/parser/SoarParser$Unary_or_binary_prefContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator without Debugger/parser/SoarParser$Unary_prefContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator without Debugger/parser/SoarParser$ValueContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator without Debugger/parser/SoarParser$Value_makeContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator without Debugger/parser/SoarParser$Value_testContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator without Debugger/parser/SoarParser$VariableContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator without Debugger/parser/SoarParser$Variable_or_sym_constantContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator without Debugger/parser/SoarParser.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator without Debugger/parser/SoarParser.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator without Debugger/parser/SoarVisitor.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/SoarTo NuxmvTranslator/Soar Translator without Debugger/parser/SoarVisitor.java" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="Year_2" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedIndex" value="1" />
+  </component>
+  <component name="ProjectId" id="2Ar4jiuqS5yzV56WT1CzHUuHuWs" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="ASKED_SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="Downloaded.Files.Path" value="D:\AHMIIAS\lib" />
+    <property name="Downloaded.Files.Path.Enabled" value="true" />
+    <property name="Repository.Attach.Annotations" value="false" />
+    <property name="Repository.Attach.JavaDocs" value="false" />
+    <property name="Repository.Attach.Sources" value="false" />
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/java" />
+    <property name="project.structure.last.edited" value="Modules" />
+    <property name="project.structure.proportion" value="0.15" />
+    <property name="project.structure.side.proportion" value="0.40735874" />
+    <property name="settings.editor.selected.configurable" value="reference.settings.project.maven.repository.indices" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\AHMIIAS_Updates\java\src\xplane" />
+      <recent name="D:\AHMIIAS_Updates\java" />
+      <recent name="D:\AHMIIAS_Updates\java\src" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\AHMIIAS_Updates\java" />
+    </key>
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="main" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Application.StartAgents">
+    <configuration name="StartAgents (1)" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="main.StartAgents" />
+      <module name="XPlaneSoarConnector" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="main.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="StartAgents" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="main.StartAgents" />
+      <module name="XPlaneSoarConnector" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="main.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="JetRunConfigurationType">
+      <option name="VM_PARAMETERS" />
+      <option name="PROGRAM_PARAMETERS" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="WORKING_DIRECTORY" />
+      <module name="" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
+      <option name="filePath" />
+      <option name="vmParameters" />
+      <option name="alternativeJrePath" />
+      <option name="programParameters" />
+      <option name="passParentEnvs" value="true" />
+      <option name="workingDirectory" />
+      <option name="isAlternativeJrePathEnabled" value="false" />
+      <option name="VM_PARAMETERS" />
+      <option name="PROGRAM_PARAMETERS" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="WORKING_DIRECTORY" />
+      <module name="" />
+      <option name="filePath" />
+      <option name="vmParameters" />
+      <option name="alternativeJrePath" />
+      <option name="programParameters" />
+      <option name="passParentEnvs" value="true" />
+      <option name="workingDirectory" />
+      <option name="isAlternativeJrePathEnabled" value="false" />
+      <option name="VM_PARAMETERS" />
+      <option name="PROGRAM_PARAMETERS" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="WORKING_DIRECTORY" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="PythonConfigurationType" factoryName="Python">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="" />
+      <option name="SCRIPT_NAME" value="" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="Tox" factoryName="Tox">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="tests" factoryName="Doctests">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="" />
+      <option name="SCRIPT_NAME" value="" />
+      <option name="CLASS_NAME" value="" />
+      <option name="METHOD_NAME" value="" />
+      <option name="FOLDER_NAME" value="" />
+      <option name="TEST_TYPE" value="TEST_SCRIPT" />
+      <option name="PATTERN" value="" />
+      <option name="USE_PATTERN" value="false" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.StartAgents" />
+        <item itemvalue="Application.StartAgents (1)" />
+        <item itemvalue="Application.StartAgents" />
+        <item itemvalue="Application.StartAgents" />
+        <item itemvalue="Application.StartAgents" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="5cc7d8ef-6a58-449d-ad44-646e2a28810e" name="Default Changelist" comment="" />
+      <created>1655754506300</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1655754506300</updated>
+    </task>
+    <task id="LOCAL-00001" summary="Restructuring">
+      <created>1655757374812</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1655757374812</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Restructuring">
+      <created>1655757622523</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1655757622523</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Restructuring">
+      <created>1655758633889</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1655758633889</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Restructuring">
+      <created>1656355459780</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1656355459780</updated>
+    </task>
+    <task id="LOCAL-00005" summary=".idea library">
+      <created>1656428367130</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1656428367130</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
+    <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="1">
+          <value>
+            <State>
+              <option name="CUSTOM_BOOLEAN_PROPERTIES">
+                <map>
+                  <entry key="Show.Git.Branches" value="true" />
+                </map>
+              </option>
+              <option name="SHOW_ONLY_AFFECTED_CHANGES" value="true" />
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="HEAD" />
+                      </list>
+                    </value>
+                  </entry>
+                  <entry key="structure">
+                    <value>
+                      <list>
+                        <option value="dir:D:/AHMIIAS_Updates/java" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="soar-agent-update" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Restructuring" />
+    <MESSAGE value=".idea library" />
+    <option name="LAST_COMMIT_MESSAGE" value=".idea library" />
+  </component>
+</project>
