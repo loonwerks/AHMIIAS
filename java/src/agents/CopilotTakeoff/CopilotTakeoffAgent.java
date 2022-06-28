@@ -29,7 +29,7 @@ import static xplane.XPlaneConnector.getFlightData;
  */
 public class CopilotTakeoffAgent extends XPlaneAgent
 {
-    boolean DISPLAYDETAILS = false, USE_LEARNING = false;
+    boolean DISPLAYDETAILS = false, USE_LEARNING = true;
     private SymbolFactory syms;
     Agent sagt = getAgent();
     InputBuilder builder;
@@ -48,7 +48,7 @@ public class CopilotTakeoffAgent extends XPlaneAgent
     private boolean airBrakesON;
     private boolean reversersON;
 
-    private String realTime;
+    private java.lang.String realTime;
     private PipedReader filterOutput;
     private XPCUserInterface UIobj;
     private WaypointController waypoints;
@@ -60,7 +60,7 @@ public class CopilotTakeoffAgent extends XPlaneAgent
     private PrintWriter rlWriter, resultWriter;
 
     @Override
-    public String name() {
+    public java.lang.String name() {
         return "Copilot_Takeoff";
     }
 
@@ -71,7 +71,7 @@ public class CopilotTakeoffAgent extends XPlaneAgent
 
     @Override
     public void start()  {
-        //System.setProperty("jsoar.agent.interpreter","tcl");
+        System.setProperty("jsoar.agent.interpreter","tcl");
         System.err.println("Started");
         sagt = getAgent();
 
@@ -79,9 +79,9 @@ public class CopilotTakeoffAgent extends XPlaneAgent
         // uncomment below to see the trace of SOAR execution.
         // It is usually lots of text, but it is often useful
 
-       // sagt.getTrace().enableAll();
-       // decisionCycle = Adaptables.adapt(sagt, DecisionCycle.class);
-       // decisionCycle.reset();
+        // sagt.getTrace().enableAll();
+        // decisionCycle = Adaptables.adapt(sagt, DecisionCycle.class);
+        // decisionCycle.reset();
         PipedWriter agentWriter = new PipedWriter();
         filterOutput = new PipedReader();
 
@@ -94,8 +94,8 @@ public class CopilotTakeoffAgent extends XPlaneAgent
 
 
         sagt.setName("SOAR_Agent");
-         //sagt.getPrinter().pushWriter(new OutputStreamWriter(System.out));
-        //sagt.getPrinter().pushWriter(agentWriter);
+//        sagt.getPrinter().pushWriter(new OutputStreamWriter(System.out));
+//        sagt.getPrinter().pushWriter(agentWriter);
 
 
         //sagt.getEvents().addListener(FlightData.class, new CopilotEventListener(syms, builder, sagt, 100));
@@ -180,13 +180,13 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                 {
                     // Contains details of the OutputEvent
                     Executors.newSingleThreadExecutor().execute(() ->
-                            {
-                                //System.err.println("hi");
-                                // Start new thread
-                               // CopilotTakeoffAgent.this.speakWmes((OutputEvent) soarEvent);  // Say all WMEs with the "spoken" attribute
-                                CopilotTakeoffAgent.this.throttleWmes((OutputEvent) soarEvent);  // Update throttle
-                                CopilotTakeoffAgent.this.VTOLModeWmes((OutputEvent) soarEvent);  // Update the VTOL rotor position
-                            });
+                    {
+                        //System.err.println("hi");
+                        // Start new thread
+                        // CopilotTakeoffAgent.this.speakWmes((OutputEvent) soarEvent);  // Say all WMEs with the "spoken" attribute
+                        CopilotTakeoffAgent.this.throttleWmes((OutputEvent) soarEvent);  // Update throttle
+                        CopilotTakeoffAgent.this.VTOLModeWmes((OutputEvent) soarEvent);  // Update the VTOL rotor position
+                    });
                 });
 
         Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(pushFlightData(), 500, 200, TimeUnit.MILLISECONDS);
@@ -225,7 +225,7 @@ public class CopilotTakeoffAgent extends XPlaneAgent
             if (nextWME.getAttribute().asString().getValue().equals("throttle"))
             {
                 //System.err.println("HELLO");
-               System.out.println(nextWME.getValue());
+                System.out.println(nextWME.getValue());
 
                 String txt = nextWME.getValue().toString();
                 float throttle = Float.parseFloat(txt);
@@ -285,7 +285,7 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                 int airspeed = Integer.parseInt(txt);
                 xpcobj.setTargetAirspeed(airspeed);
                 if(airspeed == 0 && xpcobj.getAutopilotState() != 170){
-                   // xpcobj.setAutopilot(170);
+                    // xpcobj.setAutopilot(170);
                 }
 
             }else if (nextWME.getAttribute().asString().getValue().equals("autoflaps"))
@@ -321,7 +321,7 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                 }else if(txt.equalsIgnoreCase("gps")){
                     //UIobj.selectedSensor = 0;
                 }
-               // UIobj.pilotDecision = "none";
+                // UIobj.pilotDecision = "none";
             }else if (nextWME.getAttribute().asString().getValue().equals("clear-sensor-alert-response"))
             {
                 if(nextWME.getTimetag()>this.timeTagClear) {
@@ -346,36 +346,37 @@ public class CopilotTakeoffAgent extends XPlaneAgent
 
 
                 //QMemory memory = DefaultQMemory.create();
-               // SoarQMemoryAdapter adapter = SoarQMemoryAdapter.attach(sagt, memory);
+                // SoarQMemoryAdapter adapter = SoarQMemoryAdapter.attach(sagt, memory);
                 //memory.remove("io.output-link.alert-sensor-error");
                 //memory.setString("io.output-link.clear-sensor-alert-response", "");
 
 
             }else if (nextWME.getAttribute().asString().getValue().equals("alert-sensor-error-value"))
             {
-               // if(nextWME.getTimetag()>this.timeTag) {
-                    this.timeTag = nextWME.getTimetag();
-                    //memory.setString("io.output-link.clear-sensor-alert-response", "");
-                    double err = nextWME.getValue().asDouble().getValue();
-                    System.err.println(nextWME.getValue()+" "+err+" "+trial_count);
-                    if (this.trial_count == 0) {
-                        resultWriter.println(err+" "+trial_count);
-                        resultWriter.flush();
-                    }
-                    UIobj.displayWarning("gps");
-                    // Accept High error
-                    if (err >= 9.0) {
-                        UIobj.acknowledgeError();
+                // if(nextWME.getTimetag()>this.timeTag) {
+                this.timeTag = nextWME.getTimetag();
+                //memory.setString("io.output-link.clear-sensor-alert-response", "");
+                double err = nextWME.getValue().asDouble().getValue();
+                System.err.println(nextWME.getValue()+" "+err+" "+trial_count);
+
+                if (this.trial_count == 0) {
+                    resultWriter.println(err+" "+trial_count);
+                    resultWriter.flush();
+                }
+                UIobj.displayWarning("gps");
+                // Accept High error
+                if (err >= 9.0) {
+                    UIobj.acknowledgeError();
                     // Deny Low error
-                    } else {
-                        UIobj.denyError();
-                    }
+                } else {
+                    UIobj.denyError();
+                }
 
 
-                   // QMemory memory = DefaultQMemory.create();
-                    //SoarQMemoryAdapter adapter = SoarQMemoryAdapter.attach(sagt, memory);
-                    // memory.clear("io.output-link.alert-sensor-error-value");
-               // }
+                // QMemory memory = DefaultQMemory.create();
+                //SoarQMemoryAdapter adapter = SoarQMemoryAdapter.attach(sagt, memory);
+                // memory.clear("io.output-link.alert-sensor-error-value");
+                // }
             }
 
         }
@@ -428,6 +429,8 @@ public class CopilotTakeoffAgent extends XPlaneAgent
             long bt = System.nanoTime()/1000000;
             FlightData data = getFlightData();
             double sensorErrors[] = votingobj.checkForReliability(UIobj.positions,data.altitude);
+            System.err.println(sensorErrors[0]+ " gps " + sensorErrors[1]+ " imu " +sensorErrors[2] + " lidar ");
+            UIobj.barObj.error = Math.min(sensorErrors[0],sensorErrors[1]);
             try {
                 if(this.USE_LEARNING){
                     if (!this.trialActive){
@@ -482,6 +485,27 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                                         rlWriter.println(p.getName());
                                         rlWriter.println(p.rlRuleInfo.rl_efr);
                                         rlWriter.println(p.rlRuleInfo.rl_ecr);
+                                        String name = p.getName();
+                                        double a = p.rlRuleInfo.rl_efr;
+                                        double b = p.rlRuleInfo.rl_ecr;
+                                        double val;
+                                        if(a!=0.0 && b!=0.0){
+                                            val = (a+b)/2.0;
+                                        }else{
+                                            val = a+b;
+                                        }
+
+                                        if(name.contains("gps")){
+                                            if(name.contains("do-not-warn") && name.contains("low")){
+                                                UIobj.displayObj.doNotWarnLow = val;
+                                            }else if(name.contains("do-not-warn") && name.contains("high")){
+                                                UIobj.displayObj.doNotWarnHigh = val;
+                                            }else if(name.contains("warn") && name.contains("low")){
+                                                UIobj.displayObj.warnLow = val;
+                                            }else if(name.contains("warn") && name.contains("high")){
+                                                UIobj.displayObj.warnHigh = val;
+                                            }
+                                        }
                                     }
                                 }
                                 rlWriter.flush();

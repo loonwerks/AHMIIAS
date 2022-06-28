@@ -4,10 +4,12 @@ package xplane;
 import util.RadioButton;
 import util.button;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
 import java.util.Random;
+
+import javax.swing.JFrame;
 
 public class XPCUserInterface extends JFrame implements Runnable{
 
@@ -36,6 +38,9 @@ public class XPCUserInterface extends JFrame implements Runnable{
 
     private button InduceErrorButton,InduceIncrementalErrorButton, AcknowledgeErrorButton, DenyErrorButton, LandButton, AbortLandingButton;
     private RadioButton landingOptions;
+
+    public PreferenceValueDisplay displayObj;
+    public DisplayBar barObj,barObjOld;
 
     public void displayWarning(String faultySensorName){
         this.faultySensorName = faultySensorName;
@@ -148,6 +153,9 @@ public class XPCUserInterface extends JFrame implements Runnable{
 
     @Override
     public void run() {
+        displayObj = new PreferenceValueDisplay();
+        barObj = new DisplayBar();
+        barObjOld = new DisplayBar();
         InduceErrorButton = new button("Jump Error",580, 160, 320, 30);
         InduceIncrementalErrorButton = new button("Incremental Error",580, 200, 320, 30);
         AcknowledgeErrorButton = new button("Acknowledge Error",80, 660, 320, 30);
@@ -156,10 +164,10 @@ public class XPCUserInterface extends JFrame implements Runnable{
         AbortLandingButton = new button("Abort Landing",80, 820, 320, 30);
         String optionText[] = {"Nellis AFB(KLSV)", "[H] Gilbert Development Corp (NV61)", "Las Vegas (VEGAS)"};
         landingOptions = new RadioButton(optionText,530, 450);
-        this.setSize(1000, 900);
+        this.setSize(1500, 900);
         this.setResizable(false);
         this.setTitle("Sensor Output:");
-        this.setLocation(1200,200);
+        this.setLocation(400,200);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.addKeyListener(new KeyboardListener());
         this.addMouseListener(new MouseEventListener());
@@ -247,8 +255,24 @@ public class XPCUserInterface extends JFrame implements Runnable{
             g.setFont(textFont2);
             landingOptions.draw(g);
         }
-
-
+        displayObj.paint(g);
+        BufferedImage barImg = new BufferedImage(500,500, BufferedImage.TYPE_INT_ARGB);
+        barObj.draw(barImg.getGraphics());
+        barObj.warnHigh = displayObj.warnHigh;
+        barObj.warnLow = displayObj.warnLow;
+        barObj.doNotWarnHigh = displayObj.doNotWarnHigh;
+        barObj.doNotWarnLow = displayObj.doNotWarnLow;
+        g.drawImage(barImg, 1200,300, null);
+        BufferedImage barImgOld = new BufferedImage(500,500, BufferedImage.TYPE_INT_ARGB);
+        barObjOld.draw(barImgOld.getGraphics());
+        /*barObjOld.warnHigh = displayObj.warnHigh;
+        barObjOld.warnLow = displayObj.warnLow;
+        barObjOld.doNotWarnHigh = displayObj.doNotWarnHigh;
+        barObjOld.doNotWarnLow = displayObj.doNotWarnLow;*/
+        g.drawImage(barImgOld, 1050,300, null);
+        g.drawString("Previous", 1050,725);
+        g.drawString("Present", 1200,725);
+        barObjOld.error = barObj.error;
 
     }
     private void drawTestUI(Graphics g){
@@ -261,6 +285,7 @@ public class XPCUserInterface extends JFrame implements Runnable{
         g.drawString("Airspeed: "+planeAirspeed+"kn", 550,280);
         g.fillRect(500,0,10,1200);
         g.fillRect(500,350,500,10);
+        g.fillRect(1000,0,10,1200);
     }
     private String formatPosition(double pos){
         String ans = "";

@@ -2,6 +2,8 @@ package agents.CopilotTakeoff;
 
 import data.FlightData;
 import org.jsoar.kernel.Agent;
+import org.jsoar.kernel.MatchSet;
+import org.jsoar.kernel.MatchSetEntry;
 import org.jsoar.kernel.RunType;
 import org.jsoar.kernel.io.InputBuilder;
 import org.jsoar.kernel.io.InputWme;
@@ -52,16 +54,16 @@ public class CopilotEventListener implements SoarEventListener
 
         // uncomment if you want to see the productions that matched
 
-//            MatchSet matchSet = sagt.getMatchSet();
-//
-//            if ( matchSet.getEntries().size() > 1)
-//            {
-//                System.out.println("Found matching productions!!");
-//                for (MatchSetEntry mse : matchSet.getEntries())
-//                {
-//                    System.out.println("Production:" + mse.getProduction());
-//                }
-//            }
+            MatchSet matchSet = sagt.getMatchSet();
+
+            if ( matchSet.getEntries().size() > 1)
+            {
+                System.out.println("Found matching productions!!");
+                for (MatchSetEntry mse : matchSet.getEntries())
+                {
+                    System.out.println("Production:" + mse.getProduction());
+                }
+            }
 
         sagt.runFor(1, RunType.DECISIONS);
 
