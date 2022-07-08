@@ -48,35 +48,35 @@ public
 			
 			-- NOTE: arbitrary delays between alert reception and response to be tested
 			-- NOTE: at least one step to avoid the presence of an algebraic loop in the communication between IAS and operator
-			guarantee g1 "If a sensor 1 alert is received by the operator, 
+			guarantee h_g1 "If a sensor 1 alert is received by the operator, 
 						  then an alert response is communicated by the operator at the next step":
 				(prev(InputFromIAS.sensor1ErrorData.errorAlert, false))
 				<=> (Output.sensor1AlertResponse = enum(Types_Constants::SensorAlertResponse, Accept) or 
 					 Output.sensor1AlertResponse = enum(Types_Constants::SensorAlertResponse, Reject));
 					 
-			guarantee g2 "If no sensor 1 alert is received by the operator, 
+			guarantee h_g2 "If no sensor 1 alert is received by the operator, 
 						  then no alert response is communicated by the operator at the next step":
 			(prev(not InputFromIAS.sensor1ErrorData.errorAlert, true))
 				<=> (Output.sensor1AlertResponse = enum(Types_Constants::SensorAlertResponse, None));
 				
-			guarantee g3 "If a sensor 2 alert is received by the operator, 
+			guarantee h_g3 "If a sensor 2 alert is received by the operator, 
 						  then an alert response is communicated by the operator at the next step":
 				(prev(InputFromIAS.sensor2ErrorData.errorAlert, false))
 				<=> (Output.sensor2AlertResponse = enum(Types_Constants::SensorAlertResponse, Accept) or 
 					 Output.sensor2AlertResponse = enum(Types_Constants::SensorAlertResponse, Reject));
 					 
-			guarantee g4 "If no sensor 2 alert is received by the operator, 
+			guarantee h_g4 "If no sensor 2 alert is received by the operator, 
 						  then no alert response is communicated by the operator at the next step":
 			(prev(not InputFromIAS.sensor2ErrorData.errorAlert, true))
 				<=> (Output.sensor2AlertResponse = enum(Types_Constants::SensorAlertResponse, None));
 				
-			guarantee g5 "If a sensor 3 alert is received by the operator, 
+			guarantee h_g5 "If a sensor 3 alert is received by the operator, 
 						  then an alert response is communicated by the operator at the next step":
 				(prev(InputFromIAS.sensor3ErrorData.errorAlert, false))
 				<=> (Output.sensor3AlertResponse = enum(Types_Constants::SensorAlertResponse, Accept) or 
 					 Output.sensor3AlertResponse = enum(Types_Constants::SensorAlertResponse, Reject));
 					 
-			guarantee g6 "If no sensor 3 alert is received by the operator, 
+			guarantee h_g6 "If no sensor 3 alert is received by the operator, 
 						  then no alert response is communicated by the operator at the next step":
 			(prev(not InputFromIAS.sensor3ErrorData.errorAlert, true))
 				<=> (Output.sensor3AlertResponse = enum(Types_Constants::SensorAlertResponse, None));
@@ -86,19 +86,19 @@ public
 			--GUARANTEES RELATED TO THE UNRELIABLE SENSOR SCENARIO
 			-----------------------
 				
-			guarantee "Respond to message that Sensor1 is unreliable":
+			guarantee h_g7 "Respond to message that Sensor1 is unreliable":
 				prev(not InputFromIAS.Sensor1_Reliable, false) <=> 
 					((Output.Sensor1_Unreliable_Response = enum(Response, Agree)) 
 						or (Output.Sensor1_Unreliable_Response = enum(Response, Disagree))
 					); 
 			
-			guarantee "Respond to message that Sensor2 is unreliable":
+			guarantee h_g8 "Respond to message that Sensor2 is unreliable":
 				prev(not InputFromIAS.Sensor2_Reliable, false) <=> 
 					((Output.Sensor2_Unreliable_Response = enum(Response, Agree)) 
 						or (Output.Sensor2_Unreliable_Response = enum(Response, Disagree))
 					);
 			
-			guarantee "Respond to message that Sensor3 is unreliable":
+			guarantee h_g9 "Respond to message that Sensor3 is unreliable":
 				prev(not InputFromIAS.Sensor3_Reliable, false) <=> 
 					((Output.Sensor3_Unreliable_Response = enum(Response, Agree)) 
 						or (Output.Sensor3_Unreliable_Response = enum(Response, Disagree))
@@ -108,13 +108,13 @@ public
 			--GUARANTEES RELATED TO THE ABORTED LANDING SCENARIO
 			-----------------------
 			
-			guarantee "Command initiate landing only if aircraft is in the flight phase (may be enforced by display)":
+			guarantee h_g10 "Command initiate landing only if aircraft is in the flight phase (may be enforced by display)":
 				Output.Initiate_Landing => prev((InputFromIAS.Phase = enum(Phase_Type, In_Flight)), false);
 			
-			guarantee "Command abort landing only if aircraft is in the landing phase (may be enforced by display)":
+			guarantee h_g11 "Command abort landing only if aircraft is in the landing phase (may be enforced by display)":
 				Output.Abort_Landing => prev((InputFromIAS.Phase = enum(Phase_Type, Landing)), false); 
 				
-			guarantee "Choose a landing option when they are ready":
+			guarantee h_g12 "Choose a landing option when they are ready":
 				true -> (pre(InputFromIAS.Landing_Options_Ready) => 
 							(   (Output.Landing_Option_Selection = pre(InputFromIAS.Landing_Options.Option1))
 							or  (Output.Landing_Option_Selection = pre(InputFromIAS.Landing_Options.Option2))
