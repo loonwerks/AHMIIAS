@@ -17,20 +17,9 @@ public
 			InputFromSensor3 : 		in data port Sensor_Data.impl;
 			InputFromWOWSensor : 	in data port Base_Types::Boolean;
 			Output : 				out data port H2I.impl;
-			
-		---------------------------------------------------------
-		-- S.F.R. 2022/05
 		
 		-- NOTE: no fault analysis at this level, due to missing Human implementation
 		annex safety {**		
-			 	
-			fault no_sensor1_alert_response 
-			"The operator does not communicate an alert response to a sensor 1 alert" : Faults::fail_sensor1_alert_response {
-				inputs: h2i_in <- Output; 
-				outputs: Output <- h2i_out;    
-				duration: permanent;
-				disable: true;	
-			}
 			
 			fault no_sensor1_unreliability_response 
 			"The operator does not communicate a response to a sensor 1 unreliability message" : Faults::fail_sensor1_unreliability_response {
@@ -40,69 +29,49 @@ public
 				disable: true;	
 			}
 		**};
-		---------------------------------------------------------
+		
 		
 		annex agree {**
-			---------------------------------------------------------
-			-- S.F.R. 2022/05
+				
+			-----------------------
+			--GUARANTEES RELATED TO THE UNRELIABLE SENSOR SCENARIO
+			-----------------------
 			
 			-- NOTE: arbitrary delays between alert reception and response to be tested
 			-- NOTE: at least one step to avoid the presence of an algebraic loop in the communication between IAS and operator
 			guarantee h_g1 "If a sensor 1 alert is received by the operator, 
 						  then an alert response is communicated by the operator at the next step":
-				(prev(InputFromIAS.sensor1ErrorData.errorAlert, false))
-				<=> (Output.sensor1AlertResponse = enum(Types_Constants::SensorAlertResponse, Accept) or 
-					 Output.sensor1AlertResponse = enum(Types_Constants::SensorAlertResponse, Reject));
+				(prev(InputFromIAS.sensor1ErrorData.unreliable, false))
+				<=> (Output.sensor1UnreliableResponse = enum(Types_Constants::Response, Agree) or 
+					 Output.sensor1UnreliableResponse = enum(Types_Constants::Response, Disagree));
 					 
 			guarantee h_g2 "If no sensor 1 alert is received by the operator, 
 						  then no alert response is communicated by the operator at the next step":
-			(prev(not InputFromIAS.sensor1ErrorData.errorAlert, true))
-				<=> (Output.sensor1AlertResponse = enum(Types_Constants::SensorAlertResponse, None));
+				(prev(not InputFromIAS.sensor1ErrorData.unreliable, true))
+				<=> (Output.sensor1UnreliableResponse = enum(Types_Constants::Response, Neutral));
 				
 			guarantee h_g3 "If a sensor 2 alert is received by the operator, 
 						  then an alert response is communicated by the operator at the next step":
-				(prev(InputFromIAS.sensor2ErrorData.errorAlert, false))
-				<=> (Output.sensor2AlertResponse = enum(Types_Constants::SensorAlertResponse, Accept) or 
-					 Output.sensor2AlertResponse = enum(Types_Constants::SensorAlertResponse, Reject));
+				(prev(InputFromIAS.sensor2ErrorData.unreliable, false))
+				<=> (Output.sensor2UnreliableResponse = enum(Types_Constants::Response, Agree) or 
+					 Output.sensor2UnreliableResponse = enum(Types_Constants::Response, Disagree));
 					 
 			guarantee h_g4 "If no sensor 2 alert is received by the operator, 
 						  then no alert response is communicated by the operator at the next step":
-			(prev(not InputFromIAS.sensor2ErrorData.errorAlert, true))
-				<=> (Output.sensor2AlertResponse = enum(Types_Constants::SensorAlertResponse, None));
+				(prev(not InputFromIAS.sensor2ErrorData.unreliable, true))
+				<=> (Output.sensor2UnreliableResponse = enum(Types_Constants::Response, Neutral));
 				
 			guarantee h_g5 "If a sensor 3 alert is received by the operator, 
 						  then an alert response is communicated by the operator at the next step":
-				(prev(InputFromIAS.sensor3ErrorData.errorAlert, false))
-				<=> (Output.sensor3AlertResponse = enum(Types_Constants::SensorAlertResponse, Accept) or 
-					 Output.sensor3AlertResponse = enum(Types_Constants::SensorAlertResponse, Reject));
+				(prev(InputFromIAS.sensor3ErrorData.unreliable, false))
+				<=> (Output.sensor3UnreliableResponse = enum(Types_Constants::Response, Agree) or 
+					 Output.sensor3UnreliableResponse = enum(Types_Constants::Response, Disagree));
 					 
 			guarantee h_g6 "If no sensor 3 alert is received by the operator, 
 						  then no alert response is communicated by the operator at the next step":
-			(prev(not InputFromIAS.sensor3ErrorData.errorAlert, true))
-				<=> (Output.sensor3AlertResponse = enum(Types_Constants::SensorAlertResponse, None));
-			---------------------------------------------------------
-			
-			-----------------------
-			--GUARANTEES RELATED TO THE UNRELIABLE SENSOR SCENARIO
-			-----------------------
-				
-			guarantee h_g7 "Respond to message that Sensor1 is unreliable":
-				prev(not InputFromIAS.Sensor1_Reliable, false) <=> 
-					((Output.Sensor1_Unreliable_Response = enum(Response, Agree)) 
-						or (Output.Sensor1_Unreliable_Response = enum(Response, Disagree))
-					); 
-			
-			guarantee h_g8 "Respond to message that Sensor2 is unreliable":
-				prev(not InputFromIAS.Sensor2_Reliable, false) <=> 
-					((Output.Sensor2_Unreliable_Response = enum(Response, Agree)) 
-						or (Output.Sensor2_Unreliable_Response = enum(Response, Disagree))
-					);
-			
-			guarantee h_g9 "Respond to message that Sensor3 is unreliable":
-				prev(not InputFromIAS.Sensor3_Reliable, false) <=> 
-					((Output.Sensor3_Unreliable_Response = enum(Response, Agree)) 
-						or (Output.Sensor3_Unreliable_Response = enum(Response, Disagree))
-					);					
+				(prev(not InputFromIAS.sensor3ErrorData.unreliable, true))
+				<=> (Output.sensor3UnreliableResponse = enum(Types_Constants::Response, Neutral));
+							
 
 			-----------------------
 			--GUARANTEES RELATED TO THE ABORTED LANDING SCENARIO

@@ -8,7 +8,8 @@ public
 			-- Absolute value
 			-------------------------------------
 			
-			node abs(val: real) returns (out: real);
+			node abs(val: real) 
+				returns (out: real);
 			let
 				out = if val >= 0.0 then val else val*-1.0;
 			tel;
@@ -17,16 +18,47 @@ public
 			-- Checks whether two values are within some threshold of each other
 			-------------------------------------
 			
-			node vals_within_threshold_of_each_other(val1: real, val2: real, threshold: real) returns (out: bool);
+			node vals_within_threshold_of_each_other(val1: real, val2: real, threshold: real) 
+				returns (out: bool);
 			let
 				out = (abs(val1-val2) < threshold); 
 			tel;
+			
+			---------------------------------------------------------
+			-- S.F.R. 2022/05	
+			node manhattan_distance(pos1: Position.impl, pos2: Position.impl) 
+				returns (dist: real);
+			let
+				dist = abs(pos1.X - pos2.X) + abs(pos1.Y - pos2.Y) + abs(pos1.Z - pos2.Z);
+			tel;
+			
+			-------------------------------------
+			-- Sensor error computed as minimum pairwise distance
+			-------------------------------------
+			node sensor_error_as_min_pairwise_dist(s1_data : Sensor_Data.impl, s2_data : Sensor_Data.impl, s3_data : Sensor_Data.impl)
+				returns(error1: real, error2: real, error3: real);
+			var 
+				dist_1_2 : real;
+				dist_1_3 : real;
+				dist_2_3 : real;
+			let
+				dist_1_2 = manhattan_distance(s1_data.Position, s2_data.Position);
+				dist_1_3 = manhattan_distance(s1_data.Position, s3_data.Position);
+				dist_2_3 = manhattan_distance(s2_data.Position, s3_data.Position);
+				
+				error1 = if dist_1_2 < dist_1_3 then dist_1_2 else dist_1_3;
+				error2 = if dist_1_2 < dist_2_3 then dist_1_2 else dist_2_3;
+				error3 = if dist_1_3 < dist_2_3 then dist_1_3 else dist_2_3;
+			tel;	
+					
+			---------------------------------------------------------
 			
 			-------------------------------------
 			-- Checks whether x and y values are within a horizontal threshold of each other and z values are within a vertical threshold of each other
 			-------------------------------------
 			
-			node all_xyz_vals_within_threshold_of_each_other(pos1: Position.impl, pos2: Position.impl, Horizontal_Threshold : real, Vertical_Threshold : real) returns (out: bool);
+			node all_xyz_vals_within_threshold_of_each_other(pos1: Position.impl, pos2: Position.impl, Horizontal_Threshold : real, Vertical_Threshold : real) 
+				returns (out: bool);
 			let
 				out = (		vals_within_threshold_of_each_other(pos1.X, pos2.X, Horizontal_Threshold)
 						and vals_within_threshold_of_each_other(pos1.Y, pos2.Y, Horizontal_Threshold)
@@ -37,7 +69,8 @@ public
 			-- Returns true/false for each sensor depending on whether or not its value is close to at least one of the other sensor values
 			-------------------------------------
 			
-			node Sensor_Status(Sensor1_Data : Sensor_Data.impl, Sensor2_Data : Sensor_Data.impl, Sensor3_Data : Sensor_Data.impl, Horizontal_Threshold : real, Vertical_Threshold : real) returns (Sensor1_Reliable: bool, Sensor2_Reliable: bool, Sensor3_Reliable: bool);
+			node Sensor_Status(Sensor1_Data : Sensor_Data.impl, Sensor2_Data : Sensor_Data.impl, Sensor3_Data : Sensor_Data.impl, Horizontal_Threshold : real, Vertical_Threshold : real) 
+				returns (Sensor1_Reliable: bool, Sensor2_Reliable: bool, Sensor3_Reliable: bool);
 			var 
 				Sensor_1_2_Agreement : bool;
 				Sensor_1_3_Agreement : bool;
@@ -90,7 +123,8 @@ public
 			
 			-------------------------------------		
 			 
-			node HAL (z : real) returns (HAL : real);
+			node HAL (z : real) 
+				returns (HAL : real);
 			let
 						--Takeoff/Landing
 				HAL = 	if 		z < TAKEOFF_LANDING_MAX_AGL 	then 
@@ -132,7 +166,8 @@ public
 			-------------------------------------
 						
 
-			node VAL (z : real) returns (VAL : real);
+			node VAL (z : real) 
+				returns (VAL : real);
 			let
 						--Takeoff/Landing
 				VAL = 	 if 	z < TAKEOFF_LANDING_MAX_AGL 	then 
