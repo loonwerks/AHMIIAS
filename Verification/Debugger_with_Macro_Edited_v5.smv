@@ -136,7 +136,7 @@ ASSIGN
     init (state_io_gps-error_exists) := yes;
     init (state_io_lidar-error) := 0.0;
     init (state_io_lidar-error_exists) := yes;
-    init (state_io_imu-error) := 5.5;
+    init (state_io_imu-error) := 0.0;
     init (state_io_imu-error_exists) := yes;
     init (state_io_sensor-alert-accepted) := nil;
     init (state_safety-error) := 10.0;
@@ -149,15 +149,16 @@ ASSIGN
     init (state_reward-link_reward_value) := 0.0;
     init (state_reward-link_reward_value_exists) := no;
 
-
+VAR counter_for_landing : integer;
 VAR counter_for_takeoff : integer;
 VAR state_flight_horizontal_counter : integer;
 VAR counter_for_low : integer;
 VAR counter_for_high : integer;
 VAR counter_for_safety : integer;
+VAR counter_for_normal : integer;
 VAR soarAgent : soarRules(state_superstate,state_name,state_io_throttle,state_io_throttle_exists,state_operator_name,state_flight-mode,state_io_airspeed,state_io_airspeed_exists,state_io_altitude,state_io_altitude_exists,state_landing,state_io_initiate-landing,state_io_distance-to-target,state_io_distance-to-target_exists,state_io_abort-landing,state_io_pilot-selected-landing-zone,state_sensor-unreliable,state_faulty-sensor,state_notified-pilot,state_gps-error-info_name,state_lidar-error-info_name,state_imu-error-info_name,state_io_target-altitude,state_io_target-altitude_exists,state_io_autoflaps,state_io_air-brake,state_io_air-brake_exists,state_io_alert-sensor-error-value,state_io_alert-sensor-error-value_exists,state_io_alert-sensor-error,state_io_VTOLMode,state_io_target-speed,state_io_target-speed_exists,state_gps-error-info,state_gps-error-info_value-changed,state_gps-error-info_current-value,state_gps-error-info_current-value_exists,state_gps-error-info_old-value,state_gps-error-info_old-value_exists,state_lidar-error-info,state_lidar-error-info_value-changed,state_lidar-error-info_current-value,state_lidar-error-info_current-value_exists,state_lidar-error-info_old-value,state_lidar-error-info_old-value_exists,state_imu-error-info,state_imu-error-info_value-changed,state_imu-error-info_current-value,state_imu-error-info_current-value_exists,state_imu-error-info_old-value,state_imu-error-info_old-value_exists,state_warning-issued,state_gps-error-info_warning-accepted,state_ready-to-decide,state_lidar-error-info_warning-accepted,state_imu-error-info_warning-accepted,state_gps-error-info_warn-condition,state_lidar-error-info_warn-condition,state_imu-error-info_warn-condition,state_user-response,state_io_clear-sensor-alert-response,state_io_gps-error,state_io_gps-error_exists,state_io_lidar-error,state_io_lidar-error_exists,state_io_imu-error,state_io_imu-error_exists,state_io_sensor-alert-accepted,state_safety-error,state_safety-error_exists,state_high-low-warn-error,state_high-low-warn-error_exists,state_normal-error,state_normal-error_exists,state_error-info,state_error-info_warning-accepted,state_reward-link,state_reward-link_reward_value,state_reward-link_reward_value_exists);
 
-VAR inputModuleRule : inputModule(counter_for_takeoff,state_flight_horizontal_counter,counter_for_low,counter_for_high,counter_for_safety,state_superstate,state_name,state_io_throttle,state_io_throttle_exists,state_operator_name,state_flight-mode,state_io_airspeed,state_io_airspeed_exists,state_io_altitude,state_io_altitude_exists,state_landing,state_io_initiate-landing,state_io_distance-to-target,state_io_distance-to-target_exists,state_io_abort-landing,state_io_pilot-selected-landing-zone,state_sensor-unreliable,state_faulty-sensor,state_notified-pilot,state_gps-error-info_name,state_lidar-error-info_name,state_imu-error-info_name,state_io_target-altitude,state_io_target-altitude_exists,state_io_autoflaps,state_io_air-brake,state_io_air-brake_exists,state_io_alert-sensor-error-value,state_io_alert-sensor-error-value_exists,state_io_alert-sensor-error,state_io_VTOLMode,state_io_target-speed,state_io_target-speed_exists,state_gps-error-info,state_gps-error-info_value-changed,state_gps-error-info_current-value,state_gps-error-info_current-value_exists,state_gps-error-info_old-value,state_gps-error-info_old-value_exists,state_lidar-error-info,state_lidar-error-info_value-changed,state_lidar-error-info_current-value,state_lidar-error-info_current-value_exists,state_lidar-error-info_old-value,state_lidar-error-info_old-value_exists,state_imu-error-info,state_imu-error-info_value-changed,state_imu-error-info_current-value,state_imu-error-info_current-value_exists,state_imu-error-info_old-value,state_imu-error-info_old-value_exists,state_warning-issued,state_gps-error-info_warning-accepted,state_ready-to-decide,state_lidar-error-info_warning-accepted,state_imu-error-info_warning-accepted,state_gps-error-info_warn-condition,state_lidar-error-info_warn-condition,state_imu-error-info_warn-condition,state_user-response,state_io_clear-sensor-alert-response,state_io_gps-error,state_io_gps-error_exists,state_io_lidar-error,state_io_lidar-error_exists,state_io_imu-error,state_io_imu-error_exists,state_io_sensor-alert-accepted,state_safety-error,state_safety-error_exists,state_high-low-warn-error,state_high-low-warn-error_exists,state_normal-error,state_normal-error_exists,state_error-info,state_error-info_warning-accepted,state_reward-link,state_reward-link_reward_value,state_reward-link_reward_value_exists);
+VAR inputModuleRule : inputModule(counter_for_landing,counter_for_normal,counter_for_takeoff,state_flight_horizontal_counter,counter_for_low,counter_for_high,counter_for_safety,state_superstate,state_name,state_io_throttle,state_io_throttle_exists,state_operator_name,state_flight-mode,state_io_airspeed,state_io_airspeed_exists,state_io_altitude,state_io_altitude_exists,state_landing,state_io_initiate-landing,state_io_distance-to-target,state_io_distance-to-target_exists,state_io_abort-landing,state_io_pilot-selected-landing-zone,state_sensor-unreliable,state_faulty-sensor,state_notified-pilot,state_gps-error-info_name,state_lidar-error-info_name,state_imu-error-info_name,state_io_target-altitude,state_io_target-altitude_exists,state_io_autoflaps,state_io_air-brake,state_io_air-brake_exists,state_io_alert-sensor-error-value,state_io_alert-sensor-error-value_exists,state_io_alert-sensor-error,state_io_VTOLMode,state_io_target-speed,state_io_target-speed_exists,state_gps-error-info,state_gps-error-info_value-changed,state_gps-error-info_current-value,state_gps-error-info_current-value_exists,state_gps-error-info_old-value,state_gps-error-info_old-value_exists,state_lidar-error-info,state_lidar-error-info_value-changed,state_lidar-error-info_current-value,state_lidar-error-info_current-value_exists,state_lidar-error-info_old-value,state_lidar-error-info_old-value_exists,state_imu-error-info,state_imu-error-info_value-changed,state_imu-error-info_current-value,state_imu-error-info_current-value_exists,state_imu-error-info_old-value,state_imu-error-info_old-value_exists,state_warning-issued,state_gps-error-info_warning-accepted,state_ready-to-decide,state_lidar-error-info_warning-accepted,state_imu-error-info_warning-accepted,state_gps-error-info_warn-condition,state_lidar-error-info_warn-condition,state_imu-error-info_warn-condition,state_user-response,state_io_clear-sensor-alert-response,state_io_gps-error,state_io_gps-error_exists,state_io_lidar-error,state_io_lidar-error_exists,state_io_imu-error,state_io_imu-error_exists,state_io_sensor-alert-accepted,state_safety-error,state_safety-error_exists,state_high-low-warn-error,state_high-low-warn-error_exists,state_normal-error,state_normal-error_exists,state_error-info,state_error-info_warning-accepted,state_reward-link,state_reward-link_reward_value,state_reward-link_reward_value_exists);
 
 
 -- ********************************************************************************************************
@@ -191,8 +192,8 @@ VAR inputModuleRule : inputModule(counter_for_takeoff,state_flight_horizontal_co
 
 -- --Learning rules
 -- If the sensor error is past the safety threshold, the agent shall issue a warning
-     -- LTLSPEC F (X state_imu-error-info_warn-condition = safety & state_operator_name = warn) -- proves in 53 steps
-     -- LTLSPEC F (X state_imu-error-info_warn-condition = safety & state_operator_name = do-not-warn) -- does not prove, generates a counterexample in 36 steps
+      -- LTLSPEC F (X state_imu-error-info_warn-condition = safety & state_operator_name = warn & inputModuleRule.counter_for_safety <= 8) -- proves in 53 steps
+      -- LTLSPEC F (X state_imu-error-info_warn-condition = safety & state_operator_name = do-not-warn & inputModuleRule.counter_for_safety <= 8) -- does not prove, generates a counterexample in 53 steps
 --
 -- If error difference within the sensors is non zero, then the agent shall execute the error changed operator
 --     LTLSPEC F (X state_imu-error-info_current-value != state_imu-error-info_old-value & state_operator_name = record-changed-error-imu) -- proves in 44 steps
@@ -201,17 +202,17 @@ VAR inputModuleRule : inputModule(counter_for_takeoff,state_flight_horizontal_co
 --     LTLSPEC G (X state_operator_name = record-changed-error-imu -> state_imu-error-info_value-changed = nil & (state_imu-error-info_current-value = state_imu-error-info_old-value)) -- does not prove, generates a counterexample in 58 steps
 
 -- When a sensor is at fault, and warning level is low, the agent shall not warn
-    -- LTLSPEC F (X state_imu-error-info_warn-condition = low & state_operator_name = do-not-warn) -- proves in 5 steps
-    -- LTLSPEC F (X state_imu-error-info_warn-condition = low & state_operator_name = warn) -- does not prove, generates a counterexample in 55 steps
+    -- LTLSPEC F (X state_imu-error-info_warn-condition = low & state_operator_name = do-not-warn & inputModuleRule.counter_for_low <= 32) -- proves in 54 steps
+    -- LTLSPEC F (X state_imu-error-info_warn-condition = low & state_operator_name = warn & inputModuleRule.counter_for_low <= 32) -- does not prove, generates a counterexample in 52 steps
 
 -- When a sensor is at fault, and warning level is high, the agent shall warn
-    -- LTLSPEC F (X state_imu-error-info_warn-condition = high & state_operator_name = warn)
-    -- LTLSPEC F (X state_imu-error-info_warn-condition = high & state_operator_name = do-not-warn)
+    -- LTLSPEC F (X state_imu-error-info_warn-condition = high & state_operator_name = warn & inputModuleRule.counter_for_high <= 8) -- proves in 53 steps
+    -- LTLSPEC F (X state_imu-error-info_warn-condition = high & state_operator_name = do-not-warn & inputModuleRule.counter_for_high <= 8) -- does not prove, generates a counterexample in 53 steps
 
 
 -- If the sensor error is within normal threshold, the agent shall not issue a warning.
-    -- LTLSPEC F (X state_imu-error-info_warn-condition = normal & state_operator_name = do-not-warn) -- proves in 13 steps
-    -- LTLSPEC F (X state_imu-error-info_warn-condition = normal & state_operator_name = warn) -- does not prove, generates a counterexample in 8 steps
+    -- LTLSPEC F (X state_imu-error-info_warn-condition = normal & state_operator_name = do-not-warn & inputModuleRule.counter_for_normal <= 32) -- proves in 13 steps
+    -- LTLSPEC F (X state_imu-error-info_warn-condition = normal & state_operator_name = warn & inputModuleRule.counter_for_normal <= 32) -- does not prove, generates a counterexample in 8 steps
 
 -- A learned rule with the lowest preference shall never fire
     -- (in our case it would be warn*low*gps)
@@ -241,7 +242,7 @@ VAR inputModuleRule : inputModule(counter_for_takeoff,state_flight_horizontal_co
 -- Detect landing
 
 -- Detect In-flight
-LTLSPEC F (state_io_altitude > 10000) -- does not prove, generates a counterexample in 67 steps
+-- LTLSPEC F (state_io_altitude > 10000) -- does not prove, generates a counterexample in 67 steps8
 -- LTLSPEC F (state_io_altitude < 2000) -- proves in 2 steps
 -- LTLSPEC F (state_io_initiate-landing = no) -- does not prove, generates a counterexample in 61 steps
 
@@ -344,12 +345,14 @@ LTLSPEC F (state_io_altitude > 10000) -- does not prove, generates a counterexam
 
 -- ********************************X*********************************X**********************************************************
 
-MODULE inputModule(counter_for_takeoff, state_flight_horizontal_counter,counter_for_low,counter_for_high,counter_for_safety,state_superstate,state_name,state_io_throttle,state_io_throttle_exists,state_operator_name,state_flight-mode,state_io_airspeed,state_io_airspeed_exists,state_io_altitude,state_io_altitude_exists,state_landing,state_io_initiate-landing,state_io_distance-to-target,state_io_distance-to-target_exists,state_io_abort-landing,state_io_pilot-selected-landing-zone,state_sensor-unreliable,state_faulty-sensor,state_notified-pilot,state_gps-error-info_name,state_lidar-error-info_name,state_imu-error-info_name,state_io_target-altitude,state_io_target-altitude_exists,state_io_autoflaps,state_io_air-brake,state_io_air-brake_exists,state_io_alert-sensor-error-value,state_io_alert-sensor-error-value_exists,state_io_alert-sensor-error,state_io_VTOLMode,state_io_target-speed,state_io_target-speed_exists,state_gps-error-info,state_gps-error-info_value-changed,state_gps-error-info_current-value,state_gps-error-info_current-value_exists,state_gps-error-info_old-value,state_gps-error-info_old-value_exists,state_lidar-error-info,state_lidar-error-info_value-changed,state_lidar-error-info_current-value,state_lidar-error-info_current-value_exists,state_lidar-error-info_old-value,state_lidar-error-info_old-value_exists,state_imu-error-info,state_imu-error-info_value-changed,state_imu-error-info_current-value,state_imu-error-info_current-value_exists,state_imu-error-info_old-value,state_imu-error-info_old-value_exists,state_warning-issued,state_gps-error-info_warning-accepted,state_ready-to-decide,state_lidar-error-info_warning-accepted,state_imu-error-info_warning-accepted,state_gps-error-info_warn-condition,state_lidar-error-info_warn-condition,state_imu-error-info_warn-condition,state_user-response,state_io_clear-sensor-alert-response,state_io_gps-error,state_io_gps-error_exists,state_io_lidar-error,state_io_lidar-error_exists,state_io_imu-error,state_io_imu-error_exists,state_io_sensor-alert-accepted,state_safety-error,state_safety-error_exists,state_high-low-warn-error,state_high-low-warn-error_exists,state_normal-error,state_normal-error_exists,state_error-info,state_error-info_warning-accepted,state_reward-link,state_reward-link_reward_value,state_reward-link_reward_value_exists)
+MODULE inputModule(counter_for_landing,counter_for_normal,counter_for_takeoff, state_flight_horizontal_counter,counter_for_low,counter_for_high,counter_for_safety,state_superstate,state_name,state_io_throttle,state_io_throttle_exists,state_operator_name,state_flight-mode,state_io_airspeed,state_io_airspeed_exists,state_io_altitude,state_io_altitude_exists,state_landing,state_io_initiate-landing,state_io_distance-to-target,state_io_distance-to-target_exists,state_io_abort-landing,state_io_pilot-selected-landing-zone,state_sensor-unreliable,state_faulty-sensor,state_notified-pilot,state_gps-error-info_name,state_lidar-error-info_name,state_imu-error-info_name,state_io_target-altitude,state_io_target-altitude_exists,state_io_autoflaps,state_io_air-brake,state_io_air-brake_exists,state_io_alert-sensor-error-value,state_io_alert-sensor-error-value_exists,state_io_alert-sensor-error,state_io_VTOLMode,state_io_target-speed,state_io_target-speed_exists,state_gps-error-info,state_gps-error-info_value-changed,state_gps-error-info_current-value,state_gps-error-info_current-value_exists,state_gps-error-info_old-value,state_gps-error-info_old-value_exists,state_lidar-error-info,state_lidar-error-info_value-changed,state_lidar-error-info_current-value,state_lidar-error-info_current-value_exists,state_lidar-error-info_old-value,state_lidar-error-info_old-value_exists,state_imu-error-info,state_imu-error-info_value-changed,state_imu-error-info_current-value,state_imu-error-info_current-value_exists,state_imu-error-info_old-value,state_imu-error-info_old-value_exists,state_warning-issued,state_gps-error-info_warning-accepted,state_ready-to-decide,state_lidar-error-info_warning-accepted,state_imu-error-info_warning-accepted,state_gps-error-info_warn-condition,state_lidar-error-info_warn-condition,state_imu-error-info_warn-condition,state_user-response,state_io_clear-sensor-alert-response,state_io_gps-error,state_io_gps-error_exists,state_io_lidar-error,state_io_lidar-error_exists,state_io_imu-error,state_io_imu-error_exists,state_io_sensor-alert-accepted,state_safety-error,state_safety-error_exists,state_high-low-warn-error,state_high-low-warn-error_exists,state_normal-error,state_normal-error_exists,state_error-info,state_error-info_warning-accepted,state_reward-link,state_reward-link_reward_value,state_reward-link_reward_value_exists)
 
 
 ASSIGN
         init (state_flight_horizontal_counter) := 0;
         init (counter_for_takeoff) := 0;
+        init (counter_for_landing) := 0;
+        init (counter_for_normal) := 1;
         init (counter_for_low) := 1;
         init (counter_for_high) := 1;
         init (counter_for_safety) := 1;
@@ -382,24 +385,31 @@ ASSIGN
         --     (state_flight-mode != vertical): state_flight_horizontal_counter;
         --     TRUE: state_flight_horizontal_counter;
         --   esac;
-        -- next (counter_for_low) :=
-        --   case
-        --   (state_imu-error-info_warn-condition = low): counter_for_low + 1;
-        --   (state_operator_name = do-not-warn): counter_for_low;
-        --   TRUE: counter_for_low;
-        --   esac;
-        -- next (counter_for_high) :=
-        --   case
-        --   (state_imu-error-info_warning-accepted = nil & state_warning-issued = imu): counter_for_high +1;
-        --   (state_imu-error-info_warning-accepted = yes): counter_for_high;
-        --   TRUE: counter_for_high;
-        --   esac;
-        -- next (counter_for_safety) :=
-        --   case
-        --   (state_operator_name = decision): counter_for_safety;
-        --   (state_imu-error-info_current-value = 10.6): counter_for_safety + 1;
-        --   TRUE: counter_for_safety;
-        --   esac;
+        next (counter_for_normal) :=
+          case
+          (state_imu-error-info_warn-condition = normal & state_warning-issued = imu): counter_for_normal;
+          (state_imu-error-info_warn-condition = normal & state_warning-issued != imu): counter_for_normal + 1;
+          TRUE: counter_for_low;
+          esac;
+        next (counter_for_low) :=
+          case
+          (state_imu-error-info_warn-condition = low): counter_for_low;
+          (state_imu-error-info_warn-condition != low): counter_for_low + 1;
+          TRUE: counter_for_low;
+          esac;
+        next (counter_for_high) :=
+          case
+          (state_imu-error-info_warn-condition = high & state_imu-error-info_warning-accepted = yes): counter_for_high;
+          (state_imu-error-info_warn-condition = high & state_imu-error-info_warning-accepted != yes): counter_for_high + 1;
+          TRUE: counter_for_high;
+          esac;
+        next (counter_for_safety) :=
+          case
+          (state_imu-error-info_warn-condition = safety & state_imu-error-info_warning-accepted = yes): counter_for_safety;
+          (state_imu-error-info_warn-condition = safety & state_imu-error-info_warning-accepted != yes): counter_for_safety + 1;
+
+          TRUE: counter_for_safety;
+          esac;
         -- next (state_io_gps-error) :=
         --     case
         --     (state_operator_name = warn & state_gps-error-info_value-changed = nil): 9.6;
@@ -419,15 +429,20 @@ ASSIGN
             esac;
         next (state_io_imu-error) :=
             case
-            -- (state_io_imu-error = 0.0 & state_operator_name = transition):8.5;
+            (state_io_imu-error = 0.0 & state_operator_name = transition):8.5;
             -- (state_io_imu-error = 0.0 & state_operator_name = transition):9.5;
-            (state_io_imu-error = 5.5 & state_operator_name = transition):5.5;
+            -- (state_io_imu-error = 0.0 & state_flight-mode = horizontal):10.5;
+            -- (state_io_imu-error = 10.5 & state_operator_name = warn):5.5;
             -- (state_io_imu-error = 8.5 & state_operator_name = do-not-warn):9.5;
             -- (state_operator_name = warn & state_imu-error-info_value-changed = nil): 9.6;
             -- (state_imu-error-info_old-value = 9.5 & state_imu-error-info_warning-accepted = yes & state_warning-issued = nil): 10.6;
-
-
             TRUE: state_io_imu-error;
+            esac;
+        next (counter_for_landing) :=
+            case
+                (counter_for_landing <= 40): counter_for_landing + 1;
+                (counter_for_landing = 41): counter_for_landing;
+                TRUE: counter_for_landing;
             esac;
         next (state_io_sensor-alert-accepted) :=
             case
@@ -436,8 +451,10 @@ ASSIGN
             esac;
         next(state_io_initiate-landing) :=
               case
-                  (state_io_throttle >=0.9 & state_io_altitude >= 6000 & state_imu-error-info_warning-accepted = yes) : yes;
-                  -- (state_io_abort-landing = yes) : nil;
+                  -- (state_io_initiate-landing = yes) : nil;
+                  -- (state_io_initiate-landing = nil) : nil;
+                  (state_io_throttle >=0.9 & state_io_altitude >= 6000 & counter_for_landing = 40) : yes;
+                  (state_io_abort-landing = yes) : nil;
                   TRUE: state_io_initiate-landing;
               esac;
 
@@ -447,7 +464,6 @@ ASSIGN
                    (state_landing = abort) : nil;
                    TRUE: state_io_abort-landing;
               esac;
-
         next(state_io_pilot-selected-landing-zone) :=
             case
                   (state_landing = abort) : yes;
