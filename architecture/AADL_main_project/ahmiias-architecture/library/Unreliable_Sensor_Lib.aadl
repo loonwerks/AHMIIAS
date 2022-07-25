@@ -25,32 +25,70 @@ public
 			tel;
 			
 			---------------------------------------------------------
-			-- S.F.R. 2022/05	
+			-- S.F.R. 2022/07	
+						
+			-------------------------------------
+			-- Sensor reliability is determined as follows:
+			-- If the sensor error is in the Safety range, then the sensor is unreliable and an alert is issued (see IAS.aadl)
+			-- The sensor error is given by the smallest pairwise Manhattan distance w.r.t. the other two sensors positions
+			-- The sensor error is in the Safety range if it is greater or equal than the Safety threshold
+			-- The Safety threshold is given by 2*horizontal threshold + vertical threshold
+			--
+			-- The rules above are consistent with a reliability determination based on individual coordinate components comparisons:
+			-- (|x-x'| < h_t /\ |y-y'| < h_t /\ |z-z'|) \/ (|x-x''| < h_t /\ |y-y''| < h_t /\ |z-z''|)
+			--
+			-- Assume |x-x''| + |y-y''| + |z-z''| >= |x-x'| + |y-y'| + |z-z'| (that is, d(x,x') <= d(x,x''))
+			-- Then   |x-x'|  + |y-y'|  + |z-z'|  >= 2*h_t + v_t => |x-x'|  >= h_t \/ |y-y'|  >= h_t \/ |z-z'|  >= v_t
+			-- And    |x-x''| + |y-y''| + |z-z''| >= 2*h_t + v_t => |x-x''| >= h_t \/ |y-y''| >= h_t \/ |z-z''| >= v_t
+			-- Which corresponds to the sensor being unreliable
+			-------------------------------------
 			node manhattan_distance(pos1: Position.impl, pos2: Position.impl) 
 				returns (dist: real);
 			let
 				dist = abs(pos1.X - pos2.X) + abs(pos1.Y - pos2.Y) + abs(pos1.Z - pos2.Z);
 			tel;
 			
-			-------------------------------------
-			-- Sensor error computed as minimum pairwise distance
-			-------------------------------------
-			node sensor_error_as_min_pairwise_dist(s1_data : Sensor_Data.impl, s2_data : Sensor_Data.impl, s3_data : Sensor_Data.impl)
+			
+			node sensor_error(
+				pos1 : Position.impl, 
+				pos2 : Position.impl, 
+				pos3 : Position.impl
+			)
 				returns(error1: real, error2: real, error3: real);
 			var 
 				dist_1_2 : real;
 				dist_1_3 : real;
 				dist_2_3 : real;
 			let
-				dist_1_2 = manhattan_distance(s1_data.Position, s2_data.Position);
-				dist_1_3 = manhattan_distance(s1_data.Position, s3_data.Position);
-				dist_2_3 = manhattan_distance(s2_data.Position, s3_data.Position);
+				dist_1_2 = manhattan_distance(pos1, pos2);
+				dist_1_3 = manhattan_distance(pos1, pos3);
+				dist_2_3 = manhattan_distance(pos2, pos3);
 				
 				error1 = if dist_1_2 < dist_1_3 then dist_1_2 else dist_1_3;
 				error2 = if dist_1_2 < dist_2_3 then dist_1_2 else dist_2_3;
 				error3 = if dist_1_3 < dist_2_3 then dist_1_3 else dist_2_3;
 			tel;	
-					
+			
+
+			node sensor_error_range(
+				sensor_error : real, 
+				horizontal_threshold : real, 
+				vertical_threshold : real
+			) 
+				returns (sensor_error_range: SensorErrorRange);
+			var
+				safety_thresh : real;
+				level2_thresh : real;
+				level1_thresh : real;
+			let
+				safety_thresh = horizontal_threshold + horizontal_threshold + vertical_threshold;
+				level2_thresh = (safety_thresh * 2.0) / 3.0;
+				level1_thresh = (safety_thresh) 	  / 3.0;
+				sensor_error_range =  if 		sensor_error > safety_thresh then enum(SensorErrorRange, Safety)
+									  else if   sensor_error > level2_thresh then enum(SensorErrorRange, Level2)
+									  else if   sensor_error > level1_thresh then enum(SensorErrorRange, Level1)
+									  else 									 	  enum(SensorErrorRange, Normal);
+			tel; 	
 			---------------------------------------------------------
 			
 			-------------------------------------

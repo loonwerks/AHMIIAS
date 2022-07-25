@@ -32,25 +32,7 @@ public
 		**};
 		
 		
-		annex agree {**								
-								
-			-- QUESTION: is it possible to formulate properties about the likelihood of issuing an alert in range Level1 (resp.2) after an acceptance
-			--			 or a rejection by the operator, without technical details about the learning algorithm?		
-			guarantee ias_g1 "If the sensor error is in Normal range, then no alert is issued":
-			 	(Output.sensor1ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Normal) 
-			 		=> (not Output.sensor1ErrorData.unreliable))
-		    and (Output.sensor2ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Normal) 
-			 		=> (not Output.sensor2ErrorData.unreliable)) 
-			and	(Output.sensor3ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Normal) 
-			 		=> (not Output.sensor3ErrorData.unreliable));
-			
-			guarantee ias_g2 "If the sensor error is in Safety range, then an alert is issued":
-			 	(Output.sensor1ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Safety) 
-			 		=> Output.sensor1ErrorData.unreliable) 
-			and (Output.sensor2ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Safety) 
-			 		=> Output.sensor2ErrorData.unreliable)
-			and (Output.sensor3ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Safety) 
-			 		=> Output.sensor3ErrorData.unreliable);			
+		annex agree {**										
 			
 			-----------------------
 			--UNRELIABLE SENSOR SCENARIO
@@ -70,14 +52,54 @@ public
 			eq Horizontal_Threshold : real = Unreliable_Sensor_Lib::HAL(previous_z_position);
 			
 			eq Vertical_Threshold : real = Unreliable_Sensor_Lib::VAL(previous_z_position);
-							
-			eq sensor1_reliable: bool, sensor2_reliable: bool, sensor3_reliable: bool = 
-				Unreliable_Sensor_Lib::Sensor_Status(InputFromSensor1, InputFromSensor2, InputFromSensor3, Horizontal_Threshold, Vertical_Threshold);
+																	
+			---------------------------------------------------------
+			-- S.F.R. 2022/07	
+					
+			--eq sensor1_reliable: bool, sensor2_reliable: bool, sensor3_reliable: bool = 
+			--	Unreliable_Sensor_Lib::Sensor_Status(InputFromSensor1, InputFromSensor2, InputFromSensor3, Horizontal_Threshold, Vertical_Threshold);
 				
-			guarantee ias_g3 "Sensor status to operator":
-					(Output.sensor1ErrorData.unreliable = not sensor1_reliable)
-				and (Output.sensor2ErrorData.unreliable = not sensor2_reliable)
-				and (Output.sensor3ErrorData.unreliable = not sensor3_reliable);			
+			--guarantee ias_g3 "Sensor status to operator":
+			--		(Output.sensor1ErrorData.unreliable = not sensor1_reliable)
+			--	and (Output.sensor2ErrorData.unreliable = not sensor2_reliable)
+			--	and (Output.sensor3ErrorData.unreliable = not sensor3_reliable);		
+		 		
+			eq sensor1_error : real, sensor2_error : real, sensor3_error : real = 
+				Unreliable_Sensor_Lib::sensor_error(InputFromSensor1.Position, InputFromSensor2.Position, InputFromSensor3.Position);
+				
+			eq sensor1_error_range : SensorErrorRange = 
+				Unreliable_Sensor_Lib::sensor_error_range(sensor1_error, Horizontal_Threshold, Vertical_Threshold);
+			eq sensor2_error_range : SensorErrorRange = 
+				Unreliable_Sensor_Lib::sensor_error_range(sensor2_error, Horizontal_Threshold, Vertical_Threshold);
+			eq sensor3_error_range : SensorErrorRange = 
+				Unreliable_Sensor_Lib::sensor_error_range(sensor3_error, Horizontal_Threshold, Vertical_Threshold);
+			
+			guarantee ias_g19 "Sensor error data to operator":
+					(Output.sensor1ErrorData.error = sensor1_error)
+				and (Output.sensor2ErrorData.error = sensor2_error)
+				and (Output.sensor3ErrorData.error = sensor3_error)
+				and (Output.sensor1ErrorData.errorRange = sensor1_error_range)
+				and (Output.sensor2ErrorData.errorRange = sensor2_error_range)
+				and (Output.sensor3ErrorData.errorRange = sensor3_error_range);
+										
+			-- QUESTION: is it possible to formulate properties about the likelihood of issuing an alert in range Level1 (resp.2) after an acceptance
+			--			 or a rejection by the operator, without technical details about the learning algorithm?		
+			guarantee ias_g1 "If the sensor error is in Normal range, then no unreliability alert is issued":
+			 	(Output.sensor1ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Normal) 
+			 		=> (not Output.sensor1ErrorData.unreliable))
+		    and (Output.sensor2ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Normal) 
+			 		=> (not Output.sensor2ErrorData.unreliable)) 
+			and	(Output.sensor3ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Normal) 
+			 		=> (not Output.sensor3ErrorData.unreliable));
+			
+			guarantee ias_g2 "If the sensor error is in Safety range, then an unreliability alert is issued":
+			 	(Output.sensor1ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Safety) 
+			 		=> Output.sensor1ErrorData.unreliable) 
+			and (Output.sensor2ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Safety) 
+			 		=> Output.sensor2ErrorData.unreliable)
+			and (Output.sensor3ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Safety) 
+			 		=> Output.sensor3ErrorData.unreliable);	
+			---------------------------------------------------------	
 			
 			--Should we instead pick one of the three on some other criteria?
 			guarantee ias_g4 "Recommended sensor is NIL if and only if all sensors are unreliable":
@@ -111,19 +133,27 @@ public
 					else previous_active_sensor;				
 			
 			-- NOTE: added as refinement of g7 in presence of fault no_sensor1_unreliability_response (see Human.aadl) consisting in 
-			--		 a missing operator response to an unreliable sensor message
+			--		 a missing operator response to a sensor unreliability alert
 --			guarantee ias_g8 "The active sensor should stay the same unless (i) it is unreliable, (ii) the operator agrees or does not respond after one step
 --						and (iii) there is another reliable sensor available":
 --				Output.Active_Sensor = 	
 --					if (previous_recommended_sensor = NIL)
 --						then previous_active_sensor
---					else if (	 (previous_active_sensor = 1 and (InputFromHuman.sensor1UnreliableResponse = enum(Response, Agree)
---															      or (prev(not sensor1_reliable, false) and InputFromHuman.sensor1UnreliableResponse = enum(Response, Neutral))))
---							  or (previous_active_sensor = 2 and (InputFromHuman.sensor2UnreliableResponse = enum(Response, Agree)
---							  									  or (prev(not sensor2_reliable, false) and InputFromHuman.sensor2UnreliableResponse = enum(Response, Neutral))))
---							  or (previous_active_sensor = 3 and (InputFromHuman.sensor2UnreliableResponse = enum(Response, Agree)
---							  									  or (prev(not sensor3_reliable, false) and InputFromHuman.sensor3UnreliableResponse = enum(Response, Neutral))))
---							  	)
+--					else if (	 (	 previous_active_sensor = 1 
+--								 and prev(Output.sensor1ErrorData.unreliable, false)
+--								 and (	InputFromHuman.sensor1UnreliableResponse = enum(Response, Agree) 
+--									 or InputFromHuman.sensor1UnreliableResponse = enum(Response, Neutral)
+--								 ))
+--							  or (	 previous_active_sensor = 2 
+--								 and prev(Output.sensor2ErrorData.unreliable, false)
+--								 and (	InputFromHuman.sensor2UnreliableResponse = enum(Response, Agree) 
+--									 or InputFromHuman.sensor2UnreliableResponse = enum(Response, Neutral)
+--								 ))
+--							  or (	 previous_active_sensor = 3 
+--								 and prev(Output.sensor3ErrorData.unreliable, false)
+--								 and (	InputFromHuman.sensor3UnreliableResponse = enum(Response, Agree) 
+--									 or InputFromHuman.sensor3UnreliableResponse = enum(Response, Neutral)
+--								 )))
 --						then previous_recommended_sensor
 --					else previous_active_sensor;
 
