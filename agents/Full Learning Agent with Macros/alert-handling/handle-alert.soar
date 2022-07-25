@@ -221,14 +221,6 @@ proc generateDecisionPropose { types } {
 
 generateDecisionPropose { gps lidar imu }
 
-
-sp {decision*apply
-    (state <s> ^operator <o>)
-    (<o> ^name decision)
--->
-    (<s> ^ready-to-decide yes +)
-}
-
 sp {warn*propose
     (state <s> ^ready-to-decide yes)
 -->

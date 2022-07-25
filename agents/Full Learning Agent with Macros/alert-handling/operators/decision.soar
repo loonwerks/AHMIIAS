@@ -1,0 +1,14 @@
+##!
+# @file
+#
+# @created pganeriwala 20220725
+
+echo "\nLoading decision.soar"
+
+sp {decision*apply
+    :o-support
+    (state <s> ^operator <o>)
+    (<o> ^name decision)
+-->
+    (<s> ^ready-to-decide yes +)
+}
