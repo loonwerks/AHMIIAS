@@ -168,7 +168,8 @@ public
 			 	(IAS.Output.sensor1ErrorData.errorRange = enum(Types_Constants::SensorErrorRange, Normal) 
 			 		=> (not IAS.Output.sensor1ErrorData.unreliable));
 			 		
-			-- NOTE: lemma falsifiable in presence of fault no_sensor1_unreliability_response (see Human.aadl)
+			-- NOTE: lemma becomes invalid when fault nondet_sensor1_unreliability (see IAS.aadl) is enabled
+			--       or when fault no_sensor1_unreliability_response (see Human.aadl) is enabled
 			lemma t_l35 "Operator responds to sensor unreliability alerts": 
 					(prev(IAS.Output.sensor1ErrorData.unreliable, false) <=> 
 					 (	 (Human.Output.sensor1UnreliableResponse = enum(Response, Agree)) 
@@ -185,7 +186,8 @@ public
 			
 			---------------------------------------------------------
 			-- S.F.R. 2022/07
-			-- NOTE: not valid anymore, since two sensors errors might be in range Level1/2,
+			
+			-- NOTE: not valid anymore, since two sensors errors might be in range Level1 or 2,
 			-- while only one of the two sensors is reported as unreliable
 			--lemma t_l36 "We can't have just Sensor 1 reliable":
 			--		not ((not IAS.Output.sensor1ErrorData.unreliable) 
@@ -203,7 +205,7 @@ public
 			--			 and IAS.Output.sensor2ErrorData.unreliable);
 			---------------------------------------------------------
 						 			
-			-- NOTE: lemma falsifiable in presence of nondet_sensor1_unreliability (see IAS.aadl)
+			-- NOTE: lemma becomes invalid when fault nondet_sensor1_unreliability (see IAS.aadl) is enabled
 			lemma t_l39 "Unless the active sensor becomes unreliable, 
 					the recommended sensor is the current active sensor":
 					(		(previous_active_sensor = 1 and (not IAS.Output.sensor1ErrorData.unreliable))
@@ -234,37 +236,80 @@ public
 					=>
 					IAS.Output.Active_Sensor = previous_active_sensor;
 			
+			---------------------------------------------------------
+			-- S.F.R. 2022/07
+			
+			-- NOTE: 
+			-- 1) t_l42 is the original formulation. It becomes invalid when fault no_sensor1_unreliability_response (see Human.aadl) 
+			--	  is enabled, but its validity is restored when IAS guarantee ias_g7 is refined into ias_g8 (see IAS.aadl) 
+			-- 2) t_l42 becomes invalid again, in presence of the fault, when IAS guarantee ias_g8 is refined into ias_g20: 
+			--    in fact, an unreliable sensor can remain active also if the sensor error is in Level 1 or 2 range and the operator 
+			--	  does not respond to the unreliability alert. 
+			--    t_l43 is introduced as a refinement of t_l42; t_l43 is valid in combination with ias_g20 
+			
 			lemma t_l42 "If an unreliable sensor is the active sensor, it must be the case that either 
 					the pilot disagreed with the IAS assessment 
 					or the sensor just became unreliable on this timestep 
 					or there was no reliable sensor available on the previous timestep":
-						((IAS.Output.Active_Sensor = 1) and IAS.Output.sensor1ErrorData.unreliable) 
-							=>  (	(Human.Output.sensor1UnreliableResponse = enum(Response, Disagree)) 
+						(((IAS.Output.Active_Sensor = 1) and IAS.Output.sensor1ErrorData.unreliable) 
+							=>  (	Human.Output.sensor1UnreliableResponse = enum(Response, Disagree)
 								or 	prev(not IAS.Output.sensor1ErrorData.unreliable, true) 
-								or not prev(reliable_sensor_available, true)
-								)
-					and ((IAS.Output.Active_Sensor = 2) and IAS.Output.sensor2ErrorData.unreliable) 
-							=>  (	(Human.Output.sensor2UnreliableResponse = enum(Response, Disagree)) 
-								or 	prev(not IAS.Output.sensor1ErrorData.unreliable, true) 
+								or  not prev(reliable_sensor_available, true)
+								))
+					and (((IAS.Output.Active_Sensor = 2) and IAS.Output.sensor2ErrorData.unreliable) 
+							=>  (	Human.Output.sensor2UnreliableResponse = enum(Response, Disagree) 
+								or 	prev(not IAS.Output.sensor2ErrorData.unreliable, true) 
 								or 	not prev(reliable_sensor_available, true)
-								)
-					and ((IAS.Output.Active_Sensor = 3) and IAS.Output.sensor3ErrorData.unreliable) 
-							=>  (	(Human.Output.sensor3UnreliableResponse = enum(Response, Disagree)) 
+								))
+					and (((IAS.Output.Active_Sensor = 3) and IAS.Output.sensor3ErrorData.unreliable) 
+							=>  (	Human.Output.sensor3UnreliableResponse = enum(Response, Disagree) 
+								or 	prev(not IAS.Output.sensor3ErrorData.unreliable, true) 
+								or  not prev(reliable_sensor_available, true)
+							));
+							
+			eq previous_sensor1_error_range : SensorErrorRange = 
+				prev(IAS.Output.sensor1ErrorData.errorRange, enum(Types_Constants::SensorErrorRange, Normal));
+			eq previous_sensor2_error_range : SensorErrorRange = 
+				prev(IAS.Output.sensor2ErrorData.errorRange, enum(Types_Constants::SensorErrorRange, Normal));
+			eq previous_sensor3_error_range : SensorErrorRange = 
+				prev(IAS.Output.sensor3ErrorData.errorRange, enum(Types_Constants::SensorErrorRange, Normal));
+							
+			lemma t_l43 "If an unreliable sensor is the active sensor, it must be the case that either 
+					the pilot disagreed with the IAS assessment 
+					or the pilot did not respond
+					or the sensor just became unreliable on this timestep 
+					or there was no reliable sensor available on the previous timestep":
+						(((IAS.Output.Active_Sensor = 1) and IAS.Output.sensor1ErrorData.unreliable) 
+							=>  (	Human.Output.sensor1UnreliableResponse = enum(Response, Disagree)
+								or  ( 	  Human.Output.sensor1UnreliableResponse = enum(Response, Neutral) 
+									  and (   previous_sensor1_error_range = enum(Types_Constants::SensorErrorRange, Level1)
+									       or previous_sensor1_error_range = enum(Types_Constants::SensorErrorRange, Level2)))
 								or 	prev(not IAS.Output.sensor1ErrorData.unreliable, true) 
-								or not prev(reliable_sensor_available, true)
-							);
+								or  not prev(reliable_sensor_available, true)
+								))
+					and (((IAS.Output.Active_Sensor = 2) and IAS.Output.sensor2ErrorData.unreliable) 
+							=>  (	Human.Output.sensor2UnreliableResponse = enum(Response, Disagree) 
+								or  ( 	  Human.Output.sensor2UnreliableResponse = enum(Response, Neutral) 
+									  and (   previous_sensor2_error_range = enum(Types_Constants::SensorErrorRange, Level1)
+									       or previous_sensor2_error_range = enum(Types_Constants::SensorErrorRange, Level2)))
+								or 	prev(not IAS.Output.sensor2ErrorData.unreliable, true) 
+								or 	not prev(reliable_sensor_available, true)
+								))
+					and (((IAS.Output.Active_Sensor = 3) and IAS.Output.sensor3ErrorData.unreliable) 
+							=>  (	Human.Output.sensor3UnreliableResponse = enum(Response, Disagree)
+								or  ( 	  Human.Output.sensor3UnreliableResponse = enum(Response, Neutral) 
+									  and (   previous_sensor3_error_range = enum(Types_Constants::SensorErrorRange, Level1)
+									       or previous_sensor3_error_range = enum(Types_Constants::SensorErrorRange, Level2)))
+								or 	prev(not IAS.Output.sensor3ErrorData.unreliable, true) 
+								or  not prev(reliable_sensor_available, true)
+							));
 			
-			-- NOTE: lemma falsifiable in presence of fault no_sensor1_unreliability_response (see Human.aadl), but
-			--		 made valid again by refining IAS guarantee g7 into g8 (see IAS.aadl) 
-			lemma t_l43 "If Sensor 1 is both the active sensor and unreliable, it must be the case that either
-				the pilot disagreed with the IAS assessment 
-				or the sensor just became unreliable on this timestep 
-				or there was no reliable sensor available on the previous timestep":
-						((IAS.Output.Active_Sensor = 1) and IAS.Output.sensor1ErrorData.unreliable) 
-							=>  (	(Human.Output.sensor1UnreliableResponse = enum(Response, Disagree)) 
-								or 	prev(not IAS.Output.sensor1ErrorData.unreliable, true) 
-								or not prev(reliable_sensor_available, true));
-			
+			lemma t_l48 "Sensor errors are always non-negative" :
+					IAS.Output.sensor1ErrorData.error >= 0.0
+				and IAS.Output.sensor2ErrorData.error >= 0.0
+				and IAS.Output.sensor3ErrorData.error >= 0.0;				
+			---------------------------------------------------------
+
 			lemma t_l44 "Active sensor in range":
 				IAS.Output.Active_Sensor >= 1 and IAS.Output.Active_Sensor <= 3;
 			
@@ -274,14 +319,6 @@ public
 			lemma t_l46 "Only stated transitions are allowed." :
 				IAS.some_transition or (IAS.Output.Phase = IAS.previous_phase);
 				
-			---------------------------------------------------------
-			-- S.F.R. 2022/07
-			lemma t_l48 "Sensor errors are always non-negative" :
-					IAS.Output.sensor1ErrorData.error >= 0.0
-				and IAS.Output.sensor2ErrorData.error >= 0.0
-				and IAS.Output.sensor3ErrorData.error >= 0.0;
-			---------------------------------------------------------
-			
 			------------------------------------------------------------------------------
 			-- INVALID LEMMAS (These are notably invalid.)
 			------------------------------------------------------------------------------

@@ -27,21 +27,35 @@ public
 			---------------------------------------------------------
 			-- S.F.R. 2022/07	
 						
-			-------------------------------------
-			-- Sensor reliability is determined as follows:
-			-- If the sensor error is in the Safety range, then the sensor is unreliable and an alert is issued (see IAS.aadl)
-			-- The sensor error is given by the smallest pairwise Manhattan distance w.r.t. the other two sensors positions
-			-- The sensor error is in the Safety range if it is greater or equal than the Safety threshold
-			-- The Safety threshold is given by 2*horizontal threshold + vertical threshold
+			-- Sensor reliability is affected by the sensor error as follows:
+			-- 		If the sensor error is in the Safety range, then the sensor is considered unreliable and an alert is issued (see IAS.aadl)			
+			-- The sensor error is computed as the smallest Manhattan distance between the sensor position and the two other sensors positions
+			-- 		err(x) = min{d(x,x'), d(x,x'')} = min{|x-x'| + |y-y'| + |z-z'|, |x-x''| + |y-y''| + |z-z''|}
+			-- The sensor error is in the Safety range if it is greater or equal than a Safety threshold given by 2*horizontal threshold + vertical threshold
+			-- 		err(x) >= 2*h_t + v_t
 			--
-			-- The rules above are consistent with a reliability determination based on individual coordinate components comparisons:
-			-- (|x-x'| < h_t /\ |y-y'| < h_t /\ |z-z'|) \/ (|x-x''| < h_t /\ |y-y''| < h_t /\ |z-z''|)
-			--
-			-- Assume |x-x''| + |y-y''| + |z-z''| >= |x-x'| + |y-y'| + |z-z'| (that is, d(x,x') <= d(x,x''))
-			-- Then   |x-x'|  + |y-y'|  + |z-z'|  >= 2*h_t + v_t => |x-x'|  >= h_t \/ |y-y'|  >= h_t \/ |z-z'|  >= v_t
-			-- And    |x-x''| + |y-y''| + |z-z''| >= 2*h_t + v_t => |x-x''| >= h_t \/ |y-y''| >= h_t \/ |z-z''| >= v_t
-			-- Which corresponds to the sensor being unreliable
-			-------------------------------------
+			-- The rules above are consistent with a reliability determination based on individual coordinate components comparisons,
+			-- as computed by Sensor_Status below:
+			-- 		rel(x) = (|x-x'| < h_t /\ |y-y'| < h_t /\ |z-z'| < v_t) \/ (|x-x''| < h_t /\ |y-y''| < h_t /\ |z-z''| < v_t)
+			-- In particular, err(x) >= 2*h_t + v_t => NOT rel(x)
+			-- Proof: 
+			-- 		err(x) >= 2*h_t + v_t
+			--  <=> min{d(x,x'), d(x,x'')} >= 2*h_t + v_t
+			-- 	<=> min{|x-x'| + |y-y'| + |z-z'|, |x-x''| + |y-y''| + |z-z''|} >= 2*h_t + v_t
+			--	<=> (|x-x'| + |y-y'| + |z-z'| >= 2*h_t + v_t) /\ (|x-x''| + |y-y''| + |z-z''| >= 2*h_t + v_t)
+			-- 	 => (|x-x'| >= h_t \/ |y-y'| >= h_t \/ |z-z'| >= v_t) /\ (|x-x''| >= h_t \/ |y-y''| >= h_t \/ |z-z''| >= v_t)
+			--  <=> NOT rel(x)
+			-- 
+			-- Above is a sufficient condition on err(x) for obtaining NOT rel(x)
+			-- Conversely, NOT rel(x) => err(x) >= min{h_t,v_t}
+			-- Proof:
+			--      NOT rel(x)
+			--  <=> (|x-x'| >= h_t \/ |y-y'| >= h_t \/ |z-z'| >= v_t) /\ (|x-x''| >= h_t \/ |y-y''| >= h_t \/ |z-z''| >= v_t)
+			--   => (|x-x'| + |y-y'| + |z-z'| >= min{h_t,v_t}) /\ (|x-x''| + |y-y''| + |z-z''| >= min{h_t,v_t})
+			--  <=> d(x,x') >= min{h_t,v_t} /\ d(x,x'') >= min{h_t,v_t}
+			--  <=> min{d(x,x'), d(x,x'')} >= min{h_t,v_t}
+			--  <=> err(x) >= min{h_t,v_t}
+ 			-------------------------------------
 			node manhattan_distance(pos1: Position.impl, pos2: Position.impl) 
 				returns (dist: real);
 			let
