@@ -249,37 +249,56 @@ public
 					=>
 					IAS.Output.Active_Sensor = previous_active_sensor;
 			
+			-- NOTE: lemma falsifiable in presence of fault no_sensor1_unreliability_response (see Human.aadl), but
+			--		 made valid again by refining IAS guarantee g7 into g8 (see IAS.aadl) 
+			--		 lemma can be replaced by t_l43 that is not affected by fault no_sensor1_unreliability_response
 			lemma t_l42 "If an unreliable sensor is the active sensor, it must be the case that either 
 					the pilot disagreed with the IAS assessment 
 					or the sensor just became unreliable on this timestep 
 					or there was no reliable sensor available on the previous timestep":
-						((IAS.Output.Active_Sensor = 1) and not IAS.Output.Sensor1_Reliable) 
+						(((IAS.Output.Active_Sensor = 1) and not IAS.Output.Sensor1_Reliable) 
 							=>  (	(Human.Output.Sensor1_Unreliable_Response = enum(Response, Disagree)) 
 								or 	prev(IAS.Output.Sensor1_Reliable, true) 
 								or not prev(reliable_sensor_available, true)
-								)
-					and ((IAS.Output.Active_Sensor = 2) and not IAS.Output.Sensor2_Reliable) 
+								))
+					and (((IAS.Output.Active_Sensor = 2) and not IAS.Output.Sensor2_Reliable) 
 							=>  (	(Human.Output.Sensor2_Unreliable_Response = enum(Response, Disagree)) 
 								or 	prev(IAS.Output.Sensor2_Reliable, true) 
 								or 	not prev(reliable_sensor_available, true)
-								)
-					and ((IAS.Output.Active_Sensor = 3) and not IAS.Output.Sensor3_Reliable) 
+								))
+					and (((IAS.Output.Active_Sensor = 3) and not IAS.Output.Sensor3_Reliable) 
 							=>  (	(Human.Output.Sensor3_Unreliable_Response = enum(Response, Disagree)) 
 								or 	prev(IAS.Output.Sensor3_Reliable, true) 
 								or not prev(reliable_sensor_available, true)
-							);
-			
-			-- NOTE: lemma falsifiable in presence of fault no_sensor1_unreliability_response (see Human.aadl), but
-			--		 made valid again by refining IAS guarantee g7 into g8 (see IAS.aadl) 
-			lemma t_l43 "If Sensor 1 is both the active sensor and unreliable, it must be the case that either
-				the pilot disagreed with the IAS assessment 
-				or the sensor just became unreliable on this timestep 
-				or there was no reliable sensor available on the previous timestep":
-						((IAS.Output.Active_Sensor = 1) and not IAS.Output.Sensor1_Reliable) 
-							=>  (	(Human.Output.Sensor1_Unreliable_Response = enum(Response, Disagree)) 
-								or 	prev(IAS.Output.Sensor1_Reliable, true) 
-								or not prev(reliable_sensor_available, true));
-			
+							));
+							
+--			lemma t_l43 "If an unreliable sensor is the active sensor, it must be the case that either 
+--					the pilot disagreed with the IAS assessment 
+--					or the sensor was unreliable and the pilot did not respond
+--					or the sensor just became unreliable on this timestep 
+--					or there was no reliable sensor available on the previous timestep":
+--						(((IAS.Output.Active_Sensor = 1) and not IAS.Output.Sensor1_Reliable) 
+--							=>  (	Human.Output.Sensor1_Unreliable_Response = enum(Response, Disagree) 
+--								or  (	 prev(not IAS.Output.Sensor1_Reliable, false)
+--									 and Human.Output.Sensor1_Unreliable_Response = enum(Response, Neutral))
+--								or 	prev(IAS.Output.Sensor1_Reliable, true) 
+--								or not prev(reliable_sensor_available, true)
+--								))
+--					and (((IAS.Output.Active_Sensor = 2) and not IAS.Output.Sensor2_Reliable) 
+--							=>  (	Human.Output.Sensor2_Unreliable_Response = enum(Response, Disagree)
+--								or  (	 prev(not IAS.Output.Sensor2_Reliable, false)
+--									 and Human.Output.Sensor2_Unreliable_Response = enum(Response, Neutral))
+--								or 	prev(IAS.Output.Sensor2_Reliable, true) 
+--								or 	not prev(reliable_sensor_available, true)
+--								))
+--					and (((IAS.Output.Active_Sensor = 3) and not IAS.Output.Sensor3_Reliable) 
+--							=>  (	Human.Output.Sensor3_Unreliable_Response = enum(Response, Disagree)
+--								or  (	 prev(not IAS.Output.Sensor3_Reliable, false)
+--									 and Human.Output.Sensor3_Unreliable_Response = enum(Response, Neutral)) 
+--								or 	prev(IAS.Output.Sensor3_Reliable, true) 
+--								or not prev(reliable_sensor_available, true)
+--							));
+
 			lemma t_l44 "Active sensor in range":
 				IAS.Output.Active_Sensor >= 1 and IAS.Output.Active_Sensor <= 3;
 			
