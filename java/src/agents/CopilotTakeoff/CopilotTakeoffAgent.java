@@ -29,7 +29,8 @@ import static xplane.XPlaneConnector.getFlightData;
  */
 public class CopilotTakeoffAgent extends XPlaneAgent
 {
-    boolean DISPLAYDETAILS = false, USE_LEARNING = true;
+    boolean DISPLAYDETAILS = false;
+    boolean USE_LEARNING = false; //default learning mode set to false
     private SymbolFactory syms;
     Agent sagt = getAgent();
     InputBuilder builder;
@@ -120,7 +121,6 @@ public class CopilotTakeoffAgent extends XPlaneAgent
             //sagt.getInterpreter().eval("rl --set hrl-discount on");
             //sagt.getInterpreter().eval("rl --set discount-rate 0.0");
             sagt.getInterpreter().eval("trace --rl");
-            //sagt.getInterpreter().eval("print --exact(*^reward-link *)");
         } catch (SoarException e) {
             e.printStackTrace();
         }
