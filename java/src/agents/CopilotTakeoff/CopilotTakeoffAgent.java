@@ -430,7 +430,6 @@ public class CopilotTakeoffAgent extends XPlaneAgent
             long bt = System.nanoTime()/1000000;
             FlightData data = getFlightData();
             double sensorErrors[] = votingobj.checkForReliability(UIobj.positions,data.altitude);
-//            System.err.println(sensorErrors[0]+ " gps " + sensorErrors[1]+ " imu " +sensorErrors[2] + " lidar ");
             UIobj.barObj.error = Math.min(sensorErrors[0],sensorErrors[1]);
             try {
                 if(this.USE_LEARNING){
