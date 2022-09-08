@@ -25,6 +25,36 @@ public
 			tel;
 			
 			---------------------------------------------------------
+			-- S.F.R. 2022/09
+			
+			-- How to relate cartesian and ellipsoidal/spherical systems?
+			-- see https://en.wikipedia.org/wiki/Spherical_coordinate_system
+			-- see https://gssc.esa.int/navipedia/index.php/Ellipsoidal_and_Cartesian_Coordinates_Conversion
+			
+			-- Assuming semi-axis major = semi-axis minor = R; h approximated to 0
+			-- Conversion to Cartesian coordinates
+			-- x = R * cos(lat) * cos(lon)
+			-- y = R * cos(lat) * sin(lon)
+			-- z = R * sin(lat)
+			--
+			-- Tunnel distance (Euclidean or Manhattan)
+			-- sqrt( (x-x')^2 + (y-y')^2 + (z-z')^2 )
+			-- |x-x'| + |y-y'| + |z-z'|
+			--
+			-- Conversion to ellipsoidal coordinates
+			-- lat = arctan(z/sqrt(x^2+y^2))
+			-- lon = arctan(y/x), x > 0
+			--
+			-- Haversine distance between two points (in radians) on sphere surface
+			-- see http://www.movable-type.co.uk/scripts/latlong.html
+			-- rad(x) = x * pi/180
+			-- d = 2 * R * arcsin(sqrt( sin(rad(lat'-lat)/2)^2 + (sin(rad(lon'-lon)/2)^2)*cos(rad(lat)*cos(rad(lat') ))
+
+			-- NOTE: no advantage in substituting lat,lon or x,y,z with trigonometric expressions in tunnel or spheric distances
+			-- NOTE: no simple way to relate Euclidean/Manhattan distance to Haversine distance and vice versa
+			---------------------------------------------------------
+			
+			---------------------------------------------------------
 			-- S.F.R. 2022/07	
 						
 			-- Sensor reliability is affected by the sensor error as follows:
