@@ -166,7 +166,8 @@ public class CopilotTakeoffAgent extends XPlaneAgent
             //System.out.println(pathToSoar);
             // PATH TO SOAR FILE IMPORTANT
             //pathToSoar = "C:/Users/ahmii/learning_agent/FIT_AHMIIAS-master/lvca/code/LearningPrototype/src/main/soar/com/soartech/integrated-learning-agent/load.soar";
-            pathToSoar = "C:/experimental_soar_agent/integrated-learning-agent/load.soar";
+//            pathToSoar = "C:/experimental_soar_agent/integrated-learning-agent/load.soar";
+            pathToSoar = "C:/Github Projects -Parth/Soar-Agent_Year-3/soar_agent (Year 3)/integrated-learning-agent/load.soar";
             SoarCommands.source(sagt.getInterpreter(), pathToSoar);
             System.out.println("There are now " + sagt.getProductions().getProductionCount() + " productions loaded");
 
@@ -429,7 +430,7 @@ public class CopilotTakeoffAgent extends XPlaneAgent
             long bt = System.nanoTime()/1000000;
             FlightData data = getFlightData();
             double sensorErrors[] = votingobj.checkForReliability(UIobj.positions,data.altitude);
-            System.err.println(sensorErrors[0]+ " gps " + sensorErrors[1]+ " imu " +sensorErrors[2] + " lidar ");
+//            System.err.println(sensorErrors[0]+ " gps " + sensorErrors[1]+ " imu " +sensorErrors[2] + " lidar ");
             UIobj.barObj.error = Math.min(sensorErrors[0],sensorErrors[1]);
             try {
                 if(this.USE_LEARNING){
