@@ -31,6 +31,7 @@ public class CopilotTakeoffAgent extends XPlaneAgent
 {
     boolean DISPLAYDETAILS = false;
     boolean USE_LEARNING = false; //default learning mode set to false
+    boolean CHANGE_SENSOR_AUTHORITY = false; //default pilot's choice for changing sensor
     private SymbolFactory syms;
     Agent sagt = getAgent();
     InputBuilder builder;
