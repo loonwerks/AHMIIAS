@@ -29,9 +29,9 @@ public
 			
 			-- How to relate cartesian and ellipsoidal/spherical systems?
 			-- see https://en.wikipedia.org/wiki/Spherical_coordinate_system
-			-- see https://gssc.esa.int/navipedia/index.php/Ellipsoidal_and_Cartesian_Coordinates_Conversion
+			-- see https://gssc.esa.int/navipedia/index.php/Ellipsoidal_and_Cartesian_Coordinates_Conversion			
+			-- Ellipsoidal coordinates: assuming semi-axis major = semi-axis minor = R; h approximated to 0
 			
-			-- Assuming semi-axis major = semi-axis minor = R; h approximated to 0
 			-- Conversion to Cartesian coordinates
 			-- x = R * cos(lat) * cos(lon)
 			-- y = R * cos(lat) * sin(lon)
