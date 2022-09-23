@@ -40,6 +40,7 @@ public class XPCUserInterface extends JFrame implements Runnable{
     private RadioButton landingOptions;
 
     public PreferenceValueDisplay displayObj;
+    public SensorChangeLearningOptionDisplay sensorChangeLearningObj;
     public DisplayBar barObj,barObjOld;
 
     public void displayWarning(String faultySensorName){
@@ -156,6 +157,7 @@ public class XPCUserInterface extends JFrame implements Runnable{
         displayObj = new PreferenceValueDisplay();
         barObj = new DisplayBar();
         barObjOld = new DisplayBar();
+        sensorChangeLearningObj = new SensorChangeLearningOptionDisplay();
         InduceErrorButton = new button("Jump Error",580, 160, 320, 30);
         InduceIncrementalErrorButton = new button("Incremental Error",580, 200, 320, 30);
         AcknowledgeErrorButton = new button("Acknowledge Error",80, 660, 320, 30);
@@ -256,6 +258,7 @@ public class XPCUserInterface extends JFrame implements Runnable{
             landingOptions.draw(g);
         }
         displayObj.paint(g);
+        sensorChangeLearningObj.paint(g);
         BufferedImage barImg = new BufferedImage(500,500, BufferedImage.TYPE_INT_ARGB);
         barObj.draw(barImg.getGraphics());
         barObj.warnHigh = displayObj.warnHigh;
