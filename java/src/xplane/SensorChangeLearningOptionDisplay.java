@@ -5,7 +5,7 @@ import util.button;
 
 
 public class SensorChangeLearningOptionDisplay {
-    public boolean learningModeInfo, authorityToChangeInfo;
+    public double learningModeInfo, authorityToChangeInfo;
 
     public void paint(Graphics g){
         g.drawString("Current Learning Mode : ", 520, 450);
