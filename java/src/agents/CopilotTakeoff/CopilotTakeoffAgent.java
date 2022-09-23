@@ -2,7 +2,7 @@ package agents.CopilotTakeoff;
 
 import agents.XPlaneAgent;
 import data.FlightData;
-import jdk.internal.util.xml.impl.Input;
+//import jdk.internal.util.xml.impl.Input;
 import org.jsoar.kernel.*;
 import org.jsoar.kernel.events.OutputEvent;
 import org.jsoar.kernel.io.InputBuilder;

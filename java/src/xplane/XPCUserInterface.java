@@ -32,12 +32,14 @@ public class XPCUserInterface extends JFrame implements Runnable{
     public String pilotDecision = "nil";
     public boolean displayLandingButton = false, startedLandingProcedure = false, abortLanding = false;
     public int reroutedLandingZone = -1;
+    public boolean learningModeUpdate = false;
+    public boolean authorityToChangeUpdate = false;
     public int planeAirspeed=0, planeAltitude=0;
     private int mx=0,my=0;
     private boolean displayWarning = false;
 
-    private button InduceErrorButton,InduceIncrementalErrorButton, AcknowledgeErrorButton, DenyErrorButton, LandButton, AbortLandingButton;
-    private RadioButton landingOptions;
+    private button  InduceErrorButton,InduceIncrementalErrorButton, AcknowledgeErrorButton, DenyErrorButton, LandButton, AbortLandingButton;
+    private RadioButton learningMode, authorityToChange,landingOptions;
 
     public PreferenceValueDisplay displayObj;
     public SensorChangeLearningOptionDisplay sensorChangeLearningObj;
@@ -158,6 +160,10 @@ public class XPCUserInterface extends JFrame implements Runnable{
         barObj = new DisplayBar();
         barObjOld = new DisplayBar();
         sensorChangeLearningObj = new SensorChangeLearningOptionDisplay();
+        String learningModeOptionText[] = {"On", "Off"};
+        learningMode = new RadioButton(learningModeOptionText, 530, 530);
+        String authorityToChangeOptionText[] = {"On", "Off"};
+        authorityToChange = new RadioButton(authorityToChangeOptionText, 530, 700);
         InduceErrorButton = new button("Jump Error",580, 160, 320, 30);
         InduceIncrementalErrorButton = new button("Incremental Error",580, 200, 320, 30);
         AcknowledgeErrorButton = new button("Acknowledge Error",80, 660, 320, 30);
@@ -257,6 +263,8 @@ public class XPCUserInterface extends JFrame implements Runnable{
             g.setFont(textFont2);
             landingOptions.draw(g);
         }
+        learningMode.draw(g);
+        authorityToChange.draw(g);
         displayObj.paint(g);
         sensorChangeLearningObj.paint(g);
         BufferedImage barImg = new BufferedImage(500,500, BufferedImage.TYPE_INT_ARGB);
@@ -338,6 +346,8 @@ public class XPCUserInterface extends JFrame implements Runnable{
             LandButton.update(mx,my);
             AbortLandingButton.update(mx,my);
             landingOptions.update(mx,my);
+            authorityToChange.update(mx,my);
+            learningMode.update(mx,my);
         }
     }
 
@@ -358,8 +368,12 @@ public class XPCUserInterface extends JFrame implements Runnable{
                 startedLandingProcedure = true;
             }else if(startedLandingProcedure && AbortLandingButton.button.intersects(new Rectangle(mx,my,1,1))){
                 abortLanding = true;
-            }else if(landingOptions.getSelectedOption(mx,my) != -1){
-                reroutedLandingZone = landingOptions.getSelectedOption(mx,my);
+            }else if(landingOptions.getSelectedOption(mx,my) != -1) {
+                reroutedLandingZone = landingOptions.getSelectedOption(mx, my);
+            }else if(learningMode.getSelectedOption(mx,my) != -1) {
+                learningModeUpdate = true;
+            }else if(authorityToChange.getSelectedOption(mx,my) != -1) {
+                authorityToChangeUpdate = true;
             }
         }
 
