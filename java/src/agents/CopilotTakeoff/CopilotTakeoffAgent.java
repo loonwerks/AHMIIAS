@@ -2,6 +2,7 @@ package agents.CopilotTakeoff;
 
 import agents.XPlaneAgent;
 import data.FlightData;
+import jdk.internal.util.xml.impl.Input;
 import org.jsoar.kernel.*;
 import org.jsoar.kernel.events.OutputEvent;
 import org.jsoar.kernel.io.InputBuilder;
@@ -598,6 +599,8 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                 InputWme LIDARerr = builder.getWme("lidar-error");
                 LIDARerr.update(syms.createDouble(Math.min(sensorErrors[0],sensorErrors[2])));
 
+//                InputWme USE_Learning  =builder.getWme("use-learning");
+//                USE_Learning.update(syms.createString(learning));
 
                 InputWme initiatedLandingWme = builder.getWme("initiate-landing");
                 initiatedLandingWme.update(syms.createString(UIobj.startedLandingProcedure ? "yes":"no"));

@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6bb3fedb-805b-44ac-ab51-e1904d37b78c" name="Default Changelist" comment="Code Cleaning (dead print statements)">
+    <list default="true" id="6bb3fedb-805b-44ac-ab51-e1904d37b78c" name="Default Changelist" comment="Added Changing Sensor Authority option for the pilot">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/agents/CopilotTakeoff/CopilotTakeoffAgent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/agents/CopilotTakeoff/CopilotTakeoffAgent.java" afterDir="false" />
     </list>
@@ -86,7 +86,14 @@
       <option name="project" value="LOCAL" />
       <updated>1662650220908</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Added Changing Sensor Authority option for the pilot">
+      <created>1662651916144</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1662651916144</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -105,6 +112,7 @@
     <MESSAGE value="Updated with Test UI Display" />
     <MESSAGE value="Updated with Year 1 Work" />
     <MESSAGE value="Code Cleaning (dead print statements)" />
-    <option name="LAST_COMMIT_MESSAGE" value="Code Cleaning (dead print statements)" />
+    <MESSAGE value="Added Changing Sensor Authority option for the pilot" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added Changing Sensor Authority option for the pilot" />
   </component>
 </project>
