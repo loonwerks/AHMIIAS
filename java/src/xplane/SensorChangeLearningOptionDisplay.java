@@ -11,7 +11,7 @@ public class SensorChangeLearningOptionDisplay {
         g.drawString("Current Learning Mode : ", 520, 450);
         g.drawString(String.format("%b",learningModeInfo), 800, 450);
         g.drawString("Update Learning Mode ", 520, 500);
-        g.drawString("Current Authority to Change Sensor", 520, 620);
+        g.drawString("Current Authority to Change Sensor : ", 520, 620);
         g.drawString(String.format("%b",authorityToChangeInfo), 900, 620);
         g.drawString("Update Authority to Change Sensor", 520, 670);
 

@@ -4,12 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6bb3fedb-805b-44ac-ab51-e1904d37b78c" name="Default Changelist" comment="Added learning mode and change sensor authority to flightdata input link.">
+    <list default="true" id="6bb3fedb-805b-44ac-ab51-e1904d37b78c" name="Default Changelist" comment="Added learning mode and change sensor authority to flight data input link.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/agents/CopilotTakeoff/CopilotTakeoffAgent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/agents/CopilotTakeoff/CopilotTakeoffAgent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/xplane/SensorChangeLearningOptionDisplay.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/xplane/SensorChangeLearningOptionDisplay.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/xplane/XPCUserInterface.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/xplane/XPCUserInterface.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/agents/CopilotTakeoff/CopilotTakeoffAgent.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/agents/CopilotTakeoff/CopilotTakeoffAgent.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/xplane/XPCUserInterface$MouseEventListener.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/xplane/XPCUserInterface$MouseEventListener.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/xplane/XPCUserInterface$MouseMoveListener.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/xplane/XPCUserInterface$MouseMoveListener.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/xplane/XPCUserInterface.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/xplane/XPCUserInterface.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -141,7 +144,14 @@
       <option name="project" value="LOCAL" />
       <updated>1664045434853</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="Added learning mode and change sensor authority to flight data input link.">
+      <created>1664051561232</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1664051561232</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -164,6 +174,7 @@
     <MESSAGE value="Updating Java Code for Year 3 Agent Updates" />
     <MESSAGE value="Added Graphics in UI to display option to Pilot." />
     <MESSAGE value="Added learning mode and change sensor authority to flightdata input link." />
-    <option name="LAST_COMMIT_MESSAGE" value="Added learning mode and change sensor authority to flightdata input link." />
+    <MESSAGE value="Added learning mode and change sensor authority to flight data input link." />
+    <option name="LAST_COMMIT_MESSAGE" value="Added learning mode and change sensor authority to flight data input link." />
   </component>
 </project>

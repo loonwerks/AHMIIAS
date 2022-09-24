@@ -435,6 +435,28 @@ public class CopilotTakeoffAgent extends XPlaneAgent
             double sensorErrors[] = votingobj.checkForReliability(UIobj.positions,data.altitude);
             UIobj.barObj.error = Math.min(sensorErrors[0],sensorErrors[1]);
             try {
+                System.out.println(UIobj.learningModeUpdate);
+                System.out.println(UIobj.authorityToChangeUpdate +"\n");
+                if(UIobj.learningModeUpdate != -1){
+                    if (UIobj.learningModeUpdate == 0){
+                        USE_LEARNING = true;
+                        UIobj.sensorChangeLearningObj.learningModeInfo=true;
+                    }
+                    else if(UIobj.learningModeUpdate == 1){
+                        USE_LEARNING = false;
+                        UIobj.sensorChangeLearningObj.learningModeInfo=false;
+                    }
+                }
+                if(UIobj.authorityToChangeUpdate != -1){
+                    if (UIobj.authorityToChangeUpdate == 0) {
+                        CHANGE_SENSOR_AUTHORITY = true;
+                        UIobj.sensorChangeLearningObj.authorityToChangeInfo = true;
+                    }
+                    else if(UIobj.authorityToChangeUpdate == 1){
+                        CHANGE_SENSOR_AUTHORITY = false;
+                        UIobj.sensorChangeLearningObj.authorityToChangeInfo=false;
+                    }
+                }
                 if(this.USE_LEARNING){
                     if (!this.trialActive){
                         this.trial_count += 1;
@@ -552,26 +574,7 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                     UIobj.abortLanding = false;
                     xpcobj.setAutopilot(162);
                 }
-                if(UIobj.learningModeUpdate != -1){
-                    if (UIobj.learningModeUpdate == 0){
-                        USE_LEARNING = true;
-                        UIobj.sensorChangeLearningObj.learningModeInfo=true;
-                    }
-                    else if(UIobj.learningModeUpdate == 1){
-                        USE_LEARNING = false;
-                        UIobj.sensorChangeLearningObj.learningModeInfo=false;
-                    }
-                }
-                if(UIobj.authorityToChangeUpdate != -1){
-                    if (UIobj.authorityToChangeUpdate == 0) {
-                        CHANGE_SENSOR_AUTHORITY = true;
-                        UIobj.sensorChangeLearningObj.authorityToChangeInfo = true;
-                    }
-                    else if(UIobj.authorityToChangeUpdate == 1){
-                        CHANGE_SENSOR_AUTHORITY = false;
-                        UIobj.sensorChangeLearningObj.authorityToChangeInfo=false;
-                    }
-                }
+
                 if(xpcobj.getAutopilotState() != 162){
                     xpcobj.setAutopilot(162);
 
@@ -620,10 +623,10 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                 InputWme LIDARerr = builder.getWme("lidar-error");
                 LIDARerr.update(syms.createDouble(Math.min(sensorErrors[0],sensorErrors[2])));
 
-                InputWme USE_Learning  =builder.getWme("learningMode");
-                USE_Learning.update(syms.createString(UIobj.sensorChangeLearningObj.learningModeInfo ? "on" : "off"));
-                InputWme CHANGE_SENSOR_AUTHORITY  =builder.getWme("changeSensorAuth");
-                CHANGE_SENSOR_AUTHORITY.update(syms.createString(UIobj.sensorChangeLearningObj.authorityToChangeInfo ? "on" : "off"));
+                InputWme learningModeWme  =builder.getWme("learningMode");
+                learningModeWme.update(syms.createString(UIobj.sensorChangeLearningObj.learningModeInfo ? "on" : "off"));
+                InputWme sensorChangeAuthWme  =builder.getWme("changeSensorAuth");
+                sensorChangeAuthWme.update(syms.createString(UIobj.sensorChangeLearningObj.authorityToChangeInfo ? "on" : "off"));
 
 
                 InputWme initiatedLandingWme = builder.getWme("initiate-landing");

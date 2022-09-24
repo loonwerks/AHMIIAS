@@ -356,8 +356,19 @@ public class XPCUserInterface extends JFrame implements Runnable{
 
         @Override
         public void mouseClicked(MouseEvent mouseEvent) {
+            System.err.println(learningMode.getSelectedOption(mx,my) +" is the value");
             if(!errorInGPS && InduceErrorButton.button.intersects(new Rectangle(mx,my,1,1))){
                 injectError();
+            }else if(learningMode.getSelectedOption(mx,my) != -1) {
+                System.err.println(learningMode.getSelectedOption(mx,my) +" is the value");
+                if (learningMode.getSelectedOption(mx,my) == 0){
+                    learningModeUpdate = 0;
+                }else {
+                    learningModeUpdate = learningMode.getSelectedOption(mx, my);
+                }
+                System.err.println(learningModeUpdate +" is the update");
+            }else if(authorityToChange.getSelectedOption(mx,my) != -1) {
+                authorityToChangeUpdate = authorityToChange.getSelectedOption(mx,my);
             }else if(!errorInGPS && InduceIncrementalErrorButton.button.intersects(new Rectangle(mx,my,1,1))){
                 injectIncrementalError();
             }else if(SensorUnreliable == -1 && SensorPossiblyUnreliable != -1  && AcknowledgeErrorButton.button.intersects(new Rectangle(mx,my,1,1))){
@@ -371,10 +382,6 @@ public class XPCUserInterface extends JFrame implements Runnable{
                 abortLanding = true;
             }else if(landingOptions.getSelectedOption(mx,my) != -1) {
                 reroutedLandingZone = landingOptions.getSelectedOption(mx, my);
-            }else if(learningMode.getSelectedOption(mx,my) != -1) {
-                learningModeUpdate = learningMode.getSelectedOption(mx,my);
-            }else if(authorityToChange.getSelectedOption(mx,my) != -1) {
-                authorityToChangeUpdate = authorityToChange.getSelectedOption(mx,my);
             }
         }
 
