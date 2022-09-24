@@ -435,8 +435,6 @@ public class CopilotTakeoffAgent extends XPlaneAgent
             double sensorErrors[] = votingobj.checkForReliability(UIobj.positions,data.altitude);
             UIobj.barObj.error = Math.min(sensorErrors[0],sensorErrors[1]);
             try {
-                System.out.println(UIobj.learningModeUpdate);
-                System.out.println(UIobj.authorityToChangeUpdate +"\n");
                 if(UIobj.learningModeUpdate != -1){
                     if (UIobj.learningModeUpdate == 0){
                         USE_LEARNING = true;

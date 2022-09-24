@@ -356,17 +356,14 @@ public class XPCUserInterface extends JFrame implements Runnable{
 
         @Override
         public void mouseClicked(MouseEvent mouseEvent) {
-            System.err.println(learningMode.getSelectedOption(mx,my) +" is the value");
             if(!errorInGPS && InduceErrorButton.button.intersects(new Rectangle(mx,my,1,1))){
                 injectError();
             }else if(learningMode.getSelectedOption(mx,my) != -1) {
-                System.err.println(learningMode.getSelectedOption(mx,my) +" is the value");
                 if (learningMode.getSelectedOption(mx,my) == 0){
                     learningModeUpdate = 0;
                 }else {
                     learningModeUpdate = learningMode.getSelectedOption(mx, my);
                 }
-                System.err.println(learningModeUpdate +" is the update");
             }else if(authorityToChange.getSelectedOption(mx,my) != -1) {
                 authorityToChangeUpdate = authorityToChange.getSelectedOption(mx,my);
             }else if(!errorInGPS && InduceIncrementalErrorButton.button.intersects(new Rectangle(mx,my,1,1))){
