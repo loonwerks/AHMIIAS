@@ -149,8 +149,9 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                 add("abort-landing", UIobj.startedLandingProcedure).markWme("abort-landing").
                 add("distance-to-target", UIobj.distanceToTarget).markWme("distance-to-target").
                 add("sensor-alert-accepted", "nil").markWme("sensor-alert-accepted").
-                add("reversersON", reversersON).markWme("reverse");
-
+                add("reversersON", reversersON).markWme("reverse").
+                add("learningMode", "false").markWme("learningMode").
+                add("changeSensorAuth", "false").markWme("changeSensorAuth");
         try {
 
             rlWriter = new PrintWriter("C:/soar/preference_values.txt");
@@ -551,6 +552,22 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                     UIobj.abortLanding = false;
                     xpcobj.setAutopilot(162);
                 }
+                if(UIobj.learningModeUpdate != false){
+                    USE_LEARNING = true;
+                    UIobj.sensorChangeLearningObj.learningModeInfo=true;
+                }
+                if(UIobj.authorityToChangeUpdate != false){
+                    CHANGE_SENSOR_AUTHORITY = true;
+                    UIobj.sensorChangeLearningObj.authorityToChangeInfo=true;
+                }
+                if(UIobj.learningModeUpdate == false){
+                    USE_LEARNING = false;
+                    UIobj.sensorChangeLearningObj.learningModeInfo=false;
+                }
+                if(UIobj.authorityToChangeUpdate == false){
+                    CHANGE_SENSOR_AUTHORITY = false;
+                    UIobj.sensorChangeLearningObj.authorityToChangeInfo=false;
+                }
                 if(xpcobj.getAutopilotState() != 162){
                     xpcobj.setAutopilot(162);
 
@@ -599,8 +616,11 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                 InputWme LIDARerr = builder.getWme("lidar-error");
                 LIDARerr.update(syms.createDouble(Math.min(sensorErrors[0],sensorErrors[2])));
 
-//                InputWme USE_Learning  =builder.getWme("use-learning");
-//                USE_Learning.update(syms.createString(learning));
+                InputWme USE_Learning  =builder.getWme("learningMode");
+                USE_Learning.update(syms.createString(UIobj.learningModeUpdate ? "on" : "off"));
+                InputWme CHANGE_SENSOR_AUTHORITY  =builder.getWme("changeSensorAuth");
+                CHANGE_SENSOR_AUTHORITY.update(syms.createString(UIobj.authorityToChangeUpdate ? "on" : "off"));
+
 
                 InputWme initiatedLandingWme = builder.getWme("initiate-landing");
                 initiatedLandingWme.update(syms.createString(UIobj.startedLandingProcedure ? "yes":"no"));
