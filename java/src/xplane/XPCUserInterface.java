@@ -32,8 +32,8 @@ public class XPCUserInterface extends JFrame implements Runnable{
     public String pilotDecision = "nil";
     public boolean displayLandingButton = false, startedLandingProcedure = false, abortLanding = false;
     public int reroutedLandingZone = -1;
-    public boolean learningModeUpdate = false;
-    public boolean authorityToChangeUpdate = false;
+    public int learningModeUpdate = -1;
+    public int authorityToChangeUpdate = -1;
     public int planeAirspeed=0, planeAltitude=0;
     private int mx=0,my=0;
     private boolean displayWarning = false;
@@ -346,8 +346,9 @@ public class XPCUserInterface extends JFrame implements Runnable{
             LandButton.update(mx,my);
             AbortLandingButton.update(mx,my);
             landingOptions.update(mx,my);
-            authorityToChange.update(mx,my);
             learningMode.update(mx,my);
+            authorityToChange.update(mx,my);
+
         }
     }
 
@@ -371,9 +372,9 @@ public class XPCUserInterface extends JFrame implements Runnable{
             }else if(landingOptions.getSelectedOption(mx,my) != -1) {
                 reroutedLandingZone = landingOptions.getSelectedOption(mx, my);
             }else if(learningMode.getSelectedOption(mx,my) != -1) {
-                learningModeUpdate = true;
+                learningModeUpdate = learningMode.getSelectedOption(mx,my);
             }else if(authorityToChange.getSelectedOption(mx,my) != -1) {
-                authorityToChangeUpdate = true;
+                authorityToChangeUpdate = authorityToChange.getSelectedOption(mx,my);
             }
         }
 
