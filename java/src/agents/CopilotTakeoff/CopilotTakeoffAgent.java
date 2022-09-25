@@ -621,9 +621,9 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                 InputWme LIDARerr = builder.getWme("lidar-error");
                 LIDARerr.update(syms.createDouble(Math.min(sensorErrors[0],sensorErrors[2])));
 
-                InputWme learningModeWme  =builder.getWme("learningMode");
+                InputWme learningModeWme  =builder.getWme("learning_mode");
                 learningModeWme.update(syms.createString(UIobj.sensorChangeLearningObj.learningModeInfo ? "on" : "off"));
-                InputWme sensorChangeAuthWme  =builder.getWme("changeSensorAuth");
+                InputWme sensorChangeAuthWme  =builder.getWme("change_sensor_auth");
                 sensorChangeAuthWme.update(syms.createString(UIobj.sensorChangeLearningObj.authorityToChangeInfo ? "on" : "off"));
 
 
