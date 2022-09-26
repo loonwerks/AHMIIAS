@@ -150,8 +150,8 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                 add("distance-to-target", UIobj.distanceToTarget).markWme("distance-to-target").
                 add("sensor-alert-accepted", "nil").markWme("sensor-alert-accepted").
                 add("reversersON", reversersON).markWme("reverse").
-                add("learningMode", "false").markWme("learningMode").
-                add("changeSensorAuth", "false").markWme("changeSensorAuth");
+                add("learning_mode", "false").markWme("learning_mode").
+                add("change_sensor_auth", "false").markWme("change_sensor_auth");
         try {
 
             rlWriter = new PrintWriter("C:/soar/preference_values.txt");
@@ -226,6 +226,7 @@ public class CopilotTakeoffAgent extends XPlaneAgent
             Wme nextWME = wmes.next();
             printWme(nextWME);
             //System.err.println(nextWME.getAttribute().asString().getValue());
+//            System.out.println(UIobj.selectedSensor + " is the selected sensor right now.");
             if (nextWME.getAttribute().asString().getValue().equals("throttle"))
             {
                 //System.err.println("HELLO");
@@ -241,7 +242,7 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                 }catch(Exception e){
 
                 }
-            }/*else if (nextWME.getAttribute().asString().getValue().equals("GPSUnreliable"))
+            }else if (nextWME.getAttribute().asString().getValue().equals("GPSUnreliable"))
             {
 
                 System.out.println(nextWME.getValue());
@@ -271,7 +272,7 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                     UIobj.SensorPossiblyUnreliable = 2;
                 }
 
-            }*/else if (nextWME.getAttribute().asString().getValue().equals("target-altitude"))
+            }else if (nextWME.getAttribute().asString().getValue().equals("target-altitude"))
             {
                 //System.err.println("HELLO");
                 System.out.println(nextWME.getValue());
@@ -319,13 +320,13 @@ public class CopilotTakeoffAgent extends XPlaneAgent
 
                 String txt = nextWME.getValue().toString();
                 if(txt.equalsIgnoreCase("lidar")){
-                    //UIobj.selectedSensor = 1;
+                    UIobj.selectedSensor = 1;
                 }else if(txt.equalsIgnoreCase("imu")){
-                    //UIobj.selectedSensor = 2;
+                    UIobj.selectedSensor = 2;
                 }else if(txt.equalsIgnoreCase("gps")){
-                    //UIobj.selectedSensor = 0;
+                    UIobj.selectedSensor = 0;
                 }
-                // UIobj.pilotDecision = "none";
+                UIobj.pilotDecision = "none";
             }else if (nextWME.getAttribute().asString().getValue().equals("clear-sensor-alert-response"))
             {
                 if(nextWME.getTimetag()>this.timeTagClear) {
@@ -345,7 +346,7 @@ public class CopilotTakeoffAgent extends XPlaneAgent
             {
                 System.out.println("alert-sensor-error");
                 String faultySensorName = nextWME.getValue().toString();
-                //UIobj.displayWarning(faultySensorName);
+                UIobj.displayWarning(faultySensorName);
 
 
 
@@ -455,6 +456,7 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                         UIobj.sensorChangeLearningObj.authorityToChangeInfo=false;
                     }
                 }
+//                System.out.println(USE_LEARNING + " is the mode for learning right now.");
                 if(this.USE_LEARNING){
                     if (!this.trialActive){
                         this.trial_count += 1;
@@ -621,9 +623,9 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                 InputWme LIDARerr = builder.getWme("lidar-error");
                 LIDARerr.update(syms.createDouble(Math.min(sensorErrors[0],sensorErrors[2])));
 
-                InputWme learningModeWme  =builder.getWme("learning_mode");
+                InputWme learningModeWme  = builder.getWme("learning_mode");
                 learningModeWme.update(syms.createString(UIobj.sensorChangeLearningObj.learningModeInfo ? "on" : "off"));
-                InputWme sensorChangeAuthWme  =builder.getWme("change_sensor_auth");
+                InputWme sensorChangeAuthWme  = builder.getWme("change_sensor_auth");
                 sensorChangeAuthWme.update(syms.createString(UIobj.sensorChangeLearningObj.authorityToChangeInfo ? "on" : "off"));
 
 
