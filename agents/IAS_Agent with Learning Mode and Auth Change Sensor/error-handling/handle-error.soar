@@ -1,0 +1,153 @@
+##!
+# @file
+#
+# @created rjones 20210118
+
+echo "\nLoading handle-error.soar"
+#change_sensor_auth
+### Original code commented out, refactored code below
+#sp {propose*detect*gps*error
+#    (state <s> ^flight-mode horizontal)
+#    (<s> ^sensor-unreliable no)
+#    (<s> ^io.input-link.flightdata <fd>)
+#    (<fd> ^gps-lidar-error <e1> > 10.0)
+#    (<fd> ^gps-imu-error <e2> > 10.0)
+#-->
+#    (write (crlf) |GPS is Unreliable!|)
+#    (write (crlf) |GPS - LIDAR error:| <e1>)
+#    (write (crlf) |GPS - IMU error:| <e2>)
+#    (<s> ^operator <o> + >)
+#    (<o> ^name gps-sensor-error-over-limit)
+#}
+#
+#sp {propose*detect*lidar*error
+#    (state <s> ^flight-mode horizontal)
+#    (<s> ^sensor-unreliable no)
+#    (<s> ^io.input-link.flightdata <fd>)
+#    (<fd> ^gps-lidar-error <e1> > 10.0)
+#    (<fd> ^lidar-imu-error <e2> > 10.0)
+#-->
+#    (write (crlf) |LIDAR is Unreliable!|)
+#    (write (crlf) |LIDAR - GPS error:| <e1>)
+#    (write (crlf) |LIDAR - IMU error:| <e2>)
+#    (<s> ^operator <o> + >)
+#    (<o> ^name lidar-sensor-error-over-limit)
+#}
+#
+#sp {propose*detect*imu*error
+#    (state <s> ^flight-mode horizontal)
+#    (<s> ^sensor-unreliable no)
+#    (<s> ^io.input-link.flightdata <fd>)
+#    (<fd> ^gps-imu-error <e1> > 10.0)
+#    (<fd> ^lidar-imu-error <e2> > 10.0)
+#-->
+#    (write (crlf) |IMU is Unreliable!|)
+#    (write (crlf) |IMU - GPS error:| <e1>)
+#    (write (crlf) |IMU - LIDAR error:| <e2>)
+#    (<s> ^operator <o> + >)
+#    (<o> ^name imu-sensor-error-over-limit)
+#}
+
+### Note that we are not handling the case where all three error thresholds
+### are violated
+
+# Previous Code
+# sp {top-state*elaborate*sensor-error-detected*gps
+#     (state <s> ^flight-mode horizontal
+#                ^sensor-unreliable no
+#                ^gps-error-info <gl> <gi>)
+#     (<gl> ^error gps-lidar
+#           ^warning-accepted yes)
+#     (<gi> ^error gps-imu
+#           ^warning-accepted yes)
+# -->
+#     (write (crlf) |GPS is Unreliable!|)
+#     (<s> ^sensor-error-detected gps)
+#     }
+
+
+# Previous Code  
+# sp {top-state*elaborate*sensor-error-detected*lidar
+#     (state <s> ^flight-mode horizontal
+#                ^sensor-unreliable no
+#                ^lidar-error-info <li> <gl>)
+#     (<li> ^error lidar-imu
+#           ^warning-accepted yes)
+#     (<gl> ^error gps-lidar
+#           ^warning-accepted yes)
+# -->
+#     (write (crlf) |LIDAR is Unreliable!|)
+#     (<s> ^sensor-error-detected lidar)
+#     }
+# Previous Code  
+# sp {top-state*elaborate*sensor-error-detected*imu
+#     (state <s> ^flight-mode horizontal
+#                ^sensor-unreliable no
+#                ^imu-error-info <li> <gi>)
+#     (<li> ^error lidar-imu
+#           ^warning-accepted yes)
+#     (<gi> ^error gps-imu
+#           ^warning-accepted yes)
+# -->
+#     (write (crlf) |IMU is Unreliable!|)
+#     (<s> ^sensor-error-detected imu)
+#     }
+
+proc generateSensorErrorDetected { types } {
+	foreach type $types {
+		sp "top-state*elaborate*sensor-error-detected*${type}
+            (state <s> ^flight-mode horizontal
+                    ^sensor-unreliable no
+                    ^${type}-error-info <ei>
+                    ^io.input-link.flightdata <fd>)
+            (<fd> ^change_sensor_auth on)
+            (<ei> ^warning-accepted yes)
+        -->
+            (write (crlf) |${type} is Unreliable!|)
+            (<s> ^sensor-error-detected ${type})
+		"
+    	}
+}
+
+generateSensorErrorDetected { gps lidar imu }
+
+
+sp {propose*sensor-error-over-limit
+    (state <s> ^sensor-unreliable no
+               ^sensor-error-detected <sensor>)
+-->
+    (<s> ^operator <o> + >,=)
+    (<o> ^name sensor-error-over-limit
+         ^sensor <sensor>)
+    }
+
+# pilot acknowledgement
+sp {propose*pilot-agrees
+    (state <s> ^flight-mode horizontal
+               ^sensor-unreliable yes
+              -^error-handling-complete yes)
+    (<s> ^io.input-link.flightdata <fd>)
+    (<fd> ^pilot_decision agree)
+-->
+    (write (crlf) |Pilot agrees.|)
+
+    (<s> ^operator <o> + >,=)
+    (<o> ^name pilot-agrees)
+}
+
+# pilot disagrees
+sp {propose*pilot-disagrees
+    (state <s> ^flight-mode horizontal
+               ^sensor-unreliable yes
+              -^error-handling-complete yes)
+    (<s> ^io.input-link.flightdata <fd>)
+    (<fd> ^pilot_decision disagree)
+-->
+    (write (crlf) |Pilot disagrees.|)
+
+    (<s> ^operator <o> + >,=)
+    (<o> ^name pilot-disagrees)
+}
+
+
+

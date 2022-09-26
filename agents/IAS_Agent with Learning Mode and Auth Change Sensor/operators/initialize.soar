@@ -1,0 +1,39 @@
+##!
+# @file
+#
+# @created rjones 20210118
+
+echo "\nLoading initialize.soar"
+
+sp {apply*initialize
+    (state <s> ^operator.name initialize
+               ^io.output-link <out>)
+-->
+    (<s> ^name takeoff)
+    (<s> ^flight-mode vertical)
+    (<s> ^sensor-unreliable no)
+    (<s> ^faulty-sensor none)
+    (<s> ^landing no)
+    (<s> ^notified-pilot no)
+    (<s> ^gps-error-info <egps>)
+    (<egps> ^name gps )
+    #(<egps> ^current-value 0.0)
+    (<egps> ^old-value 0.0)
+    (<s> ^lidar-error-info <elidar>)
+    (<elidar> ^name lidar )
+    #(<elidar> ^current-value 0.0)
+    (<elidar> ^old-value 0.0)
+    (<s> ^imu-error-info <eimu>)
+    (<eimu> ^name imu )
+    #(<eimu> ^current-value 0.0)
+    (<eimu> ^old-value 0.0)
+    (<out> ^target-altitude 5000)
+    (<out> ^throttle 0.0)
+    (<out> ^autoflaps off)
+    (<out> ^air-brake 0.0)
+    (<out>  ^alert-sensor-error-value 0.0)
+    (<out> ^alert-sensor-error gps)
+    (write (crlf) |Agent initialized.|)
+
+}
+
