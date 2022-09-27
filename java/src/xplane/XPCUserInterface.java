@@ -75,8 +75,8 @@ public class XPCUserInterface extends JFrame implements Runnable{
     }
     public void acknowledgeError(){
         SensorUnreliable = SensorPossiblyUnreliable;
-        /*if(selectedSensor == SensorUnreliable)
-            selectedSensor = (selectedSensor + 1) % 3;*/
+        if(selectedSensor == SensorUnreliable)
+            selectedSensor = (selectedSensor + 1) % 3;
         pilotDecision = "yes";
     }
     public void denyError(){
