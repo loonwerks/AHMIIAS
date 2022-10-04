@@ -30,7 +30,7 @@ public class XPCUserInterface extends JFrame implements Runnable{
     public int SensorUnreliable = -1;
     public String faultySensorName = "none";
     public String pilotDecision = "nil";
-    public boolean displayLandingButton = false, startedLandingProcedure = false, abortLanding = false;
+    public boolean displayLandingButton = false, startedLandingProcedure = false, abortLanding = false, finishedTakeoff = false;
     public int reroutedLandingZone = -1;
     public int learningModeUpdate = -1;
     public int authorityToChangeUpdate = -1;
@@ -263,10 +263,15 @@ public class XPCUserInterface extends JFrame implements Runnable{
             g.setFont(textFont2);
             landingOptions.draw(g);
         }
-        learningMode.draw(g);
-        authorityToChange.draw(g);
+        if(!startedLandingProcedure && finishedTakeoff) {
+            learningMode.draw(g);
+            sensorChangeLearningObj.paintLearningMode(g);
+            if(!sensorChangeLearningObj.learningModeInfo) {
+                sensorChangeLearningObj.paintAuthorityToChange(g);
+                authorityToChange.draw(g);
+            }
+        }
         displayObj.paint(g);
-        sensorChangeLearningObj.paint(g);
         BufferedImage barImg = new BufferedImage(500,500, BufferedImage.TYPE_INT_ARGB);
         barObj.draw(barImg.getGraphics());
         barObj.warnHigh = displayObj.warnHigh;

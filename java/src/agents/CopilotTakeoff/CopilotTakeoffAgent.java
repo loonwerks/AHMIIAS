@@ -403,6 +403,7 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                 //System.err.println(txt);
                 if(txt.equalsIgnoreCase("vertical")){
                     xpcobj.setVTOLModeVertical();
+                    UIobj.finishedTakeoff=false;
                     if(xpcobj.getAutopilotState() == 164)
                         xpcobj.setAutopilot(162);
                     ///xpcobj.setAutopilot(164);
@@ -410,6 +411,7 @@ public class CopilotTakeoffAgent extends XPlaneAgent
 
                 }else if(txt.equalsIgnoreCase("horizontal")){
                     xpcobj.setVTOLModeHorizontal();
+                    UIobj.finishedTakeoff=true;
                     if(xpcobj.getAutopilotState() == 164)
                         xpcobj.setAutopilot(162);
 
@@ -456,7 +458,6 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                         UIobj.sensorChangeLearningObj.authorityToChangeInfo=false;
                     }
                 }
-//                System.out.println(USE_LEARNING + " is the mode for learning right now.");
                 if(this.USE_LEARNING){
                     if (!this.trialActive){
                         this.trial_count += 1;
