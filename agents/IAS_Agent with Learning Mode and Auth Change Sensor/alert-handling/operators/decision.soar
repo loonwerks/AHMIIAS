@@ -1,0 +1,10 @@
+echo "\nLoading decision.soar"
+
+sp {decision*apply
+    :o-support
+    (state <s> ^operator <o>)
+    (<o> ^name decision)
+-->
+    (<s> ^ready-to-decide yes +)
+    (write (crlf) |applied decision|)
+}

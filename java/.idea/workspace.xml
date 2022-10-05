@@ -4,11 +4,26 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6bb3fedb-805b-44ac-ab51-e1904d37b78c" name="Default Changelist" comment="Updated with Year 1 Work" />
+    <list default="true" id="6bb3fedb-805b-44ac-ab51-e1904d37b78c" name="Default Changelist" comment="GUI Updates">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/xplane/XPCUserInterface.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/xplane/XPCUserInterface.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/agents/CopilotTakeoff/CopilotTakeoffAgent.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/agents/CopilotTakeoff/CopilotTakeoffAgent.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/xplane/XPCUserInterface$KeyboardListener.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/xplane/XPCUserInterface$KeyboardListener.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/xplane/XPCUserInterface$MouseEventListener.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/xplane/XPCUserInterface$MouseEventListener.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/xplane/XPCUserInterface$MouseMoveListener.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/xplane/XPCUserInterface$MouseMoveListener.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/xplane/XPCUserInterface.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/xplane/XPCUserInterface.class" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
@@ -30,7 +45,10 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../AHMIIAS-Year_1/java" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/.." />
+    <property name="project.structure.last.edited" value="Modules" />
+    <property name="project.structure.proportion" value="0.0" />
+    <property name="project.structure.side.proportion" value="0.40735874" />
   </component>
   <component name="RunManager">
     <configuration name="StartAgents" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
@@ -76,7 +94,98 @@
       <option name="project" value="LOCAL" />
       <updated>1656427420224</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Code Cleaning (dead print statements)">
+      <created>1662650220908</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1662650220908</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Added Changing Sensor Authority option for the pilot">
+      <created>1662651916144</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1662651916144</updated>
+    </task>
+    <task id="LOCAL-00005" summary="Updating Java Code for Year 3 Agent Updates">
+      <created>1663939550578</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1663939550578</updated>
+    </task>
+    <task id="LOCAL-00006" summary="Added Graphics in UI to display option to Pilot.">
+      <created>1663942361967</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1663942361967</updated>
+    </task>
+    <task id="LOCAL-00007" summary="Added Graphics in UI to display option to Pilot.">
+      <created>1663946022444</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1663946022444</updated>
+    </task>
+    <task id="LOCAL-00008" summary="Added Graphics in UI to display option to Pilot.">
+      <created>1663954813646</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1663954813646</updated>
+    </task>
+    <task id="LOCAL-00009" summary="Added learning mode and change sensor authority to flightdata input link.">
+      <created>1664045434853</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1664045434853</updated>
+    </task>
+    <task id="LOCAL-00010" summary="Added learning mode and change sensor authority to flight data input link.">
+      <created>1664051561232</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1664051561232</updated>
+    </task>
+    <task id="LOCAL-00011" summary="Java Integration for Pilots response Completed">
+      <created>1664053621692</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1664053621692</updated>
+    </task>
+    <task id="LOCAL-00012" summary="Java Integration for Pilots response Completed">
+      <created>1664053660589</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1664053660589</updated>
+    </task>
+    <task id="LOCAL-00013" summary="Java Integration for Pilots response Completed">
+      <created>1664212240176</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1664212240176</updated>
+    </task>
+    <task id="LOCAL-00014" summary="Java Integration for Pilots response Completed">
+      <created>1664304066906</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1664304066906</updated>
+    </task>
+    <task id="LOCAL-00015" summary="GUI Updates">
+      <created>1664921596299</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1664921596299</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -89,10 +198,19 @@
         </entry>
       </map>
     </option>
+    <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Updated with Test UI Display" />
     <MESSAGE value="Updated with Year 1 Work" />
-    <option name="LAST_COMMIT_MESSAGE" value="Updated with Year 1 Work" />
+    <MESSAGE value="Code Cleaning (dead print statements)" />
+    <MESSAGE value="Added Changing Sensor Authority option for the pilot" />
+    <MESSAGE value="Updating Java Code for Year 3 Agent Updates" />
+    <MESSAGE value="Added Graphics in UI to display option to Pilot." />
+    <MESSAGE value="Added learning mode and change sensor authority to flightdata input link." />
+    <MESSAGE value="Added learning mode and change sensor authority to flight data input link." />
+    <MESSAGE value="Java Integration for Pilots response Completed" />
+    <MESSAGE value="GUI Updates" />
+    <option name="LAST_COMMIT_MESSAGE" value="GUI Updates" />
   </component>
 </project>

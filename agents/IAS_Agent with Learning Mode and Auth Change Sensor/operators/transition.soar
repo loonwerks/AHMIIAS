@@ -1,0 +1,22 @@
+##!
+# @file
+#
+# @created rjones 20210118
+
+echo "\nLoading transition.soar"
+
+sp {apply*transition
+    (state <s> ^operator.name transition
+               ^name takeoff
+               ^flight-mode <fm>
+               ^io.output-link <out>)
+
+-->
+    (<s> ^name takeoff -)
+    (<s> ^name flying +)
+    (<out> ^VTOLMode horizontal)
+    (<s> ^flight-mode <fm> -)
+    (<s> ^flight-mode horizontal +)
+    (write (crlf) |Transitioning to Horizontal mode...|)
+}
+

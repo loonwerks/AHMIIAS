@@ -1,0 +1,68 @@
+##!
+# @file
+#
+# @created rjones 20210122
+
+echo "\nLoading learning-rewards.soar"
+
+######################
+### Learning rewards
+
+### Finally, we set reward values on the reward-link, depending on whether the user accepted our
+### warning or not.  For this simple example, we will give a reward of 1.0 if the user accepts
+### the warning and a reward of -1.0 if the user rejects the warning.
+
+### Note that we do not get any user feedback if we choose NOT to warn.  So for this example, we
+### only get reward signals when we have chosen to warn.
+
+# sp {reward-link*elaborate*reward*accepted-warning
+#     (state <s> ^reward-link <rl>
+#                ^error-info.warning-accepted yes)
+# -->
+#     (write (crlf) |User accepted warning. Reward value is 1.0|)
+#     (<rl> ^reward <rr>)
+#     (<rr> ^value 1.0)
+#     }
+
+# sp {reward-link*elaborate*reward*rejected-warning
+#     (state <s> ^reward-link <rl>
+#                ^error-info.warning-accepted no)
+# -->
+#     (write (crlf) |User rejected warning. Reward value is -1.0|)
+#     (<rl> ^reward <rr>)
+#     (<rr> ^value -1.0)
+#     }
+
+proc generateRewardAccepted { types } {
+   foreach type $types {
+      sp "reward-link*elaborate*reward*accepted-warning*${type}
+            (state <s> ^reward-link <rl>
+                ^${type}-error-info.warning-accepted yes)
+            (<s> ^io.input-link.flightdata <fd>)
+            (<fd> ^learning_mode on)
+        -->
+            (write (crlf) |User accepted warning. Reward value is 1.0 for ${type} |)
+            (<rl> ^reward <rr>)
+            (<rr> ^value 1.0)
+            "
+   }
+}
+
+generateRewardAccepted { gps lidar imu }
+
+proc generateRewardRejected { types } {
+   foreach type $types {
+      sp "reward-link*elaborate*reward*rejected-warning*${type}
+            (state <s> ^reward-link <rl>
+                ^${type}-error-info.warning-accepted no)
+            (<s> ^io.input-link.flightdata <fd>)
+            (<fd> ^learning_mode on)
+        -->
+            (write (crlf) |User rejected warning. Reward value is -1.0 for ${type} |)
+            (<rl> ^reward <rr>)
+            (<rr> ^value -1.0)
+            "
+   }
+}
+
+generateRewardRejected { gps lidar imu }

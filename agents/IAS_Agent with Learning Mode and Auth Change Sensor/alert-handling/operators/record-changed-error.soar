@@ -1,0 +1,89 @@
+##!
+# @file
+#
+# @created rjones 20210121
+
+echo "\nLoading record-changed-error.soar"
+
+sp {record-changed-error*apply*remove-old-value*gps
+    (state <s> ^operator <o>)
+    (<o> ^name record-changed-error-gps)
+    (<s> ^gps-error-info <ei>)
+    (<ei> ^old-value <v>
+         -^value-changed true)
+    (<ei> ^current-value <> <v>)
+-->
+    (write (crlf) |Removing old-error value of | <v> | for gps|)  
+    #(<ei> ^value <v> -) Changed this!
+    (<ei> ^old-value <v> -)
+    }
+
+sp {record-changed-error*apply*remove-old-value*lidar
+    (state <s> ^operator <o>)
+    (<o> ^name record-changed-error-lidar)
+    (<s> ^lidar-error-info <ei>)
+        
+    (<ei> ^old-value <v>
+         -^value-changed true)
+    (<ei> ^current-value <> <v>)
+-->
+    (write (crlf) |Removing old-error value of | <v> | for lidar|)
+    #(<ei> ^value <v> -) Changed this!
+    (<ei> ^old-value <v> -)
+    }
+
+sp {record-changed-error*apply*remove-old-value*imu
+    (state <s> ^operator <o>)
+    (<o> ^name record-changed-error-imu)
+    (<s> ^imu-error-info <ei>)
+    (<ei> ^old-value <v>
+          -^value-changed true)
+    (<ei> ^current-value <> <v>)
+-->
+    (write (crlf) |Removing old-error value of | <v> | for imu|)
+    #(<ei> ^value <v> -) Changed this!
+    (<ei> ^old-value <v> -)
+    }
+
+sp {record-changed-error*apply*new-old-value*gps
+    (state <s> ^operator <o>)
+    (<o> ^name record-changed-error-gps)
+    (<s> ^gps-error-info <ei>)
+    (<ei> ^current-value <v>)
+    (<ei> -^old-value
+         -^value-changed true)
+-->
+    (write (crlf) |Recording new old-value of | <v> | and value-changed flag for gps|)
+    (<ei> ^old-value <v>
+          ^value-changed true)
+    (<ei> ^current-value <v> -)
+    }
+
+sp {record-changed-error*apply*new-old-value*lidar
+    (state <s> ^operator <o>)
+    (<o> ^name record-changed-error-lidar)
+    (<s> ^lidar-error-info <ei>)
+    (<ei> ^current-value <v>)
+    (<ei> -^old-value
+         -^value-changed true)
+-->
+    (write (crlf) |Recording new old-value of | <v> | and value-changed flag for lidar|)
+    (<ei> ^old-value <v>
+          ^value-changed true)
+    (<ei> ^current-value <v> -)
+    }
+
+sp {record-changed-error*apply*new-old-value*imu
+    (state <s> ^operator <o>)
+    (<o> ^name record-changed-error-imu)
+    (<s> ^imu-error-info <ei>)
+    (<ei> ^current-value <v>)
+    (<ei> -^old-value
+         -^value-changed true)
+-->
+    (write (crlf) |Recording new old-value of | <v> | and value-changed flag for imu|)
+    (<ei> ^old-value <v>
+          ^value-changed true)
+    (<ei> ^current-value <v> -)
+    }
+

@@ -1,0 +1,18 @@
+##!
+# @file
+#
+# @created rjones 20210118
+
+echo "\nLoading load.soar"
+
+source "settings.soar"
+
+source "top-level.soar"
+
+source "operators/load.soar"
+
+echo "\nNow Loading Error-Handling"
+
+source "error-handling/load.soar"
+
+source "alert-handling/load.soar"
