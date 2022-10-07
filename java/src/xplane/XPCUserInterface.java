@@ -242,7 +242,6 @@ public class XPCUserInterface extends JFrame implements Runnable{
             InduceIncrementalErrorButton.draw(g);
         }else if(SensorPossiblyUnreliable != -1 && SensorUnreliable == -1 && sensorChangeLearningObj.authorityToChangeInfo){
             g.drawString(sensorNames[SensorPossiblyUnreliable]+" may be unreliable!", 75, 630);
-
             AcknowledgeErrorButton.draw(g);
             DenyErrorButton.draw(g);
         }else if(SensorUnreliable != -1 && sensorChangeLearningObj.authorityToChangeInfo){
