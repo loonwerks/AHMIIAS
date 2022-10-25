@@ -318,6 +318,12 @@ public
 						(	(IAS.Output.Active_Sensor = 1 => pre(IAS.Output.Sensor1_Reliable))
 						and (IAS.Output.Active_Sensor = 2 => pre(IAS.Output.Sensor2_Reliable))
 						and (IAS.Output.Active_Sensor = 3 => pre(IAS.Output.Sensor3_Reliable))));
+						
+			lemma t_l48 "If the active sensor is reliable, then the active sensor is not changed to an unreliable sensor":
+				((prev(IAS.Output.Active_Sensor, 1) = 1) and IAS.Output.Sensor1_Reliable)
+				=>
+				(not (		(IAS.Output.Active_Sensor = 2 and (not IAS.Output.Sensor2_Reliable))
+						or	(IAS.Output.Active_Sensor = 3 and (not IAS.Output.Sensor3_Reliable))));
 		**};
 		
 	end Team.impl;
