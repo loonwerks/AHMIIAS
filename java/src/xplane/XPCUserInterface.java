@@ -32,6 +32,7 @@ public class XPCUserInterface extends JFrame implements Runnable{
     public String pilotDecision = "nil";
     public String pilotDecisionToChange ="nil";
     public boolean ErrorSensor = false;
+    public boolean errorReseted = false;
     public boolean displayLandingButton = false, startedLandingProcedure = false, abortLanding = false, finishedTakeoff = false;
     public int reroutedLandingZone = -1;
     public int learningModeUpdate = -1;
@@ -103,6 +104,9 @@ public class XPCUserInterface extends JFrame implements Runnable{
         SensorUnreliable = -1;
         faultySensorName = "none";
         pilotDecision = "nil";
+    }
+    public void errorReset(){
+        errorReseted = true;
     }
 
 
@@ -178,8 +182,8 @@ public class XPCUserInterface extends JFrame implements Runnable{
         InduceIncrementalErrorButton = new button("Incremental Error",580, 200, 320, 30);
         AcknowledgeErrorButton = new button("Acknowledge Error",80, 660, 320, 30);
         DenyErrorButton = new button("Deny Error",80, 720, 320, 30);
-        AcknowledgeChangeButton = new button("Acknowledge Error",80, 660, 320, 30);
-        DenyChangeButton = new button("Deny Error",80, 720, 320, 30);
+        AcknowledgeChangeButton = new button("Acknowledge Sensor Change",80, 660, 360, 30);
+        DenyChangeButton = new button("Deny Sensor Change",80, 720, 360, 30);
         LandButton = new button("Initiate Landing",80, 820, 320, 30);
         AbortLandingButton = new button("Abort Landing",80, 820, 320, 30);
         String optionText[] = {"Nellis AFB(KLSV)", "[H] Gilbert Development Corp (NV61)", "Las Vegas (VEGAS)"};
@@ -248,14 +252,14 @@ public class XPCUserInterface extends JFrame implements Runnable{
             }
         }
         g.setFont(textFont2);
-        if(!errorInGPS && !errorInIMU && !errorInLIDAR) {
+        if(!errorInGPS) {
             InduceErrorButton.draw(g);
             InduceIncrementalErrorButton.draw(g);
         }else if(SensorPossiblyUnreliable != -1 && SensorUnreliable == -1 && sensorChangeLearningObj.authorityToChangeInfo){
             g.drawString(sensorNames[SensorPossiblyUnreliable]+" may be unreliable!", 75, 630);
             AcknowledgeChangeButton.draw(g);
             DenyChangeButton.draw(g);
-        }else if(SensorUnreliable != -1 && sensorChangeLearningObj.authorityToChangeInfo){
+        }else if(SensorUnreliable != -1 && sensorChangeLearningObj.authorityToChangeInfo && errorInGPS){
             g.setColor(Color.BLACK);
             g.drawString(sensorNames[SensorUnreliable]+" error acknowledged.", 75, 680);
             g.drawString("Switched to "+sensorNames[selectedSensor]+" sensor.", 75, 700);
@@ -381,6 +385,7 @@ public class XPCUserInterface extends JFrame implements Runnable{
             }else if(learningMode.getSelectedOption(mx,my) != -1) {
                 if (learningMode.getSelectedOption(mx,my) == 0){
                     learningModeUpdate = 0;
+                    authorityToChangeUpdate = -1;
                 }else {
                     learningModeUpdate = learningMode.getSelectedOption(mx, my);
                 }

@@ -554,8 +554,10 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                         } else {
                             UIobj.denyForError();
                         }
+                        UIobj.errorReset();
                     }else{
                         UIobj.ErrorSensor=true;
+                        UIobj.errorReseted = false;
                     }
                 }
 
@@ -671,8 +673,6 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                 InputWme alertAccepted = builder.getWme("sensor-alert-accepted");
                 alertAccepted.update(syms.createString(UIobj.pilotDecision));
                 // temp
-
-
                 // uncomment if you want to see the productions that matches
                 MatchSet matchSet = sagt.getMatchSet();
 
