@@ -4,30 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6bb3fedb-805b-44ac-ab51-e1904d37b78c" name="Default Changelist" comment="GUI Updates">
-      <change afterPath="$PROJECT_DIR$/.idea/kotlinc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/XPlaneSoarConnector.iml" beforeDir="false" afterPath="$PROJECT_DIR$/XPlaneSoarConnector.iml" afterDir="false" />
+    <list default="true" id="6bb3fedb-805b-44ac-ab51-e1904d37b78c" name="Default Changelist" comment="Logic in case of no response from pilot">
       <change beforePath="$PROJECT_DIR$/src/agents/CopilotTakeoff/CopilotTakeoffAgent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/agents/CopilotTakeoff/CopilotTakeoffAgent.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/xplane/XPCUserInterface.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/xplane/XPCUserInterface.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/META-INF/XPlaneSoarConnector.kotlin_module" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/META-INF/XPlaneSoarConnector.kotlin_module" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/agents/AutoTakeoff$holdPosition$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/agents/AutoTakeoff$start$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/agents/AutoTakeoff$start$1.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/agents/AutoTakeoff$start$2.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/agents/AutoTakeoff$start$2.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/agents/AutoTakeoff$start$keepAttitude$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/agents/AutoTakeoff$start$keepAttitude$1.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/agents/AutoTakeoff$start$keepAttitude$2.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/agents/AutoTakeoff$start$keepAttitude$2.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/agents/AutoTakeoff$start$keepRoll$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/agents/AutoTakeoff$start$keepRoll$1.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/agents/AutoTakeoff$start$keepRoll$2.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/agents/AutoTakeoff$start$keepRoll$2.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/agents/AutoTakeoff$start$steerNoseWheel$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/agents/AutoTakeoff$start$steerNoseWheel$1.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/agents/AutoTakeoff$start$steerNoseWheel$2.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/agents/AutoTakeoff$start$steerNoseWheel$2.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/agents/AutoTakeoff.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/agents/AutoTakeoff.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/agents/CopilotTakeoff/CopilotTakeoffAgent.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/agents/CopilotTakeoff/CopilotTakeoffAgent.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/agents/InteractiveAgent$printUntilInput$printThread$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/agents/InteractiveAgent.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/agents/InteractiveAgent.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/xplane/XPCUserInterface$KeyboardListener.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/xplane/XPCUserInterface$KeyboardListener.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/xplane/XPCUserInterface$MouseEventListener.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/xplane/XPCUserInterface$MouseEventListener.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/xplane/XPCUserInterface$MouseMoveListener.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/xplane/XPCUserInterface$MouseMoveListener.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/xplane/XPCUserInterface.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/xplane/XPCUserInterface.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -217,7 +196,14 @@
       <option name="project" value="LOCAL" />
       <updated>1665170587683</updated>
     </task>
-    <option name="localTasksCounter" value="18" />
+    <task id="LOCAL-00018" summary="Logic in case of no response from pilot">
+      <created>1666791126184</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1666791126184</updated>
+    </task>
+    <option name="localTasksCounter" value="19" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -242,6 +228,7 @@
     <MESSAGE value="Added learning mode and change sensor authority to flight data input link." />
     <MESSAGE value="Java Integration for Pilots response Completed" />
     <MESSAGE value="GUI Updates" />
-    <option name="LAST_COMMIT_MESSAGE" value="GUI Updates" />
+    <MESSAGE value="Logic in case of no response from pilot" />
+    <option name="LAST_COMMIT_MESSAGE" value="Logic in case of no response from pilot" />
   </component>
 </project>

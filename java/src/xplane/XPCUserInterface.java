@@ -100,6 +100,7 @@ public class XPCUserInterface extends JFrame implements Runnable{
         SensorUnreliable = -1;
         faultySensorName = "none";
         pilotDecision = "nil";
+        pilotDecisionToChange = "nil";
     }
 
 

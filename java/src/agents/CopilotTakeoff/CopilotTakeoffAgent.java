@@ -650,10 +650,7 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                 ab.update(syms.createString(Boolean.toString(data.airBrakesON)));
                 InputWme re = builder.getWme("reverse");
                 re.update(syms.createString(Boolean.toString(data.reversersON)));
-
-
                 InputWme alertAccepted = builder.getWme("sensor-alert-accepted");
-
                 alertAccepted.update(syms.createString(UIobj.pilotDecision));
                 // temp
 
