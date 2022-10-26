@@ -31,6 +31,7 @@ import static xplane.XPlaneConnector.getFlightData;
 public class CopilotTakeoffAgent extends XPlaneAgent
 {
     boolean DISPLAYDETAILS = false;
+    boolean isAutomated = true;
     boolean USE_LEARNING = false; //default learning mode set to false
     boolean CHANGE_SENSOR_AUTHORITY = false; //default pilot's choice for changing sensor
     private SymbolFactory syms;
@@ -325,7 +326,7 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                 }else if(txt.equalsIgnoreCase("gps")){
                     UIobj.selectedSensor = 0;
                 }
-                UIobj.pilotDecision = "none";
+                UIobj.pilotDecisionToChange = "nil";
             }else if (nextWME.getAttribute().asString().getValue().equals("clear-sensor-alert-response"))
             {
                 if(nextWME.getTimetag()>this.timeTagClear) {
@@ -369,11 +370,15 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                 }
                 UIobj.displayWarning("gps");
                 // Accept High error
-                if (err >= 9.0) {
-                    UIobj.acknowledgeForError();
-                    // Deny Low error
-                } else {
-                    UIobj.denyForError();
+                if(isAutomated) {
+                    if (err >= 9.0) {
+                        UIobj.acknowledgeForError();
+                        // Deny Low error
+                    } else {
+                        UIobj.denyForError();
+                    }
+                }else{
+                    UIobj.ErrorSensor=true;
                 }
 
 
@@ -487,13 +492,17 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                     if(this.trialActive) {
                         this.cycleCount++;
                         // incase previous response was missed
-                        if (this.cycleCount == 18 + timeOffset) {
-                            // 0: gps-lidar, 1:gps-imu, 2: imu-lidar
-                            if (Math.min(sensorErrors[0], sensorErrors[1]) >= 9.0) {
-                                UIobj.acknowledgeForError();
-                            } else {
-                                UIobj.denyForError();
+                        if(isAutomated) {
+                            if (this.cycleCount == 18 + timeOffset) {
+                                // 0: gps-lidar, 1:gps-imu, 2: imu-lidar
+                                if (Math.min(sensorErrors[0], sensorErrors[1]) >= 9.0) {
+                                    UIobj.acknowledgeForError();
+                                } else {
+                                    UIobj.denyForError();
+                                }
                             }
+                        }else{
+                            UIobj.ErrorSensor = true;
                         }
 
                         if (this.cycleCount == 20 + timeOffset) {

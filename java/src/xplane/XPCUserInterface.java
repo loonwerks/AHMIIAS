@@ -31,6 +31,7 @@ public class XPCUserInterface extends JFrame implements Runnable{
     public String faultySensorName = "none";
     public String pilotDecision = "nil";
     public String pilotDecisionToChange ="nil";
+    public boolean ErrorSensor = false;
     public boolean displayLandingButton = false, startedLandingProcedure = false, abortLanding = false, finishedTakeoff = false;
     public int reroutedLandingZone = -1;
     public int learningModeUpdate = -1;
@@ -39,7 +40,7 @@ public class XPCUserInterface extends JFrame implements Runnable{
     private int mx=0,my=0;
     private boolean displayWarning = false;
 
-    private button  InduceErrorButton,InduceIncrementalErrorButton, AcknowledgeErrorButton, DenyErrorButton, LandButton, AbortLandingButton;
+    private button  InduceErrorButton,InduceIncrementalErrorButton, AcknowledgeErrorButton, DenyErrorButton, AcknowledgeChangeButton, DenyChangeButton, LandButton, AbortLandingButton;
     private RadioButton learningMode, authorityToChange,landingOptions;
 
     public PreferenceValueDisplay displayObj;
@@ -100,7 +101,6 @@ public class XPCUserInterface extends JFrame implements Runnable{
         SensorUnreliable = -1;
         faultySensorName = "none";
         pilotDecision = "nil";
-        pilotDecisionToChange = "nil";
     }
 
 
@@ -176,6 +176,8 @@ public class XPCUserInterface extends JFrame implements Runnable{
         InduceIncrementalErrorButton = new button("Incremental Error",580, 200, 320, 30);
         AcknowledgeErrorButton = new button("Acknowledge Error",80, 660, 320, 30);
         DenyErrorButton = new button("Deny Error",80, 720, 320, 30);
+        AcknowledgeChangeButton = new button("Acknowledge Error",80, 660, 320, 30);
+        DenyChangeButton = new button("Deny Error",80, 720, 320, 30);
         LandButton = new button("Initiate Landing",80, 820, 320, 30);
         AbortLandingButton = new button("Abort Landing",80, 820, 320, 30);
         String optionText[] = {"Nellis AFB(KLSV)", "[H] Gilbert Development Corp (NV61)", "Las Vegas (VEGAS)"};
@@ -244,25 +246,27 @@ public class XPCUserInterface extends JFrame implements Runnable{
             }
         }
         g.setFont(textFont2);
-
         if(!errorInGPS && !errorInIMU && !errorInLIDAR) {
             InduceErrorButton.draw(g);
             InduceIncrementalErrorButton.draw(g);
         }else if(SensorPossiblyUnreliable != -1 && SensorUnreliable == -1 && sensorChangeLearningObj.authorityToChangeInfo){
             g.drawString(sensorNames[SensorPossiblyUnreliable]+" may be unreliable!", 75, 630);
-            AcknowledgeErrorButton.draw(g);
-            DenyErrorButton.draw(g);
+            AcknowledgeChangeButton.draw(g);
+            DenyChangeButton.draw(g);
         }else if(SensorUnreliable != -1 && sensorChangeLearningObj.authorityToChangeInfo){
             g.setColor(Color.BLACK);
             g.drawString(sensorNames[SensorUnreliable]+" error acknowledged.", 75, 680);
             g.drawString("Switched to "+sensorNames[selectedSensor]+" sensor.", 75, 700);
+        }
+        if(ErrorSensor == true){
+            AcknowledgeErrorButton.draw(g);
+            DenyErrorButton.draw(g);
         }
         if(!startedLandingProcedure && displayLandingButton){
             LandButton.draw(g);
         }else if(startedLandingProcedure && !abortLanding){
             AbortLandingButton.draw(g);
         }
-
         drawTestUI(g);
         if(abortLanding){
             g.setFont(textFont1);
@@ -353,6 +357,8 @@ public class XPCUserInterface extends JFrame implements Runnable{
             my = mouseEvent.getY();
             InduceErrorButton.update(mx,my);
             InduceIncrementalErrorButton.update(mx,my);
+            AcknowledgeChangeButton.update(mx,my);
+            DenyChangeButton.update(mx,my);
             AcknowledgeErrorButton.update(mx,my);
             DenyErrorButton.update(mx,my);
             LandButton.update(mx,my);
@@ -378,9 +384,9 @@ public class XPCUserInterface extends JFrame implements Runnable{
                 }
             }else if(authorityToChange.getSelectedOption(mx,my) != -1) {
                 authorityToChangeUpdate = authorityToChange.getSelectedOption(mx,my);
-            }else if(SensorUnreliable == -1 && SensorPossiblyUnreliable != -1  && AcknowledgeErrorButton.button.intersects(new Rectangle(mx,my,1,1))){
+            }else if(SensorUnreliable == -1 && SensorPossiblyUnreliable != -1  && AcknowledgeChangeButton.button.intersects(new Rectangle(mx,my,1,1))){
                 acknowledgeChange();
-            }else if(SensorPossiblyUnreliable != -1 && DenyErrorButton.button.intersects(new Rectangle(mx,my,1,1))) {
+            }else if(SensorPossiblyUnreliable != -1 && DenyChangeButton.button.intersects(new Rectangle(mx,my,1,1))) {
                 denyChange();
             }else if(!errorInGPS && InduceIncrementalErrorButton.button.intersects(new Rectangle(mx,my,1,1))){
                 injectIncrementalError();
@@ -391,6 +397,11 @@ public class XPCUserInterface extends JFrame implements Runnable{
                 abortLanding = true;
             }else if(landingOptions.getSelectedOption(mx,my) != -1) {
                 reroutedLandingZone = landingOptions.getSelectedOption(mx, my);
+            }else if(ErrorSensor && AcknowledgeErrorButton.button.intersects(new Rectangle(mx,my,1,1))){
+                acknowledgeForError();
+            } else if (ErrorSensor && DenyErrorButton.button.intersects(new Rectangle(mx,my,1,1))) {
+                denyForError();
+
             }
         }
 
