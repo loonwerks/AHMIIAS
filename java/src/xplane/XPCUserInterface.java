@@ -30,6 +30,7 @@ public class XPCUserInterface extends JFrame implements Runnable{
     public int SensorUnreliable = -1;
     public String faultySensorName = "none";
     public String pilotDecision = "nil";
+    public String pilotDecisionToChange ="nil";
     public boolean displayLandingButton = false, startedLandingProcedure = false, abortLanding = false, finishedTakeoff = false;
     public int reroutedLandingZone = -1;
     public int learningModeUpdate = -1;
@@ -73,15 +74,21 @@ public class XPCUserInterface extends JFrame implements Runnable{
         //errorLon = 0.1f;
 
     }
-    public void acknowledgeError(){
+    public void acknowledgeForError(){
+        pilotDecision = "yes";
+    }
+    public void denyForError(){
+        pilotDecision = "no";
+    }
+    public void acknowledgeChange(){
         SensorUnreliable = SensorPossiblyUnreliable;
         if(selectedSensor == SensorUnreliable)
             selectedSensor = (selectedSensor + 1) % 3;
-        pilotDecision = "yes";
+        pilotDecisionToChange = "yes";
     }
-    public void denyError(){
+    public void denyChange(){
         SensorPossiblyUnreliable = -1;
-        pilotDecision = "no";
+        pilotDecisionToChange = "no";
     }
     public void reset(){
         displayWarning = false;
@@ -237,7 +244,7 @@ public class XPCUserInterface extends JFrame implements Runnable{
         }
         g.setFont(textFont2);
 
-        if(!errorInGPS) {
+        if(!errorInGPS && !errorInIMU && !errorInLIDAR) {
             InduceErrorButton.draw(g);
             InduceIncrementalErrorButton.draw(g);
         }else if(SensorPossiblyUnreliable != -1 && SensorUnreliable == -1 && sensorChangeLearningObj.authorityToChangeInfo){
@@ -370,12 +377,12 @@ public class XPCUserInterface extends JFrame implements Runnable{
                 }
             }else if(authorityToChange.getSelectedOption(mx,my) != -1) {
                 authorityToChangeUpdate = authorityToChange.getSelectedOption(mx,my);
+            }else if(SensorUnreliable == -1 && SensorPossiblyUnreliable != -1  && AcknowledgeErrorButton.button.intersects(new Rectangle(mx,my,1,1))){
+                acknowledgeChange();
+            }else if(SensorPossiblyUnreliable != -1 && DenyErrorButton.button.intersects(new Rectangle(mx,my,1,1))) {
+                denyChange();
             }else if(!errorInGPS && InduceIncrementalErrorButton.button.intersects(new Rectangle(mx,my,1,1))){
                 injectIncrementalError();
-            }else if(SensorUnreliable == -1 && SensorPossiblyUnreliable != -1  && AcknowledgeErrorButton.button.intersects(new Rectangle(mx,my,1,1))){
-                acknowledgeError();
-            }else if(SensorPossiblyUnreliable != -1 && DenyErrorButton.button.intersects(new Rectangle(mx,my,1,1))) {
-                denyError();
             }else if(!startedLandingProcedure && LandButton.button.intersects(new Rectangle(mx,my,1,1))){
                 //initiate landing
                 startedLandingProcedure = true;

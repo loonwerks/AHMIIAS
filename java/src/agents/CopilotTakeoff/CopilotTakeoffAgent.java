@@ -169,7 +169,6 @@ public class CopilotTakeoffAgent extends XPlaneAgent
             //System.out.println(pathToSoar);
             // PATH TO SOAR FILE IMPORTANT
             //pathToSoar = "C:/Users/ahmii/learning_agent/FIT_AHMIIAS-master/lvca/code/LearningPrototype/src/main/soar/com/soartech/integrated-learning-agent/load.soar";
-//            pathToSoar = "C:/experimental_soar_agent/integrated-learning-agent/load.soar";
             pathToSoar = "C:/Github Projects -Parth/Soar-Agent_Year-3/soar_agent (Year 3)/integrated-learning-agent/load.soar";
             SoarCommands.source(sagt.getInterpreter(), pathToSoar);
             System.out.println("There are now " + sagt.getProductions().getProductionCount() + " productions loaded");
@@ -371,10 +370,10 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                 UIobj.displayWarning("gps");
                 // Accept High error
                 if (err >= 9.0) {
-                    UIobj.acknowledgeError();
+                    UIobj.acknowledgeForError();
                     // Deny Low error
                 } else {
-                    UIobj.denyError();
+                    UIobj.denyForError();
                 }
 
 
@@ -491,9 +490,9 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                         if (this.cycleCount == 18 + timeOffset) {
                             // 0: gps-lidar, 1:gps-imu, 2: imu-lidar
                             if (Math.min(sensorErrors[0], sensorErrors[1]) >= 9.0) {
-                                UIobj.acknowledgeError();
+                                UIobj.acknowledgeForError();
                             } else {
-                                UIobj.denyError();
+                                UIobj.denyForError();
                             }
                         }
 
@@ -538,6 +537,8 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                             }
                         }
                     }
+                } else{
+
                 }
 
                 //FlightData data = getFlightData();
