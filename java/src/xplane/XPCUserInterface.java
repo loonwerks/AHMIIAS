@@ -94,6 +94,8 @@ public class XPCUserInterface extends JFrame implements Runnable{
     public void reset(){
         displayWarning = false;
         errorInGPS = false;
+        errorInLIDAR = false;
+        errorInIMU = false;
         errorIsIncremental = false;
         errorLat=0;
         errorLon=0;

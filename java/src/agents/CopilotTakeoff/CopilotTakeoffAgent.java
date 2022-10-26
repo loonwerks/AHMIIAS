@@ -547,7 +547,16 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                         }
                     }
                 } else{
-
+                    if(isAutomated) {
+                        if (Math.min(sensorErrors[0], sensorErrors[1]) >= 9.0) {
+                            UIobj.acknowledgeForError();
+                            // Deny Low error
+                        } else {
+                            UIobj.denyForError();
+                        }
+                    }else{
+                        UIobj.ErrorSensor=true;
+                    }
                 }
 
                 //FlightData data = getFlightData();
