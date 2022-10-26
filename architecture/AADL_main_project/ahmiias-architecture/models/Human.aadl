@@ -21,12 +21,13 @@ public
 		-- NOTE: no fault analysis at this level, due to missing Human implementation
 		annex safety {**		
 			
-			fault no_sensor1_unreliability_response 
-			"The operator does not communicate a response to a sensor 1 unreliability alert" : Faults::fail_sensor1_unreliability_response {
+			fault no_active_sensor_unreliability_response 
+			"The operator does not communicate a response to an active sensor unreliability alert" : 
+				Faults::fail_active_sensor_unreliability_response {
 				inputs: h2i_in <- Output; 
 				outputs: Output <- h2i_out;    
 				duration: permanent;
-				disable: false;	
+				disable: true;	
 			}
 		**};
 		
@@ -36,41 +37,22 @@ public
 			-----------------------
 			--GUARANTEES RELATED TO THE UNRELIABLE SENSOR SCENARIO
 			-----------------------
+			eq previouslyActiveSensorReliable	: bool = prev(InputFromIAS.activeSensorErrorData.reliable, true);
 			
 			-- NOTE: arbitrary delays between alert reception and response to be tested
 			-- NOTE: at least one step to avoid the presence of an algebraic loop in the communication between IAS and operator
-			guarantee h_g1 "If a sensor 1 unreliability alert is received by the operator, 
+			guarantee h_g1 "If an active sensor unreliability alert is received by the operator, 
 						  then a response is communicated by the operator at the next step":
-				(prev(InputFromIAS.sensor1ErrorData.unreliable, false))
-				<=> (Output.sensor1UnreliableResponse = enum(Types_Constants::Response, Agree) or 
-					 Output.sensor1UnreliableResponse = enum(Types_Constants::Response, Disagree));
+				(not previouslyActiveSensorReliable)
+				<=> 
+				(   (Output.activeSensorUnreliableResponse = enum(Types_Constants::Response, Agree))
+				 or (Output.activeSensorUnreliableResponse = enum(Types_Constants::Response, Disagree)));
 					 
-			guarantee h_g2 "If no sensor 1 unreliability alert is received by the operator, 
+			guarantee h_g2 "If no active sensor unreliability alert is received by the operator, 
 						  then no response is communicated by the operator at the next step":
-				(prev(not InputFromIAS.sensor1ErrorData.unreliable, true))
-				<=> (Output.sensor1UnreliableResponse = enum(Types_Constants::Response, Neutral));
-				
-			guarantee h_g3 "If a sensor 2 unreliability alert is received by the operator, 
-						  then a response is communicated by the operator at the next step":
-				(prev(InputFromIAS.sensor2ErrorData.unreliable, false))
-				<=> (Output.sensor2UnreliableResponse = enum(Types_Constants::Response, Agree) or 
-					 Output.sensor2UnreliableResponse = enum(Types_Constants::Response, Disagree));
-					 
-			guarantee h_g4 "If no sensor 2 unreliability alert is received by the operator, 
-						  then no response is communicated by the operator at the next step":
-				(prev(not InputFromIAS.sensor2ErrorData.unreliable, true))
-				<=> (Output.sensor2UnreliableResponse = enum(Types_Constants::Response, Neutral));
-				
-			guarantee h_g5 "If a sensor 3 unreliability alert is received by the operator, 
-						  then a response is communicated by the operator at the next step":
-				(prev(InputFromIAS.sensor3ErrorData.unreliable, false))
-				<=> (Output.sensor3UnreliableResponse = enum(Types_Constants::Response, Agree) or 
-					 Output.sensor3UnreliableResponse = enum(Types_Constants::Response, Disagree));
-					 
-			guarantee h_g6 "If no sensor 3 unreliability alert is received by the operator, 
-						  then no response is communicated by the operator at the next step":
-				(prev(not InputFromIAS.sensor3ErrorData.unreliable, true))
-				<=> (Output.sensor3UnreliableResponse = enum(Types_Constants::Response, Neutral));
+				previouslyActiveSensorReliable
+				<=> 
+				Output.activeSensorUnreliableResponse = enum(Types_Constants::Response, Neutral);
 							
 
 			-----------------------
@@ -84,12 +66,11 @@ public
 				Output.Abort_Landing => prev((InputFromIAS.Phase = enum(Phase_Type, Landing)), false); 
 				
 			guarantee h_g12 "Choose a landing option when they are ready":
-				true -> (pre(InputFromIAS.Landing_Options_Ready) => 
-							(   (Output.Landing_Option_Selection = pre(InputFromIAS.Landing_Options.Option1))
-							or  (Output.Landing_Option_Selection = pre(InputFromIAS.Landing_Options.Option2))
-							or  (Output.Landing_Option_Selection = pre(InputFromIAS.Landing_Options.Option3))
-							)
-						); 						
+				true -> (pre(InputFromIAS.Landing_Options_Ready) 
+						=> 
+						(   (Output.Landing_Option_Selection = pre(InputFromIAS.Landing_Options.Option1))
+					     or (Output.Landing_Option_Selection = pre(InputFromIAS.Landing_Options.Option2))
+					     or (Output.Landing_Option_Selection = pre(InputFromIAS.Landing_Options.Option3)))); 						
 		**};
 		
 	end Human;

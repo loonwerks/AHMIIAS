@@ -21,7 +21,7 @@ public
 			Data_Model::Enumerators => ("Normal", "Level1", "Level2", "Safety");
 	end SensorErrorRange;
 
-	-- NOTE: component 'unreliable' necessary due to the choice of having a data port, rather than an event data port, for denoting the  
+	-- NOTE: component 'reliable' necessary due to the choice of having a data port, rather than an event data port, for denoting the  
 	--       presence/absence of an unreliability alert communication to the operator		
 	data SensorErrorData
 	end SensorErrorData;
@@ -30,7 +30,7 @@ public
 		subcomponents
 			error:			 data Base_Types::Float;
 			errorRange:		 data SensorErrorRange;
-			unreliable: 	 data Base_Types::Boolean;
+			reliable: 	 data Base_Types::Boolean;
 	end SensorErrorData.impl;
 
 	-- NOTE: value "Neutral" necessary due to the choice of having a data port, rather than an event data port, for denoting no response in absence of 
@@ -52,12 +52,10 @@ public
 	
 	data implementation H2I.impl
 		subcomponents
-			sensor1UnreliableResponse: 	data Response;
-			sensor2UnreliableResponse: 	data Response;
-			sensor3UnreliableResponse: 	data Response;	
-			Initiate_Landing:			data Base_Types::Boolean;
-			Abort_Landing:				data Base_Types::Boolean;
-			Landing_Option_Selection:	data Base_Types::Integer;	
+			activeSensorUnreliableResponse: data Response;
+			Initiate_Landing:				data Base_Types::Boolean;
+			Abort_Landing:					data Base_Types::Boolean;
+			Landing_Option_Selection:		data Base_Types::Integer;	
 	end H2I.impl;
 	
 	data I2H
@@ -65,17 +63,30 @@ public
 	
 	data implementation I2H.impl
 		subcomponents
-			sensor1ErrorData:  			data SensorErrorData.impl;
-			sensor2ErrorData:  			data SensorErrorData.impl;
-			sensor3ErrorData:  			data SensorErrorData.impl;
+			activeSensorErrorData:  	data SensorErrorData.impl;
 			Active_Sensor:				data Base_Types::Integer;
 			Recommended_Sensor:			data Base_Types::Integer;
+			--
 			Phase:						data Phase_Type;
 			Destination:				data Base_Types::Integer;
 			Landing_Options_Ready: 		data Base_Types::Boolean;
 			Landing_Options:			data Landing_Options.impl;			
 	end I2H.impl;
 	
+	-- NOTE: necessary to allow the formulation of some properties at team level
+	data analysisAux
+	end analysisAux;
+	
+	data implementation analysisAux.impl
+		subcomponents
+			sensor1Reliable: 	data Base_Types::Boolean;
+			sensor2Reliable: 	data Base_Types::Boolean;
+			sensor3Reliable: 	data Base_Types::Boolean;
+			sensor1ErrorRange:	data SensorErrorRange;
+			sensor2ErrorRange:	data SensorErrorRange;
+			sensor3ErrorRange:	data SensorErrorRange;
+	end analysisAux.impl;
+		
 	data Landing_Options		
 	end Landing_Options;
 	

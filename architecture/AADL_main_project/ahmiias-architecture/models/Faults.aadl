@@ -1,25 +1,27 @@
 package Faults
 public
 	with Types_Constants;
+	renames Types_Constants::all;
 	
 	annex agree {**	
 	
-		node fail_sensor1_unreliability(i2h_in: Types_Constants::I2H.impl, alt_val: bool, trigger: bool) 
-			returns (i2h_out: Types_Constants::I2H.impl); 
+		node fail_active_sensor_unreliability(i2h_in: I2H.impl, alt_val: bool, trigger: bool) 
+			returns (i2h_out: I2H.impl); 
 		var 
-			aux : Types_Constants::SensorErrorData.impl;
+			aux : SensorErrorData.impl;
 		let
-			aux = i2h_in.sensor1ErrorData;
-		  	i2h_out = if (trigger and aux.unreliable) 
-		   			  then i2h_in{sensor1ErrorData := aux{unreliable := alt_val}} 
+			aux = i2h_in.activeSensorErrorData;
+		  	i2h_out = if (trigger and (not aux.reliable)) 
+		   			  then i2h_in{activeSensorErrorData := aux{reliable := alt_val}} 
 		   			  else i2h_in;
 		tel;
 		
-		node fail_sensor1_unreliability_response(h2i_in: Types_Constants::H2I.impl, trigger: bool) 
-			returns (h2i_out: Types_Constants::H2I.impl); 
+		
+		node fail_active_sensor_unreliability_response(h2i_in: H2I.impl, trigger: bool) 
+			returns (h2i_out: H2I.impl); 
 		let
 		  	h2i_out = if (trigger) 
-		   			  then h2i_in{sensor1UnreliableResponse := enum(Types_Constants::Response, Neutral)} 
+		   			  then h2i_in{activeSensorUnreliableResponse := enum(Response, Neutral)} 
 		   			  else h2i_in;
 		tel;
 		

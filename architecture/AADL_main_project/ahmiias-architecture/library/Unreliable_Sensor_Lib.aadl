@@ -25,8 +25,6 @@ public
 			tel;
 			
 			---------------------------------------------------------
-			-- S.F.R. 2022/09
-			
 			-- How to relate cartesian and ellipsoidal/spherical systems?
 			-- see https://en.wikipedia.org/wiki/Spherical_coordinate_system
 			-- see https://gssc.esa.int/navipedia/index.php/Ellipsoidal_and_Cartesian_Coordinates_Conversion			
@@ -55,8 +53,6 @@ public
 			---------------------------------------------------------
 			
 			---------------------------------------------------------
-			-- S.F.R. 2022/07	
-						
 			-- Sensor reliability is affected by the sensor error as follows:
 			-- 		If the sensor error is in the Safety range, then the sensor is considered unreliable and an alert is issued (see IAS.aadl)			
 			-- The sensor error is computed as the smallest Manhattan distance between the sensor position and the two other sensors positions
