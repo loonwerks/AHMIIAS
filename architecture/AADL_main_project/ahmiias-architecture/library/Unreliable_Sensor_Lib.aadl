@@ -8,7 +8,8 @@ public
 			-- Absolute value
 			-------------------------------------
 			
-			node abs(val: real) returns (out: real);
+			node abs(val: real) 
+				returns (out: real);
 			let
 				out = if val >= 0.0 then val else val*-1.0;
 			tel;
@@ -17,16 +18,125 @@ public
 			-- Checks whether two values are within some threshold of each other
 			-------------------------------------
 			
-			node vals_within_threshold_of_each_other(val1: real, val2: real, threshold: real) returns (out: bool);
+			node vals_within_threshold_of_each_other(val1: real, val2: real, threshold: real) 
+				returns (out: bool);
 			let
 				out = (abs(val1-val2) < threshold); 
 			tel;
+			
+			---------------------------------------------------------
+			-- How to relate cartesian and ellipsoidal/spherical systems?
+			-- see https://en.wikipedia.org/wiki/Spherical_coordinate_system
+			-- see https://gssc.esa.int/navipedia/index.php/Ellipsoidal_and_Cartesian_Coordinates_Conversion			
+			-- Ellipsoidal coordinates: assuming semi-axis major = semi-axis minor = R; h approximated to 0
+			
+			-- Conversion to Cartesian coordinates
+			-- x = R * cos(lat) * cos(lon)
+			-- y = R * cos(lat) * sin(lon)
+			-- z = R * sin(lat)
+			--
+			-- Tunnel distance (Euclidean or Manhattan)
+			-- sqrt( (x-x')^2 + (y-y')^2 + (z-z')^2 )
+			-- |x-x'| + |y-y'| + |z-z'|
+			--
+			-- Conversion to ellipsoidal coordinates
+			-- lat = arctan(z/sqrt(x^2+y^2))
+			-- lon = arctan(y/x), x > 0
+			--
+			-- Haversine distance between two points (in radians) on sphere surface
+			-- see http://www.movable-type.co.uk/scripts/latlong.html
+			-- rad(x) = x * pi/180
+			-- d = 2 * R * arcsin(sqrt( sin(rad(lat'-lat)/2)^2 + (sin(rad(lon'-lon)/2)^2)*cos(rad(lat)*cos(rad(lat') ))
+
+			-- NOTE: no advantage in substituting lat,lon or x,y,z with trigonometric expressions in tunnel or spheric distances
+			-- NOTE: no simple way to relate Euclidean/Manhattan distance to Haversine distance and vice versa
+			---------------------------------------------------------
+			
+			---------------------------------------------------------
+			-- Sensor reliability is affected by the sensor error as follows:
+			-- 		If the sensor error is in the Safety range, then the sensor is considered unreliable and an alert is issued (see IAS.aadl)			
+			-- The sensor error is computed as the smallest Manhattan distance between the sensor position and the two other sensors positions
+			-- 		err(x) = min{d(x,x'), d(x,x'')} = min{|x-x'| + |y-y'| + |z-z'|, |x-x''| + |y-y''| + |z-z''|}
+			-- The sensor error is in the Safety range if it is greater or equal than a Safety threshold given by 2*horizontal threshold + vertical threshold
+			-- 		err(x) >= 2*h_t + v_t
+			--
+			-- The rules above are consistent with a reliability determination based on individual coordinate components comparisons,
+			-- as computed by Sensor_Status below:
+			-- 		rel(x) = (|x-x'| < h_t /\ |y-y'| < h_t /\ |z-z'| < v_t) \/ (|x-x''| < h_t /\ |y-y''| < h_t /\ |z-z''| < v_t)
+			-- In particular, err(x) >= 2*h_t + v_t => NOT rel(x)
+			-- Proof: 
+			-- 		err(x) >= 2*h_t + v_t
+			--  <=> min{d(x,x'), d(x,x'')} >= 2*h_t + v_t
+			-- 	<=> min{|x-x'| + |y-y'| + |z-z'|, |x-x''| + |y-y''| + |z-z''|} >= 2*h_t + v_t
+			--	<=> (|x-x'| + |y-y'| + |z-z'| >= 2*h_t + v_t) /\ (|x-x''| + |y-y''| + |z-z''| >= 2*h_t + v_t)
+			-- 	 => (|x-x'| >= h_t \/ |y-y'| >= h_t \/ |z-z'| >= v_t) /\ (|x-x''| >= h_t \/ |y-y''| >= h_t \/ |z-z''| >= v_t)
+			--  <=> NOT rel(x)
+			-- 
+			-- Above is a sufficient condition on err(x) for obtaining NOT rel(x)
+			-- Conversely, NOT rel(x) => err(x) >= min{h_t,v_t}
+			-- Proof:
+			--      NOT rel(x)
+			--  <=> (|x-x'| >= h_t \/ |y-y'| >= h_t \/ |z-z'| >= v_t) /\ (|x-x''| >= h_t \/ |y-y''| >= h_t \/ |z-z''| >= v_t)
+			--   => (|x-x'| + |y-y'| + |z-z'| >= min{h_t,v_t}) /\ (|x-x''| + |y-y''| + |z-z''| >= min{h_t,v_t})
+			--  <=> d(x,x') >= min{h_t,v_t} /\ d(x,x'') >= min{h_t,v_t}
+			--  <=> min{d(x,x'), d(x,x'')} >= min{h_t,v_t}
+			--  <=> err(x) >= min{h_t,v_t}
+ 			-------------------------------------
+			node manhattan_distance(pos1: Position.impl, pos2: Position.impl) 
+				returns (dist: real);
+			let
+				dist = abs(pos1.X - pos2.X) + abs(pos1.Y - pos2.Y) + abs(pos1.Z - pos2.Z);
+			tel;
+			
+			
+			node sensor_error(
+				pos1 : Position.impl, 
+				pos2 : Position.impl, 
+				pos3 : Position.impl
+			)
+				returns(error1: real, error2: real, error3: real);
+			var 
+				dist_1_2 : real;
+				dist_1_3 : real;
+				dist_2_3 : real;
+			let
+				dist_1_2 = manhattan_distance(pos1, pos2);
+				dist_1_3 = manhattan_distance(pos1, pos3);
+				dist_2_3 = manhattan_distance(pos2, pos3);
+				
+				error1 = if dist_1_2 < dist_1_3 then dist_1_2 else dist_1_3;
+				error2 = if dist_1_2 < dist_2_3 then dist_1_2 else dist_2_3;
+				error3 = if dist_1_3 < dist_2_3 then dist_1_3 else dist_2_3;
+			tel;	
+			
+
+			node sensor_error_range(
+				sensor_error : real, 
+				horizontal_threshold : real, 
+				vertical_threshold : real
+			) 
+				returns (sensor_error_range: SensorErrorRange);
+			var
+				safety_thresh : real;
+				level2_thresh : real;
+				level1_thresh : real;
+			let
+				safety_thresh = horizontal_threshold + horizontal_threshold + vertical_threshold;
+				level2_thresh = (safety_thresh * 2.0) / 3.0;
+				level1_thresh = (safety_thresh) 	  / 3.0;
+				sensor_error_range =  if 		sensor_error > safety_thresh then enum(SensorErrorRange, Safety)
+									  else if   sensor_error > level2_thresh then enum(SensorErrorRange, Level2)
+									  else if   sensor_error > level1_thresh then enum(SensorErrorRange, Level1)
+									  else 									 	  enum(SensorErrorRange, Normal);
+			tel; 	
+			---------------------------------------------------------
 			
 			-------------------------------------
 			-- Checks whether x and y values are within a horizontal threshold of each other and z values are within a vertical threshold of each other
 			-------------------------------------
 			
-			node all_xyz_vals_within_threshold_of_each_other(pos1: Position.impl, pos2: Position.impl, Horizontal_Threshold : real, Vertical_Threshold : real) returns (out: bool);
+			node all_xyz_vals_within_threshold_of_each_other(pos1: Position.impl, pos2: Position.impl, Horizontal_Threshold : real, Vertical_Threshold : real) 
+				returns (out: bool);
 			let
 				out = (		vals_within_threshold_of_each_other(pos1.X, pos2.X, Horizontal_Threshold)
 						and vals_within_threshold_of_each_other(pos1.Y, pos2.Y, Horizontal_Threshold)
@@ -37,7 +147,8 @@ public
 			-- Returns true/false for each sensor depending on whether or not its value is close to at least one of the other sensor values
 			-------------------------------------
 			
-			node Sensor_Status(Sensor1_Data : Sensor_Data.impl, Sensor2_Data : Sensor_Data.impl, Sensor3_Data : Sensor_Data.impl, Horizontal_Threshold : real, Vertical_Threshold : real) returns (Sensor1_Reliable: bool, Sensor2_Reliable: bool, Sensor3_Reliable: bool);
+			node Sensor_Status(Sensor1_Data : Sensor_Data.impl, Sensor2_Data : Sensor_Data.impl, Sensor3_Data : Sensor_Data.impl, Horizontal_Threshold : real, Vertical_Threshold : real) 
+				returns (Sensor1_Reliable: bool, Sensor2_Reliable: bool, Sensor3_Reliable: bool);
 			var 
 				Sensor_1_2_Agreement : bool;
 				Sensor_1_3_Agreement : bool;
@@ -90,7 +201,8 @@ public
 			
 			-------------------------------------		
 			 
-			node HAL (z : real) returns (HAL : real);
+			node HAL (z : real) 
+				returns (HAL : real);
 			let
 						--Takeoff/Landing
 				HAL = 	if 		z < TAKEOFF_LANDING_MAX_AGL 	then 
@@ -132,7 +244,8 @@ public
 			-------------------------------------
 						
 
-			node VAL (z : real) returns (VAL : real);
+			node VAL (z : real) 
+				returns (VAL : real);
 			let
 						--Takeoff/Landing
 				VAL = 	 if 	z < TAKEOFF_LANDING_MAX_AGL 	then 
