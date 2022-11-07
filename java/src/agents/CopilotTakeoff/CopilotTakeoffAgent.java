@@ -45,10 +45,14 @@ public class CopilotTakeoffAgent extends XPlaneAgent
     double throttle = 0.0;
     double targetHeading = 0.0;
     double errorInSensor = 0.0;
+    public boolean GPSReliable = true;
+    public boolean IMUReliable = true;
+    public boolean LidarReliable = true;
     int timeTag = 0, timeTagClear =0;
     boolean allEnginesOK = true;
     DecisionCycle decisionCycle;
     private boolean wheelBrakesON;
+    private  boolean warningResponse = false;
     private boolean airBrakesON;
     private boolean reversersON;
 
@@ -59,8 +63,10 @@ public class CopilotTakeoffAgent extends XPlaneAgent
     private XPlaneConnector xpcobj;
     private VotingLogic votingobj;
     private int cycleCount = 0, trial_count = 0,timeOffset = 0;;
+    private int responseCount =0, response_count =0, responseTimeOffset =0;
     private String pilotAlertResponse = "yes";
     private boolean trialActive = false;
+    private boolean responseActive = false;
     private PrintWriter rlWriter, resultWriter;
 
     @Override
@@ -152,7 +158,10 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                 add("sensor-alert-accepted", "nil").markWme("sensor-alert-accepted").
                 add("reversersON", reversersON).markWme("reverse").
                 add("learning_mode", "false").markWme("learning_mode").
-                add("change_sensor_auth", "false").markWme("change_sensor_auth");
+                add("change_sensor_auth", "false").markWme("change_sensor_auth").
+                add("gps-reliable", "true").markWme("gps-reliable").
+                add("imu-reliable", "true").markWme("imu-reliable").
+                add("lidar-reliable", "true").markWme("lidar-reliable");
         try {
 
             rlWriter = new PrintWriter("C:/soar/preference_values.txt");
@@ -362,7 +371,7 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                 this.timeTag = nextWME.getTimetag();
                 //memory.setString("io.output-link.clear-sensor-alert-response", "");
                 double err = nextWME.getValue().asDouble().getValue();
-                System.err.println(nextWME.getValue()+" "+err+" "+trial_count);
+//                System.err.println(nextWME.getValue()+" "+err+" "+trial_count);
 
                 if (this.trial_count == 0) {
                     resultWriter.println(err+" "+trial_count);
@@ -446,6 +455,8 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                     if (UIobj.learningModeUpdate == 0){
                         USE_LEARNING = true;
                         UIobj.sensorChangeLearningObj.learningModeInfo=true;
+                        CHANGE_SENSOR_AUTHORITY = false;
+                        UIobj.sensorChangeLearningObj.authorityToChangeInfo=false;
                     }
                     else if(UIobj.learningModeUpdate == 1){
                         USE_LEARNING = false;
@@ -495,7 +506,7 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                         if(isAutomated) {
                             if (this.cycleCount == 18 + timeOffset) {
                                 // 0: gps-lidar, 1:gps-imu, 2: imu-lidar
-                                if (Math.min(sensorErrors[0], sensorErrors[1]) >= 9.0) {
+                                if (UIobj.barObj.error >= 9.0) {
                                     UIobj.acknowledgeForError();
                                 } else {
                                     UIobj.denyForError();
@@ -547,16 +558,27 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                         }
                     }
                 } else{
-                    if(isAutomated) {
-                        if (Math.min(sensorErrors[0], sensorErrors[1]) >= 9.0) {
+                    if(isAutomated && UIobj.finishedTakeoff && !warningResponse) {
+                        if (UIobj.barObj.error >= 9.0) {
                             UIobj.acknowledgeForError();
+                            this.warningResponse = true;
                             // Deny Low error
                         } else {
                             UIobj.denyForError();
+                            this.warningResponse = true;
                         }
-                        UIobj.errorReset();
+                        //Pilot accepts/denies the warning issued.
+                        this.response_count += 1;
+
+                        if (this.response_count == 5){
+                            //Pilot hasn't responded in 5 seconds.
+                            this.warningResponse =false;
+                            this.response_count =0;
+                            UIobj.errorReset();
+                        }
+
                     }else{
-                        UIobj.ErrorSensor=true;
+//                        UIobj.ErrorSensor=true;
                         UIobj.errorReseted = false;
                     }
                 }
@@ -638,6 +660,14 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                 GPSvIMU.update(syms.createDouble(sensorErrors[1]));
                 InputWme LIDARvIMU = builder.getWme("lidar-imu-error");
                 LIDARvIMU.update(syms.createDouble(sensorErrors[2]));
+
+                InputWme GPSReliability = builder.getWme("gps-reliable");
+                GPSReliability.update(syms.createString(GPSReliable ? "yes" : "no"));
+                InputWme IMUReliability = builder.getWme("imu-reliable");
+                IMUReliability.update(syms.createString(IMUReliable ? "yes" : "no"));
+                InputWme LidarReliability = builder.getWme("lidar-reliable");
+                LidarReliability.update(syms.createString(LidarReliable ? "yes" : "no"));
+
                 InputWme GPSerr = builder.getWme("gps-error");
                 GPSerr.update(syms.createDouble(Math.min(sensorErrors[0],sensorErrors[1])));
                 InputWme IMUerr = builder.getWme("imu-error");

@@ -42,6 +42,7 @@ public class XPCUserInterface extends JFrame implements Runnable{
     private boolean displayWarning = false;
 
     private button  InduceErrorButton,InduceIncrementalErrorButton, AcknowledgeErrorButton, DenyErrorButton, AcknowledgeChangeButton, DenyChangeButton, LandButton, AbortLandingButton;
+    private button InduceLowErrorButton, InduceHighErrorButton, InduceSafetyErrorButton;
     private RadioButton learningMode, authorityToChange,landingOptions;
 
     public PreferenceValueDisplay displayObj;
@@ -53,7 +54,21 @@ public class XPCUserInterface extends JFrame implements Runnable{
         SensorPossiblyUnreliable = 0;
         displayWarning = true;
     }
-
+    public void injectLowError(){
+        errorInGPS = true;
+        errorLat = 0.06f;
+        errorLon = 0.06f;
+    }
+    public void injectHighError(){
+        errorInGPS = true;
+        errorLat = 0.065f;
+        errorLon = 0.065f;
+    }
+    public void injectSafetyError(){
+        errorInGPS = true;
+        errorLat = 0.08f;
+        errorLon = 0.08f;
+    }
     public void injectError(){
 
         errorInGPS = true;
@@ -107,6 +122,7 @@ public class XPCUserInterface extends JFrame implements Runnable{
     }
     public void errorReset(){
         errorReseted = true;
+        reset();
     }
 
 
@@ -180,6 +196,9 @@ public class XPCUserInterface extends JFrame implements Runnable{
         authorityToChange = new RadioButton(authorityToChangeOptionText, 530, 700);
         InduceErrorButton = new button("Jump Error",580, 160, 320, 30);
         InduceIncrementalErrorButton = new button("Incremental Error",580, 200, 320, 30);
+        InduceLowErrorButton = new button("Low Jump Error",580, 120, 320, 30);
+        InduceHighErrorButton = new button("High Jump Error",580, 160, 320, 30);
+        InduceSafetyErrorButton = new button("Safety Jump Error",580, 200, 320, 30);
         AcknowledgeErrorButton = new button("Acknowledge Error",80, 660, 320, 30);
         DenyErrorButton = new button("Deny Error",80, 720, 320, 30);
         AcknowledgeChangeButton = new button("Acknowledge Sensor Change",80, 660, 360, 30);
@@ -252,10 +271,14 @@ public class XPCUserInterface extends JFrame implements Runnable{
             }
         }
         g.setFont(textFont2);
-        if(!errorInGPS) {
+        if(!errorInGPS && sensorChangeLearningObj.learningModeInfo) {
             InduceErrorButton.draw(g);
             InduceIncrementalErrorButton.draw(g);
-        }else if(SensorPossiblyUnreliable != -1 && SensorUnreliable == -1 && sensorChangeLearningObj.authorityToChangeInfo){
+        } else if (!errorInGPS && !sensorChangeLearningObj.learningModeInfo && finishedTakeoff) {
+            InduceLowErrorButton.draw(g);
+            InduceHighErrorButton.draw(g);
+            InduceSafetyErrorButton.draw(g);
+        } else if(SensorPossiblyUnreliable != -1 && SensorUnreliable == -1 && sensorChangeLearningObj.authorityToChangeInfo){
             g.drawString(sensorNames[SensorPossiblyUnreliable]+" may be unreliable!", 75, 630);
             AcknowledgeChangeButton.draw(g);
             DenyChangeButton.draw(g);
@@ -362,6 +385,9 @@ public class XPCUserInterface extends JFrame implements Runnable{
             mx = mouseEvent.getX();
             my = mouseEvent.getY();
             InduceErrorButton.update(mx,my);
+            InduceLowErrorButton.update(mx,my);
+            InduceHighErrorButton.update(mx,my);
+            InduceSafetyErrorButton.update(mx,my);
             InduceIncrementalErrorButton.update(mx,my);
             AcknowledgeChangeButton.update(mx,my);
             DenyChangeButton.update(mx,my);
@@ -380,12 +406,19 @@ public class XPCUserInterface extends JFrame implements Runnable{
 
         @Override
         public void mouseClicked(MouseEvent mouseEvent) {
+            if(!errorInGPS && InduceLowErrorButton.button.intersects(new Rectangle(mx, my, 1, 1))){
+                injectLowError();
+            }else if(!errorInGPS && InduceHighErrorButton.button.intersects(new Rectangle(mx, my, 1, 1))){
+                injectHighError();
+            }else if(!errorInGPS && InduceSafetyErrorButton.button.intersects(new Rectangle(mx, my, 1, 1))){
+                injectSafetyError();
+            }
             if(!errorInGPS && InduceErrorButton.button.intersects(new Rectangle(mx,my,1,1))){
                 injectError();
             }else if(learningMode.getSelectedOption(mx,my) != -1) {
                 if (learningMode.getSelectedOption(mx,my) == 0){
                     learningModeUpdate = 0;
-                    authorityToChangeUpdate = -1;
+                    authorityToChangeUpdate = -1;;
                 }else {
                     learningModeUpdate = learningMode.getSelectedOption(mx, my);
                 }
