@@ -7,7 +7,11 @@
     <list default="true" id="6bb3fedb-805b-44ac-ab51-e1904d37b78c" name="Default Changelist" comment="Logic in the case of no response from pilot">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/agents/CopilotTakeoff/CopilotTakeoffAgent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/agents/CopilotTakeoff/CopilotTakeoffAgent.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/xplane/XPCUserInterface.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/xplane/XPCUserInterface.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/agents/CopilotTakeoff/CopilotTakeoffAgent.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/agents/CopilotTakeoff/CopilotTakeoffAgent.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/xplane/XPCUserInterface$KeyboardListener.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/xplane/XPCUserInterface$KeyboardListener.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/xplane/XPCUserInterface$MouseEventListener.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/xplane/XPCUserInterface$MouseEventListener.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/xplane/XPCUserInterface$MouseMoveListener.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/xplane/XPCUserInterface$MouseMoveListener.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/xplane/XPCUserInterface.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/xplane/XPCUserInterface.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -232,7 +236,14 @@
       <option name="project" value="LOCAL" />
       <updated>1666805105147</updated>
     </task>
-    <option name="localTasksCounter" value="23" />
+    <task id="LOCAL-00023" summary="Logic in the case of no response from pilot">
+      <created>1667790773334</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1667790773334</updated>
+    </task>
+    <option name="localTasksCounter" value="24" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">

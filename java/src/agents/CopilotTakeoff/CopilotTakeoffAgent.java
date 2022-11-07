@@ -14,6 +14,7 @@ import org.jsoar.kernel.memory.Wme;
 import org.jsoar.kernel.symbols.SymbolFactory;
 import org.jsoar.util.commands.SoarCommands;
 import util.VotingLogic;
+import xplane.SensorChangeLearningOptionDisplay;
 import xplane.WaypointController;
 import xplane.XPCUserInterface;
 import xplane.XPlaneConnector;
@@ -569,7 +570,11 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                         }
                         //Pilot accepts/denies the warning issued.
                         this.response_count += 1;
-
+                        if(UIobj.sensorChangeLearningObj.authorityToChangeInfo && this.response_count < 5 && UIobj.barObj.error >=10){
+                            UIobj.pilotDecisionToChange = "yes";
+                            InputWme pilotSensorChangeWme = builder.getWme("pilot_decision");
+                            pilotSensorChangeWme.update(syms.createString(UIobj.pilotDecision));
+                        }
                         if (this.response_count == 5){
                             //Pilot hasn't responded in 5 seconds.
                             this.warningResponse =false;
@@ -577,9 +582,6 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                             UIobj.errorReset();
                         }
 
-                    }else{
-//                        UIobj.ErrorSensor=true;
-                        UIobj.errorReseted = false;
                     }
                 }
 
@@ -651,7 +653,6 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                 throttle.update(syms.createDouble(data.throttle));
                 InputWme errorInSensorWme = builder.getWme("sensor-error");
                 errorInSensorWme.update(syms.createDouble(errorInSensor));
-
 
                 //double sensorErrors[] = votingobj.checkForReliability(UIobj.positions,data.altitude);
                 InputWme GPSvLIDAR = builder.getWme("gps-lidar-error");
