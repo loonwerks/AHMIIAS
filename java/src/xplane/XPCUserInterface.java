@@ -47,7 +47,7 @@ public class XPCUserInterface extends JFrame implements Runnable{
 
     public PreferenceValueDisplay displayObj;
     public SensorChangeLearningOptionDisplay sensorChangeLearningObj;
-    public DisplayBar barObj,barObjOld;
+    public DisplayBar GPSbarObj,GPSbarObjOld, IMUbarObj,IMUbarObjOld, LIDARbarObj,LIDARbarObjOld;
 
     public void displayWarning(String faultySensorName){
         this.faultySensorName = faultySensorName;
@@ -187,8 +187,12 @@ public class XPCUserInterface extends JFrame implements Runnable{
     @Override
     public void run() {
         displayObj = new PreferenceValueDisplay();
-        barObj = new DisplayBar();
-        barObjOld = new DisplayBar();
+        GPSbarObj = new DisplayBar();
+        GPSbarObjOld = new DisplayBar();
+        IMUbarObj = new DisplayBar();
+        IMUbarObjOld = new DisplayBar();
+        LIDARbarObj = new DisplayBar();
+        LIDARbarObjOld = new DisplayBar();
         sensorChangeLearningObj = new SensorChangeLearningOptionDisplay();
         String learningModeOptionText[] = {"On", "Off"};
         learningMode = new RadioButton(learningModeOptionText, 530, 530);
@@ -313,22 +317,22 @@ public class XPCUserInterface extends JFrame implements Runnable{
         }
         displayObj.paint(g);
         BufferedImage barImg = new BufferedImage(500,500, BufferedImage.TYPE_INT_ARGB);
-        barObj.draw(barImg.getGraphics());
-        barObj.warnHigh = displayObj.warnHigh;
-        barObj.warnLow = displayObj.warnLow;
-        barObj.doNotWarnHigh = displayObj.doNotWarnHigh;
-        barObj.doNotWarnLow = displayObj.doNotWarnLow;
+        GPSbarObj.draw(barImg.getGraphics());
+        GPSbarObj.warnHigh = displayObj.warnHigh;
+        GPSbarObj.warnLow = displayObj.warnLow;
+        GPSbarObj.doNotWarnHigh = displayObj.doNotWarnHigh;
+        GPSbarObj.doNotWarnLow = displayObj.doNotWarnLow;
         g.drawImage(barImg, 1200,300, null);
         BufferedImage barImgOld = new BufferedImage(500,500, BufferedImage.TYPE_INT_ARGB);
-        barObjOld.draw(barImgOld.getGraphics());
-        /*barObjOld.warnHigh = displayObj.warnHigh;
-        barObjOld.warnLow = displayObj.warnLow;
-        barObjOld.doNotWarnHigh = displayObj.doNotWarnHigh;
-        barObjOld.doNotWarnLow = displayObj.doNotWarnLow;*/
+        GPSbarObjOld.draw(barImgOld.getGraphics());
+        /*GPSbarObjOld.warnHigh = displayObj.warnHigh;
+        GPSbarObjOld.warnLow = displayObj.warnLow;
+        GPSbarObjOld.doNotWarnHigh = displayObj.doNotWarnHigh;
+        GPSbarObjOld.doNotWarnLow = displayObj.doNotWarnLow;*/
         g.drawImage(barImgOld, 1050,300, null);
         g.drawString("Previous", 1050,725);
         g.drawString("Present", 1200,725);
-        barObjOld.error = barObj.error;
+        GPSbarObjOld.error = GPSbarObj.error;
 
     }
     private void drawTestUI(Graphics g){

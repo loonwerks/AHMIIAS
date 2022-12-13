@@ -7,11 +7,6 @@
     <list default="true" id="6bb3fedb-805b-44ac-ab51-e1904d37b78c" name="Default Changelist" comment="Logic in the case of no response from pilot">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/agents/CopilotTakeoff/CopilotTakeoffAgent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/agents/CopilotTakeoff/CopilotTakeoffAgent.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/agents/CopilotTakeoff/CopilotTakeoffAgent.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/agents/CopilotTakeoff/CopilotTakeoffAgent.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/xplane/XPCUserInterface$KeyboardListener.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/xplane/XPCUserInterface$KeyboardListener.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/xplane/XPCUserInterface$MouseEventListener.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/xplane/XPCUserInterface$MouseEventListener.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/xplane/XPCUserInterface$MouseMoveListener.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/xplane/XPCUserInterface$MouseMoveListener.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/xplane/XPCUserInterface.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/xplane/XPCUserInterface.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -42,16 +37,16 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Github Projects -Parth/JavaAgent_SeniorDesign&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;SDKs&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;configurable.group.editor&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "last_opened_file_path": "C:/soar_translator",
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.2",
+    "settings.editor.selected.configurable": "configurable.group.editor"
   }
-}</component>
+}]]></component>
   <component name="RunManager">
     <configuration name="StartAgents" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="main.StartAgents" />
@@ -243,7 +238,14 @@
       <option name="project" value="LOCAL" />
       <updated>1667790773334</updated>
     </task>
-    <option name="localTasksCounter" value="24" />
+    <task id="LOCAL-00024" summary="Logic in the case of no response from pilot">
+      <created>1667794047988</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1667794047988</updated>
+    </task>
+    <option name="localTasksCounter" value="25" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">

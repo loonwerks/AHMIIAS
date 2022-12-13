@@ -260,6 +260,7 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                 String txt = nextWME.getValue().toString();
                 if(txt.equalsIgnoreCase("yes")){
                     UIobj.SensorPossiblyUnreliable = 0;
+                    GPSReliable = false;
                 }
 
             }else if (nextWME.getAttribute().asString().getValue().equals("LIDARUnreliable"))
@@ -270,6 +271,7 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                 String txt = nextWME.getValue().toString();
                 if(txt.equalsIgnoreCase("yes")){
                     UIobj.SensorPossiblyUnreliable = 1;
+                    LidarReliable = false;
                 }
 
             }else if (nextWME.getAttribute().asString().getValue().equals("IMUUnreliable"))
@@ -280,6 +282,7 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                 String txt = nextWME.getValue().toString();
                 if(txt.equalsIgnoreCase("yes")){
                     UIobj.SensorPossiblyUnreliable = 2;
+                    IMUReliable = false;
                 }
 
             }else if (nextWME.getAttribute().asString().getValue().equals("target-altitude"))
@@ -450,7 +453,7 @@ public class CopilotTakeoffAgent extends XPlaneAgent
             long bt = System.nanoTime()/1000000;
             FlightData data = getFlightData();
             double sensorErrors[] = votingobj.checkForReliability(UIobj.positions,data.altitude);
-            UIobj.barObj.error = Math.min(sensorErrors[0],sensorErrors[1]);
+            UIobj.GPSbarObj.error = Math.min(sensorErrors[0],sensorErrors[1]);
             try {
                 if(UIobj.learningModeUpdate != -1){
                     if (UIobj.learningModeUpdate == 0){
@@ -507,7 +510,7 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                         if(isAutomated) {
                             if (this.cycleCount == 18 + timeOffset) {
                                 // 0: gps-lidar, 1:gps-imu, 2: imu-lidar
-                                if (UIobj.barObj.error >= 9.0) {
+                                if (UIobj.GPSbarObj.error >= 9.0) {
                                     UIobj.acknowledgeForError();
                                 } else {
                                     UIobj.denyForError();
@@ -560,7 +563,7 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                     }
                 } else{
                     if(isAutomated && UIobj.finishedTakeoff && !warningResponse) {
-                        if (UIobj.barObj.error >= 9.0) {
+                        if (UIobj.GPSbarObj.error >= 9.0) {
                             UIobj.acknowledgeForError();
                             this.warningResponse = true;
                             // Deny Low error
@@ -570,7 +573,7 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                         }
                         //Pilot accepts/denies the warning issued.
                         this.response_count += 1;
-                        if(UIobj.sensorChangeLearningObj.authorityToChangeInfo && this.response_count < 5 && UIobj.barObj.error >=10){
+                        if(UIobj.sensorChangeLearningObj.authorityToChangeInfo && this.response_count < 5 && UIobj.GPSbarObj.error >=10){
                             UIobj.pilotDecisionToChange = "yes";
                             InputWme pilotSensorChangeWme = builder.getWme("pilot_decision");
                             pilotSensorChangeWme.update(syms.createString(UIobj.pilotDecision));
