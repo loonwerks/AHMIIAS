@@ -23,7 +23,7 @@ public class XPCUserInterface extends JFrame implements Runnable{
     private Font textFont2 = new Font("Courier", Font.PLAIN,20);
     private String sensorNames[] = {"GPS", "Lidar", "IMU", "Target Waypoint"};
     private double targetLat, targetLon;
-    public int selectedSensor = 0;
+    public int activeSensor = 0;
     private float errorLat=0, errorLon=0;
     private boolean errorInGPS = false,errorInIMU=false,errorInLIDAR=false, errorIsIncremental = false;
     public int SensorPossiblyUnreliable = -1;
@@ -99,8 +99,8 @@ public class XPCUserInterface extends JFrame implements Runnable{
     }
     public void acknowledgeChange(){
         SensorUnreliable = SensorPossiblyUnreliable;
-        if(selectedSensor == SensorUnreliable)
-            selectedSensor = (selectedSensor + 1) % 3;
+        if(activeSensor == SensorUnreliable)
+            activeSensor = (activeSensor + 1) % 3;
         pilotDecisionToChange = "yes";
     }
     public void denyChange(){
@@ -251,7 +251,7 @@ public class XPCUserInterface extends JFrame implements Runnable{
     public void draw(Graphics g){
         for(int i = 0;i < 4 ;i++) {
 
-            if(i == selectedSensor) {
+            if(i == activeSensor) {
                 g.setColor(new Color(102,255,102));
             }else{
                 g.setColor(Color.LIGHT_GRAY);
@@ -291,7 +291,7 @@ public class XPCUserInterface extends JFrame implements Runnable{
         }else if(SensorUnreliable != -1 && sensorChangeLearningObj.authorityToChangeInfo && errorInGPS){
             g.setColor(Color.BLACK);
             g.drawString(sensorNames[SensorUnreliable]+" error acknowledged.", 75, 680);
-            g.drawString("Switched to "+sensorNames[selectedSensor]+" sensor.", 75, 700);
+            g.drawString("Switched to "+sensorNames[activeSensor]+" sensor.", 75, 700);
         }
         if(ErrorSensor == true){
             AcknowledgeErrorButton.draw(g);

@@ -236,7 +236,7 @@ public class CopilotTakeoffAgent extends XPlaneAgent
             Wme nextWME = wmes.next();
             printWme(nextWME);
             //System.err.println(nextWME.getAttribute().asString().getValue());
-//            System.out.println(UIobj.selectedSensor + " is the selected sensor right now.");
+//            System.out.println(UIobj.activeSensor + " is the selected sensor right now.");
             if (nextWME.getAttribute().asString().getValue().equals("throttle"))
             {
                 //System.err.println("HELLO");
@@ -333,11 +333,11 @@ public class CopilotTakeoffAgent extends XPlaneAgent
 
                 String txt = nextWME.getValue().toString();
                 if(txt.equalsIgnoreCase("lidar")){
-                    UIobj.selectedSensor = 1;
+                    UIobj.activeSensor = 1;
                 }else if(txt.equalsIgnoreCase("imu")){
-                    UIobj.selectedSensor = 2;
+                    UIobj.activeSensor = 2;
                 }else if(txt.equalsIgnoreCase("gps")){
-                    UIobj.selectedSensor = 0;
+                    UIobj.activeSensor = 0;
                 }
                 UIobj.pilotDecisionToChange = "nil";
             }else if (nextWME.getAttribute().asString().getValue().equals("clear-sensor-alert-response"))
@@ -622,10 +622,10 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                 double latitude = 0.0;
                 double longitude = 0.0;
 
-                if(UIobj.selectedSensor == 0){
+                if(UIobj.activeSensor == 0){
                     latitude = UIobj.getGPSLat();
                     longitude = UIobj.getGPSLon();
-                }else if(UIobj.selectedSensor == 1){
+                }else if(UIobj.activeSensor == 1){
                     latitude = UIobj.getLidarLat();
                     longitude = UIobj.getLidarLon();
                 }else{
