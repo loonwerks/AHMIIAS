@@ -33,7 +33,7 @@ public class XPCUserInterface extends JFrame implements Runnable{
     public String pilotDecisionToChange ="nil";
     public boolean ErrorSensor = false;
     public boolean errorReseted = false;
-    public boolean displayLandingButton = false, startedLandingProcedure = false, abortLanding = false, finishedTakeoff = false;
+    public boolean displayLandingButton = false, initiateLanding = false, abortLanding = false, finishedTakeoff = false;
     public int reroutedLandingZone = -1;
     public int learningModeUpdate = -1;
     public int authorityToChangeUpdate = -1;
@@ -297,9 +297,9 @@ public class XPCUserInterface extends JFrame implements Runnable{
             AcknowledgeErrorButton.draw(g);
             DenyErrorButton.draw(g);
         }
-        if(!startedLandingProcedure && displayLandingButton){
+        if(!initiateLanding && displayLandingButton){
             LandButton.draw(g);
-        }else if(startedLandingProcedure && !abortLanding){
+        }else if(initiateLanding && !abortLanding){
             AbortLandingButton.draw(g);
         }
         drawTestUI(g);
@@ -309,7 +309,7 @@ public class XPCUserInterface extends JFrame implements Runnable{
             g.setFont(textFont2);
             landingOptions.draw(g);
         }
-        if(!startedLandingProcedure && finishedTakeoff) {
+        if(!initiateLanding && finishedTakeoff) {
             learningMode.draw(g);
             sensorChangeLearningObj.paintLearningMode(g);
             if(!sensorChangeLearningObj.learningModeInfo) {
@@ -481,10 +481,10 @@ public class XPCUserInterface extends JFrame implements Runnable{
                 denyChange();
             }else if(!errorInGPS && InduceIncrementalErrorButton.button.intersects(new Rectangle(mx,my,1,1))){
                 injectIncrementalError();
-            }else if(!startedLandingProcedure && LandButton.button.intersects(new Rectangle(mx,my,1,1))){
+            }else if(!initiateLanding && LandButton.button.intersects(new Rectangle(mx,my,1,1))){
                 //initiate landing
-                startedLandingProcedure = true;
-            }else if(startedLandingProcedure && AbortLandingButton.button.intersects(new Rectangle(mx,my,1,1))){
+                initiateLanding = true;
+            }else if(initiateLanding && AbortLandingButton.button.intersects(new Rectangle(mx,my,1,1))){
                 abortLanding = true;
             }else if(landingOptions.getSelectedOption(mx,my) != -1) {
                 reroutedLandingZone = landingOptions.getSelectedOption(mx, my);

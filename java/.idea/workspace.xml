@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6bb3fedb-805b-44ac-ab51-e1904d37b78c" name="Default Changelist" comment="Learning For Three Sensors">
+    <list default="true" id="6bb3fedb-805b-44ac-ab51-e1904d37b78c" name="Default Changelist" comment="AADL Mapping">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/agents/CopilotTakeoff/CopilotTakeoffAgent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/agents/CopilotTakeoff/CopilotTakeoffAgent.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/xplane/XPCUserInterface.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/xplane/XPCUserInterface.java" afterDir="false" />
@@ -274,7 +274,14 @@
       <option name="project" value="LOCAL" />
       <updated>1670978259808</updated>
     </task>
-    <option name="localTasksCounter" value="29" />
+    <task id="LOCAL-00029" summary="AADL Mapping">
+      <created>1670982745443</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1670982745443</updated>
+    </task>
+    <option name="localTasksCounter" value="30" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -303,6 +310,7 @@
     <MESSAGE value="Logic in the case of no response from pilot" />
     <MESSAGE value="Learning For Three Sensors Bar Chart GUI Update" />
     <MESSAGE value="Learning For Three Sensors" />
-    <option name="LAST_COMMIT_MESSAGE" value="Learning For Three Sensors" />
+    <MESSAGE value="AADL Mapping" />
+    <option name="LAST_COMMIT_MESSAGE" value="AADL Mapping" />
   </component>
 </project>

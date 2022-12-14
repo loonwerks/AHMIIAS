@@ -153,8 +153,8 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                 add("imu-error", 0.0).markWme("imu-error").
                 add("lidar-error", 0.0).markWme("lidar-error").
                 add("pilot_decision", "none").markWme("pilot_decision").
-                add("initiate-landing", UIobj.startedLandingProcedure).markWme("initiate-landing").
-                add("abort-landing", UIobj.startedLandingProcedure).markWme("abort-landing").
+                add("initiate-landing", UIobj.initiateLanding).markWme("initiate-landing").
+                add("abort-landing", UIobj.initiateLanding).markWme("abort-landing").
                 add("distance-to-target", UIobj.distanceToTarget).markWme("distance-to-target").
                 add("sensor-alert-accepted", "nil").markWme("sensor-alert-accepted").
                 add("reversersON", reversersON).markWme("reverse").
@@ -639,7 +639,7 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                     waypoints.currentWaypoint = UIobj.reroutedLandingZone + 4;
                     UIobj.reroutedLandingZone = -1;
 
-                    UIobj.startedLandingProcedure = false;
+                    UIobj.initiateLanding = false;
                     UIobj.abortLanding = false;
                     xpcobj.setAutopilot(162);
                 }
@@ -706,7 +706,7 @@ public class CopilotTakeoffAgent extends XPlaneAgent
 
 
                 InputWme initiatedLandingWme = builder.getWme("initiate-landing");
-                initiatedLandingWme.update(syms.createString(UIobj.startedLandingProcedure ? "yes":"no"));
+                initiatedLandingWme.update(syms.createString(UIobj.initiateLanding ? "yes":"no"));
                 InputWme abortLandingWme = builder.getWme("abort-landing");
                 abortLandingWme.update(syms.createString(UIobj.abortLanding ? "yes":"no"));
                 InputWme pilotWme = builder.getWme("pilot_decision");
