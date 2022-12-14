@@ -464,6 +464,7 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                     }
                     else if(UIobj.learningModeUpdate == 1){
                         USE_LEARNING = false;
+                        this.trialActive = false;
                         UIobj.sensorChangeLearningObj.learningModeInfo=false;
                     }
                 }
@@ -554,16 +555,6 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                                             }else if(name.contains("warn") && name.contains("high*gps")){
                                                 UIobj.GPSdisplayObj.warnHigh = val;
                                             }
-                                        } else if (name.contains("imu")) {
-                                            if(name.contains("do-not-warn") && name.contains("low*imu")){
-                                                UIobj.IMUdisplayObj.doNotWarnLow = val;
-                                            }else if(name.contains("do-not-warn") && name.contains("high*imu")){
-                                                UIobj.IMUdisplayObj.doNotWarnHigh = val;
-                                            }else if(name.contains("warn") && name.contains("low*imu")){
-                                                UIobj.IMUdisplayObj.warnLow = val;
-                                            }else if(name.contains("warn") && name.contains("high*imu")){
-                                                UIobj.IMUdisplayObj.warnHigh = val;
-                                            }
                                         } else if (name.contains("lidar")) {
                                             if(name.contains("do-not-warn") && name.contains("low*lidar")){
                                                 UIobj.LIDARdisplayObj.doNotWarnLow = val;
@@ -573,6 +564,16 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                                                 UIobj.LIDARdisplayObj.warnLow = val;
                                             }else if(name.contains("warn") && name.contains("high*lidar")){
                                                 UIobj.LIDARdisplayObj.warnHigh = val;
+                                            }
+                                        } else if (name.contains("imu")) {
+                                            if(name.contains("do-not-warn") && name.contains("low*imu")){
+                                                UIobj.IMUdisplayObj.doNotWarnLow = val;
+                                            }else if(name.contains("do-not-warn") && name.contains("high*imu")){
+                                                UIobj.IMUdisplayObj.doNotWarnHigh = val;
+                                            }else if(name.contains("warn") && name.contains("low*imu")){
+                                                UIobj.IMUdisplayObj.warnLow = val;
+                                            }else if(name.contains("warn") && name.contains("high*imu")){
+                                                UIobj.IMUdisplayObj.warnHigh = val;
                                             }
                                         }
                                     }

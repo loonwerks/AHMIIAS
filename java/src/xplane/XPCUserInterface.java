@@ -338,47 +338,47 @@ public class XPCUserInterface extends JFrame implements Runnable{
         g.drawString("GPS Sensor", 1100, 775);
         GPSbarObjOld.error = GPSbarObj.error;
 
-        IMUdisplayObj.sensor=1;
-        IMUdisplayObj.paint(g);
-        BufferedImage IMUbarImg = new BufferedImage(500,500, BufferedImage.TYPE_INT_ARGB);
-        IMUbarObj.draw(IMUbarImg.getGraphics());
-        IMUbarObj.warnHigh = IMUdisplayObj.warnHigh;
-        IMUbarObj.warnLow = IMUdisplayObj.warnLow;
-        IMUbarObj.doNotWarnHigh = IMUdisplayObj.doNotWarnHigh;
-        IMUbarObj.doNotWarnLow = IMUdisplayObj.doNotWarnLow;
-        g.drawImage(IMUbarImg, 1600,300, null);
-        BufferedImage IMUbarImgOld = new BufferedImage(500,500, BufferedImage.TYPE_INT_ARGB);
-        IMUbarObjOld.draw(IMUbarImgOld.getGraphics());
-        /*IMUbarObjOld.warnHigh = IMUdisplayObj.warnHigh;
-        IMUbarObjOld.warnLow = IMUdisplayObj.warnLow;
-        IMUbarObjOld.doNotWarnHigh = IMUdisplayObj.doNotWarnHigh;
-        IMUbarObjOld.doNotWarnLow = IMUdisplayObj.doNotWarnLow;*/
-        g.drawImage(IMUbarImgOld, 1450,300, null);
-        g.drawString("Previous", 1450,725);
-        g.drawString("Present", 1600,725);
-        g.drawString("IMU Sensor", 1500, 775);
-        IMUbarObjOld.error = IMUbarObj.error;
-
-        LIDARdisplayObj.sensor=2;
+        LIDARdisplayObj.sensor=1;
         LIDARdisplayObj.paint(g);
-        BufferedImage LIDARbarImg = new BufferedImage(500,500, BufferedImage.TYPE_INT_ARGB);
-        LIDARbarObj.draw(LIDARbarImg.getGraphics());
+        BufferedImage IMUbarImg = new BufferedImage(500,500, BufferedImage.TYPE_INT_ARGB);
+        LIDARbarObj.draw(IMUbarImg.getGraphics());
         LIDARbarObj.warnHigh = LIDARdisplayObj.warnHigh;
         LIDARbarObj.warnLow = LIDARdisplayObj.warnLow;
         LIDARbarObj.doNotWarnHigh = LIDARdisplayObj.doNotWarnHigh;
         LIDARbarObj.doNotWarnLow = LIDARdisplayObj.doNotWarnLow;
-        g.drawImage(LIDARbarImg, 2000,300, null);
-        BufferedImage LIDARbarImgOld = new BufferedImage(500,500, BufferedImage.TYPE_INT_ARGB);
-        LIDARbarObjOld.draw(LIDARbarImgOld.getGraphics());
+        g.drawImage(IMUbarImg, 1600,300, null);
+        BufferedImage IMUbarImgOld = new BufferedImage(500,500, BufferedImage.TYPE_INT_ARGB);
+        LIDARbarObjOld.draw(IMUbarImgOld.getGraphics());
         /*LIDARbarObjOld.warnHigh = LIDARdisplayObj.warnHigh;
         LIDARbarObjOld.warnLow = LIDARdisplayObj.warnLow;
         LIDARbarObjOld.doNotWarnHigh = LIDARdisplayObj.doNotWarnHigh;
         LIDARbarObjOld.doNotWarnLow = LIDARdisplayObj.doNotWarnLow;*/
+        g.drawImage(IMUbarImgOld, 1450,300, null);
+        g.drawString("Previous", 1450,725);
+        g.drawString("Present", 1600,725);
+        g.drawString("IMU Sensor", 1500, 775);
+        LIDARbarObjOld.error = LIDARbarObj.error;
+
+        IMUdisplayObj.sensor=2;
+        IMUdisplayObj.paint(g);
+        BufferedImage LIDARbarImg = new BufferedImage(500,500, BufferedImage.TYPE_INT_ARGB);
+        IMUbarObj.draw(LIDARbarImg.getGraphics());
+        IMUbarObj.warnHigh = IMUdisplayObj.warnHigh;
+        IMUbarObj.warnLow = IMUdisplayObj.warnLow;
+        IMUbarObj.doNotWarnHigh = IMUdisplayObj.doNotWarnHigh;
+        IMUbarObj.doNotWarnLow = IMUdisplayObj.doNotWarnLow;
+        g.drawImage(LIDARbarImg, 2000,300, null);
+        BufferedImage LIDARbarImgOld = new BufferedImage(500,500, BufferedImage.TYPE_INT_ARGB);
+        IMUbarObjOld.draw(LIDARbarImgOld.getGraphics());
+        /*IMUbarObjOld.warnHigh = IMUdisplayObj.warnHigh;
+        IMUbarObjOld.warnLow = IMUdisplayObj.warnLow;
+        IMUbarObjOld.doNotWarnHigh = IMUdisplayObj.doNotWarnHigh;
+        IMUbarObjOld.doNotWarnLow = IMUdisplayObj.doNotWarnLow;*/
         g.drawImage(LIDARbarImgOld, 1850,300, null);
         g.drawString("Previous", 1850,725);
         g.drawString("Present", 2000,725);
         g.drawString(" LIDAR Sensor", 1900, 775);
-        LIDARbarObjOld.error = LIDARbarObj.error;
+        IMUbarObjOld.error = IMUbarObj.error;
 
 
     }
