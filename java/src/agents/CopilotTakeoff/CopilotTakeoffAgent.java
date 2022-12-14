@@ -546,13 +546,13 @@ public class CopilotTakeoffAgent extends XPlaneAgent
 
                                         if(name.contains("gps")){
                                             if(name.contains("do-not-warn") && name.contains("low")){
-                                                UIobj.displayObj.doNotWarnLow = val;
+                                                UIobj.GPSdisplayObj.doNotWarnLow = val;
                                             }else if(name.contains("do-not-warn") && name.contains("high")){
-                                                UIobj.displayObj.doNotWarnHigh = val;
+                                                UIobj.GPSdisplayObj.doNotWarnHigh = val;
                                             }else if(name.contains("warn") && name.contains("low")){
-                                                UIobj.displayObj.warnLow = val;
+                                                UIobj.GPSdisplayObj.warnLow = val;
                                             }else if(name.contains("warn") && name.contains("high")){
-                                                UIobj.displayObj.warnHigh = val;
+                                                UIobj.GPSdisplayObj.warnHigh = val;
                                             }
                                         }
                                     }
