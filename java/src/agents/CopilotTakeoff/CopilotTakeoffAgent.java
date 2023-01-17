@@ -394,15 +394,18 @@ public class CopilotTakeoffAgent extends XPlaneAgent
         }
     }
     private void AcknowledgeError(double err, String faultySensorName){
-        // Accept High error
+
         if(isAutomated) {
+            // Accept High error
             if (err >= 9.0 && (faultySensorName == "gps" || faultySensorName == "imu")) {
                 UIobj.acknowledgeForError();
-                // Deny Low error
+            // Deny Low error
             } else if(err >=9.0 && faultySensorName == "lidar" ) {
                 UIobj.denyForError();
+            // Accept High error
             } else if (err < 9.0 && faultySensorName == "imu") {
                 UIobj.acknowledgeForError();
+            // Deny Low error
             } else {
                 UIobj.denyForError();
             }
