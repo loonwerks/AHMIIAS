@@ -381,18 +381,8 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                     resultWriter.println(err+" "+trial_count);
                     resultWriter.flush();
                 }
-                UIobj.displayWarning("gps");
-                // Accept High error
-                if(isAutomated) {
-                    if (err >= 9.0) {
-                        UIobj.acknowledgeForError();
-                        // Deny Low error
-                    } else {
-                        UIobj.denyForError();
-                    }
-                }else{
-                    UIobj.ErrorSensor=true;
-                }
+                UIobj.displayWarning(UIobj.faultySensorName);
+                AcknowledgeError(err, UIobj.faultySensorName);
 
 
                 // QMemory memory = DefaultQMemory.create();
@@ -401,6 +391,23 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                 // }
             }
 
+        }
+    }
+    private void AcknowledgeError(double err, String faultySensorName){
+        // Accept High error
+        if(isAutomated) {
+            if (err >= 9.0 && (faultySensorName == "gps" || faultySensorName == "imu")) {
+                UIobj.acknowledgeForError();
+                // Deny Low error
+            } else if(err >=9.0 && faultySensorName == "lidar" ) {
+                UIobj.denyForError();
+            } else if (err < 9.0 && faultySensorName == "imu") {
+                UIobj.acknowledgeForError();
+            } else {
+                UIobj.denyForError();
+            }
+        }else{
+            UIobj.ErrorSensor=true;
         }
     }
     private void VTOLModeWmes(OutputEvent soarEvent)
