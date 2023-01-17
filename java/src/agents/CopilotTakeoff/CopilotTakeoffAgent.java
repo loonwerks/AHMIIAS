@@ -520,11 +520,20 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                         // incase previous response was missed
                         if(isAutomated) {
                             if (this.cycleCount == 18 + timeOffset) {
-                                // 0: gps-lidar, 1:gps-imu, 2: imu-lidar
-                                if (UIobj.GPSbarObj.error >= 9.0) {
-                                    UIobj.acknowledgeForError();
-                                } else {
-                                    UIobj.denyForError();
+                                if (UIobj.faultySensorName == "gps") {
+                                    if (UIobj.GPSbarObj.error >= 9.0) {
+                                        UIobj.acknowledgeForError();
+                                    } else {
+                                        UIobj.denyForError();
+                                    }
+                                } else if (UIobj.faultySensorName == "imu") {
+                                        UIobj.acknowledgeForError();
+                                } else if (UIobj.faultySensorName == "lidar") {
+                                    if (UIobj.LIDARbarObj.error < 10.0) {
+                                        UIobj.denyForError();
+                                    } else {
+                                        UIobj.acknowledgeForError();
+                                    }
                                 }
                             }
                         }else{
