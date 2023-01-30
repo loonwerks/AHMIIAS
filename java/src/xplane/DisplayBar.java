@@ -23,23 +23,28 @@ public class DisplayBar {
 		g.setColor(Color.white);
 		g.fillRect(0, 200, 100, 100);
 		Color c = Color.white;
-		if(warnHigh > doNotWarnHigh){
-			c = new Color(255, 0, 0, (int)(255*Math.max(warnHigh-doNotWarnHigh, 0)));
+		if(Math.abs(warnHigh-doNotWarnHigh) < 1.0 ){
+			if(warnHigh > doNotWarnHigh){
+				c = new Color(255, 0, 0, (int)(255*Math.max(warnHigh-doNotWarnHigh, 0)));
 
-		}else{
-			c = new Color(0, 255, 0, (int)(255*Math.max(-warnHigh+doNotWarnHigh, 0)));
+			}else{
+				c = new Color(0, 255, 0, (int)(255*Math.max(-warnHigh+doNotWarnHigh, 0)));
+			}
+			g.setColor(c);
+			g.fillRect(0, 100, 100, 100);
 		}
-		g.setColor(c);
-		g.fillRect(0, 100, 100, 100);
 
-		if(warnLow > doNotWarnLow){
-			c = new Color(255, 0, 0, (int)(255*Math.max(warnLow-doNotWarnLow, 0)));
+		if(Math.abs(warnLow-doNotWarnLow) < 1.0){
+			if(warnLow > doNotWarnLow){
+				c = new Color(255, 0, 0, (int)(255*Math.max(warnLow-doNotWarnLow, 0)));
 
-		}else{
-			c = new Color(0, 255, 0, (int)(255*Math.max(-warnLow+doNotWarnLow, 0)));
+			}else{
+				c = new Color(0, 255, 0, (int)(255*Math.max(-warnLow+doNotWarnLow, 0)));
+			}
+			g.setColor(c);
+			g.fillRect(0, 200, 100, 100);
 		}
-		g.setColor(c);
-		g.fillRect(0, 200, 100, 100);
+
 
 		g.setColor(Color.black);
 		if(error > 8.0) {

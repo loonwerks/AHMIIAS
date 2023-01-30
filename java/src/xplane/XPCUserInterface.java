@@ -21,7 +21,7 @@ public class XPCUserInterface extends JFrame implements Runnable{
     public double distanceToTarget = 0.0;
     private Font textFont1 = new Font("Courier", Font.BOLD,25);
     private Font textFont2 = new Font("Courier", Font.PLAIN,20);
-    private String sensorNames[] = {"GPS", "Lidar", "IMU", "Target Waypoint"};
+    private String sensorNames[] = {"GPS", "IMU", "Lidar", "Target Waypoint"};
     private double targetLat, targetLon;
     public int activeSensor = 0;
     private float errorLat=0, errorLon=0;
@@ -29,8 +29,8 @@ public class XPCUserInterface extends JFrame implements Runnable{
     public int SensorPossiblyUnreliable = -1;
     public int SensorUnreliable = -1;
     public String faultySensorName = "none";
-    public String pilotDecision = "nil";
-    public String pilotDecisionToChange ="nil";
+    public String pilotDecision = "none";
+    public String pilotDecisionToChange ="none";
     public boolean ErrorSensor = false;
     public boolean errorReseted = false;
     public boolean displayLandingButton = false, initiateLanding = false, abortLanding = false, finishedTakeoff = false;
@@ -56,22 +56,30 @@ public class XPCUserInterface extends JFrame implements Runnable{
     }
     public void injectLowError(){
         errorInGPS = true;
+//        errorInIMU = true;
+//        errorInLIDAR = true;
         errorLat = 0.06f;
         errorLon = 0.06f;
     }
     public void injectHighError(){
         errorInGPS = true;
+//        errorInIMU = true;
+//        errorInLIDAR = true;
         errorLat = 0.065f;
         errorLon = 0.065f;
     }
     public void injectSafetyError(){
         errorInGPS = true;
+//        errorInIMU = true;
+//        errorInLIDAR = true;
         errorLat = 0.08f;
         errorLon = 0.08f;
     }
     public void injectError(){
 
         errorInGPS = true;
+//        errorInIMU = true;
+//        errorInLIDAR = true;
         if (new Random().nextBoolean()) {
             errorLat = 0.06f;
             errorLon = 0.06f;
@@ -84,7 +92,7 @@ public class XPCUserInterface extends JFrame implements Runnable{
     public void injectIncrementalError(){
 
         errorInGPS = true;
-        //errorInIMU = true;
+//        errorInIMU = true;
         //errorInLIDAR = true;
         errorIsIncremental = true;
         //errorLat = 0.1f;
@@ -117,8 +125,9 @@ public class XPCUserInterface extends JFrame implements Runnable{
         errorLon=0;
         SensorPossiblyUnreliable = -1;
         SensorUnreliable = -1;
-        faultySensorName = "none";
-        pilotDecision = "nil";
+//        faultySensorName = "none";
+        pilotDecision = "none";
+        pilotDecisionToChange = "none";
     }
     public void errorReset(){
         errorReseted = true;
@@ -170,18 +179,16 @@ public class XPCUserInterface extends JFrame implements Runnable{
         return positions[0][1];
     }
 
-    public double getLidarLat(){
-        return positions[1][0];
-    }
+    public double getLidarLat(){return positions[2][0];}
     public double getLidarLon(){
-        return positions[1][1];
+        return positions[2][1];
     }
 
     public double getIMULat(){
-        return positions[2][0];
+        return positions[1][0];
     }
     public double getIMULon(){
-        return positions[2][1];
+        return positions[1][1];
     }
 
     @Override
@@ -338,47 +345,48 @@ public class XPCUserInterface extends JFrame implements Runnable{
         g.drawString("GPS Sensor", 1100, 775);
         GPSbarObjOld.error = GPSbarObj.error;
 
-        LIDARdisplayObj.sensor=1;
-        LIDARdisplayObj.paint(g);
-        BufferedImage IMUbarImg = new BufferedImage(500,500, BufferedImage.TYPE_INT_ARGB);
-        LIDARbarObj.draw(IMUbarImg.getGraphics());
-        LIDARbarObj.warnHigh = LIDARdisplayObj.warnHigh;
-        LIDARbarObj.warnLow = LIDARdisplayObj.warnLow;
-        LIDARbarObj.doNotWarnHigh = LIDARdisplayObj.doNotWarnHigh;
-        LIDARbarObj.doNotWarnLow = LIDARdisplayObj.doNotWarnLow;
-        g.drawImage(IMUbarImg, 1600,300, null);
-        BufferedImage IMUbarImgOld = new BufferedImage(500,500, BufferedImage.TYPE_INT_ARGB);
-        LIDARbarObjOld.draw(IMUbarImgOld.getGraphics());
-        /*LIDARbarObjOld.warnHigh = LIDARdisplayObj.warnHigh;
-        LIDARbarObjOld.warnLow = LIDARdisplayObj.warnLow;
-        LIDARbarObjOld.doNotWarnHigh = LIDARdisplayObj.doNotWarnHigh;
-        LIDARbarObjOld.doNotWarnLow = LIDARdisplayObj.doNotWarnLow;*/
-        g.drawImage(IMUbarImgOld, 1450,300, null);
-        g.drawString("Previous", 1450,725);
-        g.drawString("Present", 1600,725);
-        g.drawString("IMU Sensor", 1500, 775);
-        LIDARbarObjOld.error = LIDARbarObj.error;
 
-        IMUdisplayObj.sensor=2;
+        IMUdisplayObj.sensor=1;
         IMUdisplayObj.paint(g);
-        BufferedImage LIDARbarImg = new BufferedImage(500,500, BufferedImage.TYPE_INT_ARGB);
-        IMUbarObj.draw(LIDARbarImg.getGraphics());
+        BufferedImage IMUbarImg = new BufferedImage(500,500, BufferedImage.TYPE_INT_ARGB);
+        IMUbarObj.draw(IMUbarImg.getGraphics());
         IMUbarObj.warnHigh = IMUdisplayObj.warnHigh;
         IMUbarObj.warnLow = IMUdisplayObj.warnLow;
         IMUbarObj.doNotWarnHigh = IMUdisplayObj.doNotWarnHigh;
         IMUbarObj.doNotWarnLow = IMUdisplayObj.doNotWarnLow;
-        g.drawImage(LIDARbarImg, 2000,300, null);
-        BufferedImage LIDARbarImgOld = new BufferedImage(500,500, BufferedImage.TYPE_INT_ARGB);
-        IMUbarObjOld.draw(LIDARbarImgOld.getGraphics());
+        g.drawImage(IMUbarImg, 1600,300, null);
+        BufferedImage IMUbarImgOld = new BufferedImage(500,500, BufferedImage.TYPE_INT_ARGB);
+        IMUbarObjOld.draw(IMUbarImgOld.getGraphics());
         /*IMUbarObjOld.warnHigh = IMUdisplayObj.warnHigh;
         IMUbarObjOld.warnLow = IMUdisplayObj.warnLow;
         IMUbarObjOld.doNotWarnHigh = IMUdisplayObj.doNotWarnHigh;
         IMUbarObjOld.doNotWarnLow = IMUdisplayObj.doNotWarnLow;*/
+        g.drawImage(IMUbarImgOld, 1450,300, null);
+        g.drawString("Previous", 1450,725);
+        g.drawString("Present", 1600,725);
+        g.drawString("IMU Sensor", 1500, 775);
+        IMUbarObjOld.error = IMUbarObj.error;
+
+        LIDARdisplayObj.sensor=2;
+        LIDARdisplayObj.paint(g);
+        BufferedImage LIDARbarImg = new BufferedImage(500,500, BufferedImage.TYPE_INT_ARGB);
+        LIDARbarObj.draw(LIDARbarImg.getGraphics());
+        LIDARbarObj.warnHigh = LIDARdisplayObj.warnHigh;
+        LIDARbarObj.warnLow = LIDARdisplayObj.warnLow;
+        LIDARbarObj.doNotWarnHigh = LIDARdisplayObj.doNotWarnHigh;
+        LIDARbarObj.doNotWarnLow = LIDARdisplayObj.doNotWarnLow;
+        g.drawImage(LIDARbarImg, 2000,300, null);
+        BufferedImage LIDARbarImgOld = new BufferedImage(500,500, BufferedImage.TYPE_INT_ARGB);
+        IMUbarObjOld.draw(LIDARbarImgOld.getGraphics());
+        /*LIDARbarObjOld.warnHigh = LIDARdisplayObj.warnHigh;
+        LIDARbarObjOld.warnLow = LIDARdisplayObj.warnLow;
+        LIDARbarObjOld.doNotWarnHigh = LIDARdisplayObj.doNotWarnHigh;
+        LIDARbarObjOld.doNotWarnLow = LIDARdisplayObj.doNotWarnLow;*/
         g.drawImage(LIDARbarImgOld, 1850,300, null);
         g.drawString("Previous", 1850,725);
         g.drawString("Present", 2000,725);
         g.drawString(" LIDAR Sensor", 1900, 775);
-        IMUbarObjOld.error = IMUbarObj.error;
+        LIDARbarObjOld.error = LIDARbarObj.error;
 
 
     }
@@ -481,6 +489,10 @@ public class XPCUserInterface extends JFrame implements Runnable{
                 denyChange();
             }else if(!errorInGPS && InduceIncrementalErrorButton.button.intersects(new Rectangle(mx,my,1,1))){
                 injectIncrementalError();
+            }else if(ErrorSensor && AcknowledgeErrorButton.button.intersects(new Rectangle(mx,my,1,1))){
+                acknowledgeForError();
+            } else if (ErrorSensor && DenyErrorButton.button.intersects(new Rectangle(mx,my,1,1))) {
+                denyForError();
             }else if(!initiateLanding && LandButton.button.intersects(new Rectangle(mx,my,1,1))){
                 //initiate landing
                 initiateLanding = true;
@@ -488,11 +500,6 @@ public class XPCUserInterface extends JFrame implements Runnable{
                 abortLanding = true;
             }else if(landingOptions.getSelectedOption(mx,my) != -1) {
                 reroutedLandingZone = landingOptions.getSelectedOption(mx, my);
-            }else if(ErrorSensor && AcknowledgeErrorButton.button.intersects(new Rectangle(mx,my,1,1))){
-                acknowledgeForError();
-            } else if (ErrorSensor && DenyErrorButton.button.intersects(new Rectangle(mx,my,1,1))) {
-                denyForError();
-
             }
         }
 

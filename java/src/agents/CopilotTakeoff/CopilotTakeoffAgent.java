@@ -65,7 +65,6 @@ public class CopilotTakeoffAgent extends XPlaneAgent
     private VotingLogic votingobj;
     private int cycleCount = 0, trial_count = 0,timeOffset = 0;;
     private int responseCount =0, response_count =0, responseTimeOffset =0;
-    private String pilotAlertResponse = "yes";
     private boolean trialActive = false;
     private boolean responseActive = false;
     private PrintWriter rlWriter, resultWriter;
@@ -90,9 +89,9 @@ public class CopilotTakeoffAgent extends XPlaneAgent
         // uncomment below to see the trace of SOAR execution.
         // It is usually lots of text, but it is often useful
 
-        // sagt.getTrace().enableAll();
-        // decisionCycle = Adaptables.adapt(sagt, DecisionCycle.class);
-        // decisionCycle.reset();
+//         sagt.getTrace().enableAll();
+//         decisionCycle = Adaptables.adapt(sagt, DecisionCycle.class);
+//         decisionCycle.reset();
         PipedWriter agentWriter = new PipedWriter();
         filterOutput = new PipedReader();
 
@@ -127,9 +126,6 @@ public class CopilotTakeoffAgent extends XPlaneAgent
 
         sagt.initialize();
         try {
-            //sagt.getInterpreter().eval("rl --set temporal-discount off");
-            //sagt.getInterpreter().eval("rl --set hrl-discount on");
-            //sagt.getInterpreter().eval("rl --set discount-rate 0.0");
             sagt.getInterpreter().eval("trace --rl");
         } catch (SoarException e) {
             e.printStackTrace();
@@ -152,14 +148,16 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                 add("gps-error", 0.0).markWme("gps-error").
                 add("imu-error", 0.0).markWme("imu-error").
                 add("lidar-error", 0.0).markWme("lidar-error").
-                add("pilot_decision", "none").markWme("pilot_decision").
+                add("pilot-decision", "none").markWme("pilot-decision").
+                add("pilot-decision-to-change", "none").markWme("pilot-decision-to-change").
                 add("initiate-landing", UIobj.initiateLanding).markWme("initiate-landing").
                 add("abort-landing", UIobj.initiateLanding).markWme("abort-landing").
                 add("distance-to-target", UIobj.distanceToTarget).markWme("distance-to-target").
-                add("sensor-alert-accepted", "nil").markWme("sensor-alert-accepted").
+//                add("sensor-alert-accepted", "none").markWme("sensor-alert-accepted").
+                add("alert-sensor-error", errorInSensor).markWme("alert-sensor-error").
                 add("reversersON", reversersON).markWme("reverse").
-                add("learning_mode", "false").markWme("learning_mode").
-                add("change_sensor_auth", "false").markWme("change_sensor_auth").
+                add("learning-mode", "off").markWme("learning-mode").
+                add("change-sensor-auth", "false").markWme("change-sensor-auth").
                 add("gps-reliable", "true").markWme("gps-reliable").
                 add("imu-reliable", "true").markWme("imu-reliable").
                 add("lidar-reliable", "true").markWme("lidar-reliable");
@@ -236,7 +234,6 @@ public class CopilotTakeoffAgent extends XPlaneAgent
             Wme nextWME = wmes.next();
             printWme(nextWME);
             //System.err.println(nextWME.getAttribute().asString().getValue());
-//            System.out.println(UIobj.activeSensor + " is the selected sensor right now.");
             if (nextWME.getAttribute().asString().getValue().equals("throttle"))
             {
                 //System.err.println("HELLO");
@@ -270,7 +267,7 @@ public class CopilotTakeoffAgent extends XPlaneAgent
 
                 String txt = nextWME.getValue().toString();
                 if(txt.equalsIgnoreCase("yes")){
-                    UIobj.SensorPossiblyUnreliable = 1;
+                    UIobj.SensorPossiblyUnreliable = 2;
                     LidarReliable = false;
                 }
 
@@ -281,7 +278,7 @@ public class CopilotTakeoffAgent extends XPlaneAgent
 
                 String txt = nextWME.getValue().toString();
                 if(txt.equalsIgnoreCase("yes")){
-                    UIobj.SensorPossiblyUnreliable = 2;
+                    UIobj.SensorPossiblyUnreliable = 1;
                     IMUReliable = false;
                 }
 
@@ -332,27 +329,28 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                 System.out.println(nextWME.getValue());
 
                 String txt = nextWME.getValue().toString();
-                if(txt.equalsIgnoreCase("lidar")){
+                if(txt.equalsIgnoreCase("imu")){
                     UIobj.activeSensor = 1;
-                }else if(txt.equalsIgnoreCase("imu")){
+                }else if(txt.equalsIgnoreCase("lidar")){
                     UIobj.activeSensor = 2;
                 }else if(txt.equalsIgnoreCase("gps")){
                     UIobj.activeSensor = 0;
                 }
-                UIobj.pilotDecisionToChange = "nil";
-            }else if (nextWME.getAttribute().asString().getValue().equals("clear-sensor-alert-response"))
+                UIobj.pilotDecisionToChange = "none";
+            }else if (nextWME.getAttribute().asString().getValue().equals("clear-pilot-response-for-error"))
             {
+                System.out.println("clear-pilot-response-for-error");
+                System.out.println(nextWME.getValue());
                 if(nextWME.getTimetag()>this.timeTagClear) {
                     this.timeTagClear = nextWME.getTimetag();
-                    System.out.println("clear-sensor-alert-response");
+                    System.out.println("clear-pilot-response-for-error");
                     System.out.println(nextWME.getValue());
 
-                    UIobj.pilotDecision = "nil";
-                    UIobj.reset();
+//                    UIobj.reset();
                     QMemory memory = DefaultQMemory.create();
                     SoarQMemoryAdapter adapter = SoarQMemoryAdapter.attach(sagt, memory);
-                    //memory.setString("io.output-link.clear-sensor-alert-response", "");
-                    //memory.remove("io.output-link.clear-sensor-alert-response");
+                    //memory.setString("io.output-link.clear-pilot-response-for-error", "");
+                    //memory.remove("io.output-link.clear-pilot-response-for-error");
                     //memory.remove("io.flightdata.input-link.alert-sensor-error");
                 }
             }else if (nextWME.getAttribute().asString().getValue().equals("alert-sensor-error"))
@@ -361,29 +359,44 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                 String faultySensorName = nextWME.getValue().toString();
                 UIobj.displayWarning(faultySensorName);
 
-
-
                 //QMemory memory = DefaultQMemory.create();
                 // SoarQMemoryAdapter adapter = SoarQMemoryAdapter.attach(sagt, memory);
                 //memory.remove("io.output-link.alert-sensor-error");
-                //memory.setString("io.output-link.clear-sensor-alert-response", "");
+                //memory.setString("io.output-link.clear-pilot-response-for-error", "");
 
 
             }else if (nextWME.getAttribute().asString().getValue().equals("alert-sensor-error-value"))
             {
                 // if(nextWME.getTimetag()>this.timeTag) {
                 this.timeTag = nextWME.getTimetag();
-                //memory.setString("io.output-link.clear-sensor-alert-response", "");
+                //memory.setString("io.output-link.clear-pilot-response-for-error", "");
                 double err = nextWME.getValue().asDouble().getValue();
-//                System.err.println(nextWME.getValue()+" "+err+" "+trial_count);
-
                 if (this.trial_count == 0) {
                     resultWriter.println(err+" "+trial_count);
                     resultWriter.flush();
                 }
-                UIobj.displayWarning(UIobj.faultySensorName);
-                AcknowledgeError(err, UIobj.faultySensorName);
-
+                String faultySensorName = UIobj.faultySensorName;
+                UIobj.displayWarning(faultySensorName);
+                if(isAutomated) {
+                    // Accept High error
+                    System.out.println(faultySensorName);
+                    if (err >= 9.0 && (faultySensorName.equalsIgnoreCase("gps") || faultySensorName.equalsIgnoreCase("imu"))) {
+                        UIobj.acknowledgeForError();
+                        System.err.println("Error Acknowledged");
+                        // Deny Low error
+                    } else if(err >=9.0 && faultySensorName.equalsIgnoreCase("lidar")) {
+                        UIobj.denyForError();
+                        // Accept High error
+                    } else if (err < 9.0 && faultySensorName.equalsIgnoreCase("imu")) {
+                        UIobj.acknowledgeForError();
+                        // Deny Low error
+                    } else {
+                        UIobj.denyForError();
+                    }
+                }
+//                else{
+//                    UIobj.ErrorSensor=true;
+//                }
 
                 // QMemory memory = DefaultQMemory.create();
                 //SoarQMemoryAdapter adapter = SoarQMemoryAdapter.attach(sagt, memory);
@@ -393,26 +406,7 @@ public class CopilotTakeoffAgent extends XPlaneAgent
 
         }
     }
-    private void AcknowledgeError(double err, String faultySensorName){
 
-        if(isAutomated) {
-            // Accept High error
-            if (err >= 9.0 && (faultySensorName == "gps" || faultySensorName == "imu")) {
-                UIobj.acknowledgeForError();
-            // Deny Low error
-            } else if(err >=9.0 && faultySensorName == "lidar" ) {
-                UIobj.denyForError();
-            // Accept High error
-            } else if (err < 9.0 && faultySensorName == "imu") {
-                UIobj.acknowledgeForError();
-            // Deny Low error
-            } else {
-                UIobj.denyForError();
-            }
-        }else{
-            UIobj.ErrorSensor=true;
-        }
-    }
     private void VTOLModeWmes(OutputEvent soarEvent)
     {
 
@@ -435,21 +429,15 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                         xpcobj.setAutopilot(162);
                     ///xpcobj.setAutopilot(164);
 
-
                 }else if(txt.equalsIgnoreCase("horizontal")){
                     xpcobj.setVTOLModeHorizontal();
                     UIobj.finishedTakeoff=true;
                     if(xpcobj.getAutopilotState() == 164)
                         xpcobj.setAutopilot(162);
-
-
-
                 }else{
                     System.err.println("ERROR invalid VTOLMode");
                 }
-
                 //speakText(txt);
-
                 // QMemory memory = DefaultQMemory.create();
                 //SoarQMemoryAdapter adapter = SoarQMemoryAdapter.attach(sagt, memory);
                 //memory.setString("io.output-link.throttle", "");
@@ -463,7 +451,10 @@ public class CopilotTakeoffAgent extends XPlaneAgent
             long bt = System.nanoTime()/1000000;
             FlightData data = getFlightData();
             double sensorErrors[] = votingobj.checkForReliability(UIobj.positions,data.altitude);
+            // 0: gps-lidar, 1: gps-imu, 2: imu-lidar
             UIobj.GPSbarObj.error = Math.min(sensorErrors[0],sensorErrors[1]);
+//            UIobj.IMUbarObj.error = Math.min(sensorErrors[1],sensorErrors[2]);
+            //UIobj.LIDARbarObj.error = Math.min(sensorErrors[0],sensorErrors[2]);
             try {
                 if(UIobj.learningModeUpdate != -1){
                     if (UIobj.learningModeUpdate == 0){
@@ -474,7 +465,6 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                     }
                     else if(UIobj.learningModeUpdate == 1){
                         USE_LEARNING = false;
-                        this.trialActive = false;
                         UIobj.sensorChangeLearningObj.learningModeInfo=false;
                     }
                 }
@@ -498,7 +488,7 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                             sagt.getInterpreter().eval("rl --set learning off");
                             //sagt.getInterpreter().eval("echo turning learning off");
 
-                            // Testing if non incremental error fixes issue with wrong preference values
+                            // Testing if non-incremental error fixes issue with wrong preference values
                             //UIobj.injectError();
                             UIobj.injectIncrementalError();
                         }else {
@@ -517,30 +507,35 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                     }
                     if(this.trialActive) {
                         this.cycleCount++;
+
                         // incase previous response was missed
                         if(isAutomated) {
                             if (this.cycleCount == 18 + timeOffset) {
-                                if (UIobj.faultySensorName == "gps") {
-                                    if (UIobj.GPSbarObj.error >= 9.0) {
+                                if (UIobj.faultySensorName.equalsIgnoreCase("gps")) {
+
+                                    if (Math.min(sensorErrors[0], sensorErrors[1]) >= 9.0) {
+                                        System.err.println("Acknowledged - 1");
                                         UIobj.acknowledgeForError();
                                     } else {
+                                        System.err.println("Denied - 1");
                                         UIobj.denyForError();
                                     }
-                                } else if (UIobj.faultySensorName == "imu") {
-                                        UIobj.acknowledgeForError();
-                                } else if (UIobj.faultySensorName == "lidar") {
-                                    if (UIobj.LIDARbarObj.error < 10.0) {
+                                } else if (UIobj.faultySensorName.equalsIgnoreCase("imu")) {
+                                    System.err.println(Math.min(sensorErrors[1],sensorErrors[2]));
+                                    System.err.println("Acknowledged - 2");
+                                    UIobj.acknowledgeForError();
+                                } else if (UIobj.faultySensorName.equalsIgnoreCase("lidar")) {
+                                    if (Math.min(sensorErrors[0], sensorErrors[2]) < 10.0) {
                                         UIobj.denyForError();
-                                    } else {
-                                        UIobj.acknowledgeForError();
                                     }
                                 }
                             }
-                        }else{
-                            UIobj.ErrorSensor = true;
+//                        else{
+//                            UIobj.ErrorSensor = true;
+//                        }
                         }
-
                         if (this.cycleCount == 20 + timeOffset) {
+                            System.err.println(this.cycleCount + " " + timeOffset + " " +this.trialActive + " " + UIobj.pilotDecision);
                             UIobj.reset();
                         }
                         if (this.cycleCount >= 30 + timeOffset) {
@@ -563,35 +558,34 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                                         }else{
                                             val = a+b;
                                         }
-
                                         if(name.contains("gps")){
-                                            if(name.contains("do-not-warn") && name.contains("low*gps")){
+                                            if(name.equalsIgnoreCase("do-not-warn*select*low*gps")){
                                                 UIobj.GPSdisplayObj.doNotWarnLow = val;
-                                            }else if(name.contains("do-not-warn") && name.contains("high*gps")){
+                                            }else if(name.equalsIgnoreCase("do-not-warn*select*high*gps")){
                                                 UIobj.GPSdisplayObj.doNotWarnHigh = val;
-                                            }else if(name.contains("warn") && name.contains("low*gps")){
+                                            }else if(name.equalsIgnoreCase("warn*select*low*gps")){
                                                 UIobj.GPSdisplayObj.warnLow = val;
-                                            }else if(name.contains("warn") && name.contains("high*gps")){
+                                            }else if(name.equalsIgnoreCase("warn*select*high*gps")){
                                                 UIobj.GPSdisplayObj.warnHigh = val;
                                             }
                                         } else if (name.contains("lidar")) {
-                                            if(name.contains("do-not-warn") && name.contains("low*lidar")){
+                                            if(name.equalsIgnoreCase("do-not-warn*select*low*lidar")){
                                                 UIobj.LIDARdisplayObj.doNotWarnLow = val;
-                                            }else if(name.contains("do-not-warn") && name.contains("high*lidar")){
+                                            }else if(name.equalsIgnoreCase("do-not-warn*select*high*lidar")){
                                                 UIobj.LIDARdisplayObj.doNotWarnHigh = val;
-                                            }else if(name.contains("warn") && name.contains("low*lidar")){
+                                            }else if(name.equalsIgnoreCase("warn*select*low*lidar")){
                                                 UIobj.LIDARdisplayObj.warnLow = val;
-                                            }else if(name.contains("warn") && name.contains("high*lidar")){
+                                            }else if(name.equalsIgnoreCase("warn*select*high*lidar")){
                                                 UIobj.LIDARdisplayObj.warnHigh = val;
                                             }
                                         } else if (name.contains("imu")) {
-                                            if(name.contains("do-not-warn") && name.contains("low*imu")){
+                                            if(name.equalsIgnoreCase("do-not-warn*select*low*imu")){
                                                 UIobj.IMUdisplayObj.doNotWarnLow = val;
-                                            }else if(name.contains("do-not-warn") && name.contains("high*imu")){
+                                            }else if(name.equalsIgnoreCase("do-not-warn*select*high*imu")){
                                                 UIobj.IMUdisplayObj.doNotWarnHigh = val;
-                                            }else if(name.contains("warn") && name.contains("low*imu")){
+                                            }else if(name.equalsIgnoreCase("warn*select*low*imu")){
                                                 UIobj.IMUdisplayObj.warnLow = val;
-                                            }else if(name.contains("warn") && name.contains("high*imu")){
+                                            }else if(name.equalsIgnoreCase("warn*select*high*imu")){
                                                 UIobj.IMUdisplayObj.warnHigh = val;
                                             }
                                         }
@@ -601,32 +595,48 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                             }
                         }
                     }
-                } else{
-                    if(isAutomated && UIobj.finishedTakeoff && !warningResponse) {
-                        if (UIobj.GPSbarObj.error >= 9.0) {
-                            UIobj.acknowledgeForError();
-                            this.warningResponse = true;
-                            // Deny Low error
-                        } else {
-                            UIobj.denyForError();
-                            this.warningResponse = true;
-                        }
-                        //Pilot accepts/denies the warning issued.
-                        this.response_count += 1;
-                        if(UIobj.sensorChangeLearningObj.authorityToChangeInfo && this.response_count < 5 && UIobj.GPSbarObj.error >=10){
-                            UIobj.pilotDecisionToChange = "yes";
-                            InputWme pilotSensorChangeWme = builder.getWme("pilot_decision");
-                            pilotSensorChangeWme.update(syms.createString(UIobj.pilotDecision));
-                        }
-                        if (this.response_count == 5){
-                            //Pilot hasn't responded in 5 seconds.
-                            this.warningResponse =false;
-                            this.response_count =0;
-                            UIobj.errorReset();
-                        }
-
-                    }
                 }
+                else {
+                            UIobj.GPSdisplayObj.doNotWarnLow = -0.44102395046814723;//
+                            UIobj.GPSdisplayObj.doNotWarnHigh = -0.26272201487851005;
+                            UIobj.GPSdisplayObj.warnLow = -1.368224688831993;
+                            UIobj.GPSdisplayObj.warnHigh = -0.024536630970000004;
+                            UIobj.LIDARdisplayObj.doNotWarnLow = -0.08943312353220001;
+                            UIobj.LIDARdisplayObj.doNotWarnHigh = -0.09797019121649216;
+                            UIobj.LIDARdisplayObj.warnLow = -1.00109058896428;//
+                            UIobj.LIDARdisplayObj.warnHigh = -1.0447228987;
+                            UIobj.IMUdisplayObj.doNotWarnLow = 0.29178447557721987;
+                            UIobj.IMUdisplayObj.doNotWarnHigh = 0.29178447557721987;
+                            UIobj.IMUdisplayObj.warnLow = 0.9483619319005033;
+                            UIobj.IMUdisplayObj.warnHigh = 1.1079438430599902;
+
+                }
+//                else{
+//                    if(isAutomated && UIobj.finishedTakeoff && !warningResponse) {
+//                        if (UIobj.GPSbarObj.error >= 9.0) {
+//                            UIobj.acknowledgeForError();
+//                            this.warningResponse = true;
+//                            // Deny Low error
+//                        } else {
+//                            UIobj.denyForError();
+//                            this.warningResponse = true;
+//                        }
+//                        //Pilot accepts/denies the warning issued.
+//                        this.response_count += 1;
+//                        if(UIobj.sensorChangeLearningObj.authorityToChangeInfo && this.response_count < 5 && UIobj.GPSbarObj.error >=10){
+//                            UIobj.pilotDecisionToChange = "yes";
+//                            InputWme pilotSensorChangeWme = builder.getWme("pilot-decision-to-change");
+//                            pilotSensorChangeWme.update(syms.createString(UIobj.pilotDecision));
+//                        }
+//                        if (this.response_count == 5){
+//                            //Pilot hasn't responded in 5 seconds.
+//                            this.warningResponse =false;
+//                            this.response_count =0;
+//                            UIobj.errorReset();
+//                        }
+//
+//                    }
+//                }
 
                 //FlightData data = getFlightData();
                 //building the input structure for the soar agent
@@ -636,8 +646,9 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                 if(DISPLAYDETAILS)
                     System.out.println(data.lat +","+data.lon);
                 UIobj.setGPSValue((float) data.lat, (float) data.lon);
-                UIobj.setLidarValue((float) data.lat, (float) data.lon);
                 UIobj.setIMUValue((float) data.lat, (float) data.lon);
+                UIobj.setLidarValue((float) data.lat, (float) data.lon);
+
 
                 double latitude = 0.0;
                 double longitude = 0.0;
@@ -646,11 +657,11 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                     latitude = UIobj.getGPSLat();
                     longitude = UIobj.getGPSLon();
                 }else if(UIobj.activeSensor == 1){
-                    latitude = UIobj.getLidarLat();
-                    longitude = UIobj.getLidarLon();
-                }else{
                     latitude = UIobj.getIMULat();
                     longitude = UIobj.getIMULon();
+                }else{
+                    latitude = UIobj.getLidarLat();
+                    longitude = UIobj.getLidarLon();
                 }
                 if(DISPLAYDETAILS)
                     System.out.println(xpcobj.getAutopilotState());
@@ -696,6 +707,8 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                 throttle.update(syms.createDouble(data.throttle));
                 InputWme errorInSensorWme = builder.getWme("sensor-error");
                 errorInSensorWme.update(syms.createDouble(errorInSensor));
+                InputWme alertErrorInSensorWme = builder.getWme("alert-sensor-error");
+                alertErrorInSensorWme.update(syms.createDouble(errorInSensor));
 
                 //double sensorErrors[] = votingobj.checkForReliability(UIobj.positions,data.altitude);
                 InputWme GPSvLIDAR = builder.getWme("gps-lidar-error");
@@ -719,9 +732,9 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                 InputWme LIDARerr = builder.getWme("lidar-error");
                 LIDARerr.update(syms.createDouble(Math.min(sensorErrors[0],sensorErrors[2])));
 
-                InputWme learningModeWme  = builder.getWme("learning_mode");
+                InputWme learningModeWme  = builder.getWme("learning-mode");
                 learningModeWme.update(syms.createString(UIobj.sensorChangeLearningObj.learningModeInfo ? "on" : "off"));
-                InputWme sensorChangeAuthWme  = builder.getWme("change_sensor_auth");
+                InputWme sensorChangeAuthWme  = builder.getWme("change-sensor-auth");
                 sensorChangeAuthWme.update(syms.createString(UIobj.sensorChangeLearningObj.authorityToChangeInfo ? "on" : "off"));
 
 
@@ -729,8 +742,11 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                 initiatedLandingWme.update(syms.createString(UIobj.initiateLanding ? "yes":"no"));
                 InputWme abortLandingWme = builder.getWme("abort-landing");
                 abortLandingWme.update(syms.createString(UIobj.abortLanding ? "yes":"no"));
-                InputWme pilotWme = builder.getWme("pilot_decision");
+                InputWme pilotWme = builder.getWme("pilot-decision");
                 pilotWme.update(syms.createString(UIobj.pilotDecision));
+                InputWme pilotChangeWme = builder.getWme("pilot-decision-to-change");
+                pilotChangeWme.update(syms.createString(UIobj.pilotDecisionToChange));
+
 
                 InputWme d = builder.getWme("distance-to-target");
                 d.update(syms.createDouble(UIobj.distanceToTarget));
@@ -744,8 +760,8 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                 ab.update(syms.createString(Boolean.toString(data.airBrakesON)));
                 InputWme re = builder.getWme("reverse");
                 re.update(syms.createString(Boolean.toString(data.reversersON)));
-                InputWme alertAccepted = builder.getWme("sensor-alert-accepted");
-                alertAccepted.update(syms.createString(UIobj.pilotDecision));
+//                InputWme alertAccepted = builder.getWme("sensor-alert-accepted");
+//                alertAccepted.update(syms.createString(UIobj.pilotDecision));
                 // temp
                 // uncomment if you want to see the productions that matches
                 MatchSet matchSet = sagt.getMatchSet();

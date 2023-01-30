@@ -18,9 +18,9 @@ public class VotingLogic {
     public double[] checkForReliability(float[][] sensorPositions, int altitude){
         double horizontalThreshold = calculateHorizontalThreshold(altitude)/1000.0;//in Km
 
-        double GPSvsLIDARdistance = getDistanceBetweenTwoPoints(sensorPositions[0][0],sensorPositions[0][1],sensorPositions[1][0],sensorPositions[1][1]);
-        double GPSvsIMUdistance = getDistanceBetweenTwoPoints(sensorPositions[0][0],sensorPositions[0][1],sensorPositions[2][0],sensorPositions[2][1]);
-        double LIDARvsIMUdistance = getDistanceBetweenTwoPoints(sensorPositions[1][0],sensorPositions[1][1],sensorPositions[2][0],sensorPositions[2][1]);
+        double GPSvsLIDARdistance = getDistanceBetweenTwoPoints(sensorPositions[0][0],sensorPositions[0][1],sensorPositions[2][0],sensorPositions[2][1]);
+        double GPSvsIMUdistance = getDistanceBetweenTwoPoints(sensorPositions[0][0],sensorPositions[0][1],sensorPositions[1][0],sensorPositions[1][1]);
+        double LIDARvsIMUdistance = getDistanceBetweenTwoPoints(sensorPositions[2][0],sensorPositions[2][1],sensorPositions[1][0],sensorPositions[1][1]);
 
 
         return new double[]{truncate(GPSvsLIDARdistance),truncate(GPSvsIMUdistance),truncate(LIDARvsIMUdistance)};
