@@ -4,7 +4,7 @@
 # @created rjones 20210118
 
 echo "\nLoading handle-error.soar"
-#change_sensor_auth
+#change-sensor-auth
 ### Original code commented out, refactored code below
 #sp {propose*detect*gps*error
 #    (state <s> ^flight-mode horizontal)
@@ -66,7 +66,7 @@ echo "\nLoading handle-error.soar"
 #     }
 
 
-# Previous Code  
+# Previous Code
 # sp {top-state*elaborate*sensor-error-detected*lidar
 #     (state <s> ^flight-mode horizontal
 #                ^sensor-unreliable no
@@ -79,7 +79,7 @@ echo "\nLoading handle-error.soar"
 #     (write (crlf) |LIDAR is Unreliable!|)
 #     (<s> ^sensor-error-detected lidar)
 #     }
-# Previous Code  
+# Previous Code
 # sp {top-state*elaborate*sensor-error-detected*imu
 #     (state <s> ^flight-mode horizontal
 #                ^sensor-unreliable no
@@ -100,7 +100,8 @@ proc generateSensorErrorDetected { types } {
                     ^sensor-unreliable no
                     ^${type}-error-info <ei>
                     ^io.input-link.flightdata <fd>)
-            (<fd> ^change_sensor_auth on)
+            (<fd> ^change-sensor-auth on
+                  ^learning-mode off )
             (<ei> ^warning-accepted yes)
         -->
             (write (crlf) |${type} is Unreliable!|)
@@ -109,7 +110,7 @@ proc generateSensorErrorDetected { types } {
     	}
 }
 
-generateSensorErrorDetected { gps lidar imu }
+generateSensorErrorDetected { gps imu lidar }
 
 
 sp {propose*sensor-error-over-limit
@@ -127,7 +128,8 @@ sp {propose*pilot-agrees
                ^sensor-unreliable yes
               -^error-handling-complete yes)
     (<s> ^io.input-link.flightdata <fd>)
-    (<fd> ^pilot_decision agree)
+    (<fd> ^learning-mode off )
+    (<fd> ^pilot-decision-to-change yes)
 -->
     (write (crlf) |Pilot agrees.|)
 
@@ -141,7 +143,8 @@ sp {propose*pilot-disagrees
                ^sensor-unreliable yes
               -^error-handling-complete yes)
     (<s> ^io.input-link.flightdata <fd>)
-    (<fd> ^pilot_decision disagree)
+    (<fd> ^learning-mode off )
+    (<fd> ^pilot-decision-to-change no)
 -->
     (write (crlf) |Pilot disagrees.|)
 

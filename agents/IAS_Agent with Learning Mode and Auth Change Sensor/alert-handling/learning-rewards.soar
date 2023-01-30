@@ -39,7 +39,7 @@ proc generateRewardAccepted { types } {
             (state <s> ^reward-link <rl>
                 ^${type}-error-info.warning-accepted yes)
             (<s> ^io.input-link.flightdata <fd>)
-            (<fd> ^learning_mode on)
+            (<fd> ^learning-mode on)
         -->
             (write (crlf) |User accepted warning. Reward value is 1.0 for ${type} |)
             (<rl> ^reward <rr>)
@@ -48,7 +48,7 @@ proc generateRewardAccepted { types } {
    }
 }
 
-generateRewardAccepted { gps lidar imu }
+generateRewardAccepted { gps imu lidar }
 
 proc generateRewardRejected { types } {
    foreach type $types {
@@ -56,7 +56,7 @@ proc generateRewardRejected { types } {
             (state <s> ^reward-link <rl>
                 ^${type}-error-info.warning-accepted no)
             (<s> ^io.input-link.flightdata <fd>)
-            (<fd> ^learning_mode on)
+            (<fd> ^learning-mode on)
         -->
             (write (crlf) |User rejected warning. Reward value is -1.0 for ${type} |)
             (<rl> ^reward <rr>)
@@ -65,4 +65,4 @@ proc generateRewardRejected { types } {
    }
 }
 
-generateRewardRejected { gps lidar imu }
+generateRewardRejected { gps imu lidar }

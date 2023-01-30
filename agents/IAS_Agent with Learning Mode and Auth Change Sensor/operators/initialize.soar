@@ -15,6 +15,7 @@ sp {apply*initialize
     (<s> ^faulty-sensor none)
     (<s> ^landing no)
     (<s> ^notified-pilot no)
+    (<s> ^user-response none)
     (<s> ^gps-error-info <egps>)
     (<egps> ^name gps )
     #(<egps> ^current-value 0.0)
