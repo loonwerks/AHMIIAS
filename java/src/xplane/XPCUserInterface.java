@@ -377,7 +377,7 @@ public class XPCUserInterface extends JFrame implements Runnable{
         LIDARbarObj.doNotWarnLow = LIDARdisplayObj.doNotWarnLow;
         g.drawImage(LIDARbarImg, 2000,300, null);
         BufferedImage LIDARbarImgOld = new BufferedImage(500,500, BufferedImage.TYPE_INT_ARGB);
-        IMUbarObjOld.draw(LIDARbarImgOld.getGraphics());
+        LIDARbarObjOld.draw(LIDARbarImgOld.getGraphics());
         /*LIDARbarObjOld.warnHigh = LIDARdisplayObj.warnHigh;
         LIDARbarObjOld.warnLow = LIDARdisplayObj.warnLow;
         LIDARbarObjOld.doNotWarnHigh = LIDARdisplayObj.doNotWarnHigh;
