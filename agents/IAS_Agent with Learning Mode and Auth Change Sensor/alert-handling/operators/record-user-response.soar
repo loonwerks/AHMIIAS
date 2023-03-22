@@ -18,12 +18,13 @@ proc generateRecordUserResponseYesApply { types } {
 		-->
 		    (<ei> ^warning-accepted yes)
 		    (<s> ^warning-issued ${type} -)
-		    (<out> ^clear-sensor-alert-response yes)
+		    (<out> ^clear-pilot-response-for-error yes)
+			(write (crlf) |User Response Yes|)
 		"
     	}
 }
 
-generateRecordUserResponseYesApply { gps lidar imu }
+generateRecordUserResponseYesApply { gps imu lidar }
 
 proc generateRecordUserResponseNoApply { types } {
 	foreach type $types {
@@ -38,12 +39,13 @@ proc generateRecordUserResponseNoApply { types } {
 		-->
 		    (<ei> ^warning-accepted no)
 		    (<s> ^warning-issued ${type} -)
-		    (<out> ^clear-sensor-alert-response yes)
+		    (<out> ^clear-pilot-response-for-error no)
+			(write (crlf) |User Response No|)
 		"
     	}
 }
 
-generateRecordUserResponseNoApply { gps lidar imu }
+generateRecordUserResponseNoApply { gps imu lidar }
 
 
 #sp {record-user-response*apply*gps

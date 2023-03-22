@@ -41,12 +41,12 @@ sp {top-state*elaborate*error-info*current-value*imu
 
 
 sp {top-state*elaborate*user-response*agree
-    (state <s> ^io.input-link.flightdata.sensor-alert-accepted yes)
+    (state <s> ^io.input-link.flightdata.pilot-decision yes)
 -->
     (<s> ^user-response yes)
     }
 sp {top-state*elaborate*user-response*disagree
-    (state <s> ^io.input-link.flightdata.sensor-alert-accepted no)
+    (state <s> ^io.input-link.flightdata.pilot-decision no)
 -->
     (<s> ^user-response no)
     }
@@ -89,7 +89,7 @@ proc generateSafetyWarnCondition { types } {
    }
 }
 
-generateSafetyWarnCondition { gps lidar imu }
+generateSafetyWarnCondition { gps imu lidar }
 
 ##########################
 ### Detect high warn-condition for a sensor
@@ -108,7 +108,7 @@ proc generateHighWarnCondition { types } {
             "
    }
 }
-generateHighWarnCondition { gps lidar imu }
+generateHighWarnCondition { gps imu lidar }
 
 ##########################
 ### Detect low warn-condition for a sensor
@@ -121,8 +121,8 @@ proc generateLowWarnCondition { types } {
                          ^${type}-error-info <ei>)
               (<ei> ^current-value >= <nv>)
               (<ei> ^current-value < <hv>)
-              
-              
+
+
 	      #(<ei> -^warn-condition safety)
 	      #(<ei> -^warn-condition high)
             -->
@@ -130,7 +130,7 @@ proc generateLowWarnCondition { types } {
             "
    }
 }
-generateLowWarnCondition { gps lidar imu }
+generateLowWarnCondition { gps imu lidar }
 
 proc generateDisplayWarnCondition { types } {
    foreach type $types {
@@ -143,7 +143,7 @@ proc generateDisplayWarnCondition { types } {
             "
    }
 }
-#generateDisplayWarnCondition { gps lidar imu }
+#generateDisplayWarnCondition { gps imu lidar }
 
 
 ######################
@@ -165,7 +165,7 @@ proc generateNormalWarnCondition { types } {
    }
 }
 
-generateNormalWarnCondition { gps lidar imu }
+generateNormalWarnCondition { gps imu lidar }
 
 ########################
 ### Any time one of the error values changes, record the change and set the ^error-changed flag
@@ -185,7 +185,7 @@ proc generateRecordChangedErrorPropose { types } {
             "
    }
 }
-generateRecordChangedErrorPropose { gps lidar imu }
+generateRecordChangedErrorPropose { gps imu lidar }
 
 
 ############################
@@ -219,7 +219,7 @@ proc generateDecisionPropose { types } {
    }
 }
 
-generateDecisionPropose { gps lidar imu }
+generateDecisionPropose { gps imu lidar }
 
 sp {warn*propose
     (state <s> ^ready-to-decide yes)
@@ -247,14 +247,14 @@ proc generateRecordUserResponsePropose { types } {
               (state <s> ^${type}-error-info <ei>)
 	      (<s> ^flight-mode horizontal)
 	      (<s> ^warning-issued ${type})
-	      (<s> ^user-response <x> <> nil)
+	      (<s> ^user-response <x> <> none)
 	      (<ei> -^warning-accepted)
             -->
-              (<s> ^operator <o> + >,=)
+          (<s> ^operator <o> + >,=)
 	      (<o> ^name record-user-response)
 	      (write (crlf) |Pilot response: | <x>)
             "
    }
 }
 
-generateRecordUserResponsePropose { gps lidar imu }
+generateRecordUserResponsePropose { gps imu lidar }

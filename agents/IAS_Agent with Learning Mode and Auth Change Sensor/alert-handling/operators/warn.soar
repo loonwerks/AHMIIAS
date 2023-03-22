@@ -30,6 +30,7 @@ sp {warn*apply*warning-accepted*remove*gps
 -->
     (<ei> ^warning-accepted <x> -)
     (<s> ^ready-to-decide yes -)
+    (write (crlf) |Warning Accepted so Removed|)
     }
 
 sp {warn*apply*warning-accepted*remove*lidar
@@ -78,6 +79,7 @@ sp {warn*apply*issue-warning*gps
     (<s> ^warning-issued gps)
     (<ei> ^value-changed true -)
     (<s> ^ready-to-decide yes -)
+    (write (crlf) |Warning Issued|)
     }
 
 sp {warn*apply*issue-warning*lidar

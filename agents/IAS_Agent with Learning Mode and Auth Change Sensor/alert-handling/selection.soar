@@ -21,7 +21,7 @@ proc generateWarnBestSafetyCondition { types } {
         "
     }
 }
-generateWarnBestSafetyCondition { gps lidar imu }
+generateWarnBestSafetyCondition { gps imu lidar }
 
 ### Always choose NOT to warn in the normal condition
 
@@ -36,11 +36,10 @@ proc generateDoNotWarnBestNormalCondition { types } {
             (<ei> ^warn-condition <wc>)
         -->
             (<s> ^operator <o> >,=)
-            (write (crlf) |proposed do-not-warn in selection for ${type} | <wc> | condition |)
         "
     }
 }
-generateDoNotWarnBestNormalCondition { gps lidar imu }
+generateDoNotWarnBestNormalCondition { gps imu lidar }
 
 ################################
 ### Learning conditions
