@@ -33,6 +33,7 @@ public class XPCUserInterface extends JFrame implements Runnable{
     public String pilotDecisionToChange ="none";
     public boolean ErrorSensor = false;
     public boolean errorReseted = false;
+    public boolean reroutedLandingZoneSelected = false;
     public boolean displayLandingButton = false, initiateLanding = false, abortLanding = false, finishedTakeoff = false;
     public int reroutedLandingZone = -1;
     public int learningModeUpdate = -1;
@@ -72,8 +73,8 @@ public class XPCUserInterface extends JFrame implements Runnable{
         errorInGPS = true;
 //        errorInIMU = true;
 //        errorInLIDAR = true;
-        errorLat = 0.08f;
-        errorLon = 0.08f;
+        errorLat = 0.072f;
+        errorLon = 0.072f;
     }
     public void injectError(){
 
@@ -125,7 +126,7 @@ public class XPCUserInterface extends JFrame implements Runnable{
         errorLon=0;
         SensorPossiblyUnreliable = -1;
         SensorUnreliable = -1;
-//        faultySensorName = "none";
+        faultySensorName = "none";
         pilotDecision = "none";
         pilotDecisionToChange = "none";
     }
@@ -304,9 +305,9 @@ public class XPCUserInterface extends JFrame implements Runnable{
             AcknowledgeErrorButton.draw(g);
             DenyErrorButton.draw(g);
         }
-        if(!initiateLanding && displayLandingButton){
+        if(!initiateLanding && displayLandingButton && !sensorChangeLearningObj.learningModeInfo){
             LandButton.draw(g);
-        }else if(initiateLanding && !abortLanding){
+        }else if(initiateLanding && !abortLanding && !sensorChangeLearningObj.learningModeInfo){
             AbortLandingButton.draw(g);
         }
         drawTestUI(g);
@@ -377,7 +378,7 @@ public class XPCUserInterface extends JFrame implements Runnable{
         LIDARbarObj.doNotWarnLow = LIDARdisplayObj.doNotWarnLow;
         g.drawImage(LIDARbarImg, 2000,300, null);
         BufferedImage LIDARbarImgOld = new BufferedImage(500,500, BufferedImage.TYPE_INT_ARGB);
-        IMUbarObjOld.draw(LIDARbarImgOld.getGraphics());
+        LIDARbarObjOld.draw(LIDARbarImgOld.getGraphics());
         /*LIDARbarObjOld.warnHigh = LIDARdisplayObj.warnHigh;
         LIDARbarObjOld.warnLow = LIDARdisplayObj.warnLow;
         LIDARbarObjOld.doNotWarnHigh = LIDARdisplayObj.doNotWarnHigh;
@@ -500,6 +501,7 @@ public class XPCUserInterface extends JFrame implements Runnable{
                 abortLanding = true;
             }else if(landingOptions.getSelectedOption(mx,my) != -1) {
                 reroutedLandingZone = landingOptions.getSelectedOption(mx, my);
+                reroutedLandingZoneSelected = true;
             }
         }
 

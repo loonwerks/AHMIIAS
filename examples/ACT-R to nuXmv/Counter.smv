@@ -8,7 +8,6 @@ VAR goal: {yes, no};
 VAR num1: {nil,one,two,three,four,five};
 VAR num2: {nil,one,two,three,four,five};
 VAR num: {nil,one,two,three,four,five};
-VAR stepcounter: integer; 
 
 ASSIGN
  init(count_from-Start) := two;
@@ -20,27 +19,28 @@ ASSIGN
  init(num1) := nil;
  init(num2) := nil;
  init(num) := nil;
- init(stepcounter) := 0;
 
-VAR InputTemplate: CounterInput(stepcounter,num1, num2, num, goal,count_from-Count,count_from-Start,count_from-End, number-Number,number-Next); 
-VAR ACTR: counter(counter,num1, num2, num, goal,count_from-Count,count_from-Start,count_from-End, number-Number,number-Next);
+VAR InputTemplate: CounterInput(num1, num2, num, goal,count_from-Count,count_from-Start,count_from-End, number-Number,number-Next); 
+VAR ACTR: counter(num1, num2, num, goal,count_from-Count,count_from-Start,count_from-End, number-Number,number-Next);
 
 -----------------------------------------------
 --LTLSPECS
-LTLSPEC F (Y num1 = three)
--- LTLSPEC F (X num2 = two)
--- LTLSPEC F (num1 = num)
---LTLSPEC F(stepcounter <2)
-
+LTLSPEC F (goal = no U num = five)
+--LTLSPEC F (goal = no U num2= three)
+--LTLSPEC F (num1 = two U num= five)
+-- LTLSPEC F (Y num1 = three -> num2 = five) ---not proved
+--LTLSPEC F (X num1 = two -> num2 = one )
+--LTLSPEC F (X num1 = three & X num2 = four)
+--LTLSPEC F ( O num = one)
+--LTLSPEC F (X num1 = two & X num2 = one)
+--LTLSPEC F (Y num2 = three)
+--LTLSPEC G (Y num2 = three)
+--LTLSPEC F (Y num2 = three)
+--LTLSPEC G F (num1=three)
+--LTLSPEC F (X num2 = three)
+--LTLSPEC F (num1 = five)
 --------------------------------------------
-MODULE CounterInput(stepcounter, num1, num2, num, goal,count_from-Count,count_from-Start,count_from-End, number-Number,number-Next)
-     TRANS
-     next (stepcounter)=
-     case
-     (num1 = three & num2 = three):stepcounter + 1;
-     TRUE: stepcounter;
-    esac;
-
+MODULE CounterInput(num1, num2, num, goal,count_from-Count,count_from-Start,count_from-End, number-Number,number-Next)
     TRANS
         next(count_from-Start)=
         case
@@ -55,27 +55,19 @@ MODULE CounterInput(stepcounter, num1, num2, num, goal,count_from-Count,count_fr
         (count_from-End !=nil ): four;
         TRUE: count_from-End;
         esac;
-    TRANS
-        next(number-Next)=
-        case
-        (number-Number= two): three;
-        (number-Number= three): four;
-        TRUE: number-Next;
-        esac;
 
     TRANS 
         next(num1)=
         case
         (num1 = nil): count_from-Start;
-        (goal = no & count_from-Count= two & number-Next=three): three;
-        (goal = no & count_from-Count= three & number-Next=four): four;
-        (goal = no & count_from-Count= four & number-Next=five): five;
+        (goal = no & count_from-Count= num1 & number-Next=num2): num2;
         TRUE: num1;
         esac;
 
     TRANS
         next(num2)= 
         case
+        (num2 = nil): count_from-Count;
         (goal = no & count_from-Count=two): three;
         (goal = no & count_from-Count=three): four;
         (goal = no & count_from-Count=four): five;
@@ -85,22 +77,15 @@ MODULE CounterInput(stepcounter, num1, num2, num, goal,count_from-Count,count_fr
     TRANS 
         next (num)=
         case 
-        (goal = no & count_from-End= num2 & count_from-Count= num2 & num2 != nil): num2;
+        (num = nil): count_from-End;
+        (goal = no & count_from-Start= num2 & count_from-Count= num2 & num2 != nil): num;
         TRUE: num;
         esac;
 
 
-MODULE counter(stepcounter, num1, num2, num, goal,count_from-Count,count_from-Start,count_from-End, number-Number,number-Next)
+MODULE counter(num1, num2, num, goal,count_from-Count,count_from-Start,count_from-End, number-Number,number-Next)
 
     
-    TRANS 
-        next(number-Number) = 
-        case
-            (count_from-Start= num1 & count_from-Count = nil): num1;
-            (count_from-Count = num1 & count_from-End !=num & number-Number = num1 & number-Next=num2): num2;
-
-        TRUE : number-Number;
-        esac;
 
     TRANS 
         next(count_from-Count)=
@@ -110,7 +95,16 @@ MODULE counter(stepcounter, num1, num2, num, goal,count_from-Count,count_from-St
             
         TRUE : count_from-Count; 
         esac;
- 
+
+
+    TRANS 
+        next(number-Number) = 
+        case
+            (count_from-Start= num1 & count_from-Count = nil): num1;
+            (count_from-Count = num1 & count_from-End !=num & number-Number = num1 & number-Next=num2): num2;
+
+        TRUE : number-Number;
+        esac; 
 
     TRANS
         next(goal)=

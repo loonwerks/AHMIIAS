@@ -4,8 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6bb3fedb-805b-44ac-ab51-e1904d37b78c" name="Default Changelist" comment="Included learning for 3 sensors">
+    <list default="true" id="6bb3fedb-805b-44ac-ab51-e1904d37b78c" name="Default Changelist" comment="Actions after Learning">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/agents/CopilotTakeoff/CopilotTakeoffAgent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/agents/CopilotTakeoff/CopilotTakeoffAgent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/xplane/XPCUserInterface.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/xplane/XPCUserInterface.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/agents/CopilotTakeoff/CopilotTakeoffAgent.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/agents/CopilotTakeoff/CopilotTakeoffAgent.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/xplane/XPCUserInterface.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/xplane/XPCUserInterface.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -39,7 +43,7 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "last_opened_file_path": "D:/AHMIIAS_Updates",
+    "last_opened_file_path": "C:/WebTranslator",
     "project.structure.last.edited": "Modules",
     "project.structure.proportion": "0.0",
     "project.structure.side.proportion": "0.2",
@@ -328,7 +332,21 @@
       <option name="project" value="LOCAL" />
       <updated>1675093789968</updated>
     </task>
-    <option name="localTasksCounter" value="37" />
+    <task id="LOCAL-00037" summary="GUI Cleaning Update">
+      <created>1675870546967</created>
+      <option name="number" value="00037" />
+      <option name="presentableId" value="LOCAL-00037" />
+      <option name="project" value="LOCAL" />
+      <updated>1675870546967</updated>
+    </task>
+    <task id="LOCAL-00038" summary="Actions after Learning">
+      <created>1676945055508</created>
+      <option name="number" value="00038" />
+      <option name="presentableId" value="LOCAL-00038" />
+      <option name="project" value="LOCAL" />
+      <updated>1676945055508</updated>
+    </task>
+    <option name="localTasksCounter" value="39" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -360,6 +378,8 @@
     <MESSAGE value="AADL Mapping" />
     <MESSAGE value="Learning Preferences for Experimentation" />
     <MESSAGE value="Included learning for 3 sensors" />
-    <option name="LAST_COMMIT_MESSAGE" value="Included learning for 3 sensors" />
+    <MESSAGE value="GUI Cleaning Update" />
+    <MESSAGE value="Actions after Learning" />
+    <option name="LAST_COMMIT_MESSAGE" value="Actions after Learning" />
   </component>
 </project>

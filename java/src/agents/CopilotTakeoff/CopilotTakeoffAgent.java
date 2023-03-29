@@ -130,7 +130,7 @@ public class CopilotTakeoffAgent extends XPlaneAgent
         } catch (SoarException e) {
             e.printStackTrace();
         }
-
+        //Builds the flight data which has to be sent to the SOAR agent
         builder = InputBuilder.create(sagt.getInputOutput());
         builder.push("flightdata").markWme("fd").
                 add("airspeed", 0.0).markWme("as").
@@ -151,7 +151,8 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                 add("pilot-decision", "none").markWme("pilot-decision").
                 add("pilot-decision-to-change", "none").markWme("pilot-decision-to-change").
                 add("initiate-landing", UIobj.initiateLanding).markWme("initiate-landing").
-                add("abort-landing", UIobj.initiateLanding).markWme("abort-landing").
+                add("abort-landing", UIobj.abortLanding).markWme("abort-landing").
+                add("pilot-selected-landing-zone", "none").markWme("pilot-selected-landing-zone").
                 add("distance-to-target", UIobj.distanceToTarget).markWme("distance-to-target").
 //                add("sensor-alert-accepted", "none").markWme("sensor-alert-accepted").
                 add("alert-sensor-error", errorInSensor).markWme("alert-sensor-error").
@@ -596,47 +597,67 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                         }
                     }
                 }
-                else {
-                            UIobj.GPSdisplayObj.doNotWarnLow = -0.44102395046814723;//
-                            UIobj.GPSdisplayObj.doNotWarnHigh = -0.26272201487851005;
-                            UIobj.GPSdisplayObj.warnLow = -1.368224688831993;
-                            UIobj.GPSdisplayObj.warnHigh = -0.024536630970000004;
-                            UIobj.LIDARdisplayObj.doNotWarnLow = -0.08943312353220001;
-                            UIobj.LIDARdisplayObj.doNotWarnHigh = -0.09797019121649216;
-                            UIobj.LIDARdisplayObj.warnLow = -1.00109058896428;//
-                            UIobj.LIDARdisplayObj.warnHigh = -1.0447228987;
-                            UIobj.IMUdisplayObj.doNotWarnLow = 0.29178447557721987;
-                            UIobj.IMUdisplayObj.doNotWarnHigh = 0.29178447557721987;
-                            UIobj.IMUdisplayObj.warnLow = 0.9483619319005033;
-                            UIobj.IMUdisplayObj.warnHigh = 1.1079438430599902;
+
+                else{
+                    UIobj.GPSdisplayObj.doNotWarnLow = -0.44102395046814723;
+                    UIobj.GPSdisplayObj.doNotWarnHigh = -0.26272201487851005;
+                    UIobj.GPSdisplayObj.warnLow = -1.368224688831993;
+                    UIobj.GPSdisplayObj.warnHigh = -0.024536630970000004;
+                    UIobj.LIDARdisplayObj.doNotWarnLow = -0.08943312353220001;
+                    UIobj.LIDARdisplayObj.doNotWarnHigh = -0.09797019121649216;
+                    UIobj.LIDARdisplayObj.warnLow = -1.00109058896428;//
+                    UIobj.LIDARdisplayObj.warnHigh = -1.0447228987;
+                    UIobj.IMUdisplayObj.doNotWarnLow = 0.29178447557721987;
+                    UIobj.IMUdisplayObj.doNotWarnHigh = 0.29178447557721987;
+                    UIobj.IMUdisplayObj.warnLow = 0.9483619319005033;
+                    UIobj.IMUdisplayObj.warnHigh = 1.1079438430599902;
+
+                    if(isAutomated && UIobj.finishedTakeoff && !warningResponse) {
+                        if (UIobj.faultySensorName.equalsIgnoreCase("gps")) {
+                            if (Math.min(sensorErrors[0], sensorErrors[1]) >= 9.0) {
+                                System.err.println("Acknowledged - 1");
+                                UIobj.acknowledgeForError();
+                                this.warningResponse = true;
+                            } else {
+                                System.err.println("Denied - 1");
+                                UIobj.denyForError();
+                                this.warningResponse = true;
+                            }
+                        } else if (UIobj.faultySensorName.equalsIgnoreCase("imu")) {
+                            System.err.println(Math.min(sensorErrors[1],sensorErrors[2]));
+                            System.err.println("Acknowledged - 2");
+                            UIobj.acknowledgeForError();
+                            this.warningResponse = true;
+                        } else if (UIobj.faultySensorName.equalsIgnoreCase("lidar")) {
+                            if (Math.min(sensorErrors[0], sensorErrors[2]) < 10.0) {
+                                UIobj.denyForError();
+                                this.warningResponse = true;
+                            }
+                        }
+
+                        //Pilot accepts/denies the warning issued.
+                        this.response_count += 1;
+                        if(UIobj.sensorChangeLearningObj.authorityToChangeInfo && this.response_count %5 != 0  && (UIobj.GPSbarObj.error >=10 || UIobj.IMUbarObj.error >=10 || UIobj.LIDARbarObj.error >=10)){
+                            UIobj.pilotDecisionToChange = "yes";
+                            InputWme pilotSensorChangeWme = builder.getWme("pilot-decision-to-change");
+                            pilotSensorChangeWme.update(syms.createString(UIobj.pilotDecision));
+                        }
+                        if (this.response_count % 5 == 0 ){
+                            //Pilot hasn't responded in 5 seconds.
+                            this.warningResponse =false;
+                            UIobj.pilotDecisionToChange = "yes";
+                            InputWme pilotSensorChangeWme = builder.getWme("pilot-decision-to-change");
+                            pilotSensorChangeWme.update(syms.createString(UIobj.pilotDecision));
+                            this.response_count =0;
+                            UIobj.errorReset();
+                        }
+                        if(this.response_count % 5 != 0){
+                            this.response_count++;
+                        }
+                        System.err.println(this.response_count);
+                    }
 
                 }
-//                else{
-//                    if(isAutomated && UIobj.finishedTakeoff && !warningResponse) {
-//                        if (UIobj.GPSbarObj.error >= 9.0) {
-//                            UIobj.acknowledgeForError();
-//                            this.warningResponse = true;
-//                            // Deny Low error
-//                        } else {
-//                            UIobj.denyForError();
-//                            this.warningResponse = true;
-//                        }
-//                        //Pilot accepts/denies the warning issued.
-//                        this.response_count += 1;
-//                        if(UIobj.sensorChangeLearningObj.authorityToChangeInfo && this.response_count < 5 && UIobj.GPSbarObj.error >=10){
-//                            UIobj.pilotDecisionToChange = "yes";
-//                            InputWme pilotSensorChangeWme = builder.getWme("pilot-decision-to-change");
-//                            pilotSensorChangeWme.update(syms.createString(UIobj.pilotDecision));
-//                        }
-//                        if (this.response_count == 5){
-//                            //Pilot hasn't responded in 5 seconds.
-//                            this.warningResponse =false;
-//                            this.response_count =0;
-//                            UIobj.errorReset();
-//                        }
-//
-//                    }
-//                }
 
                 //FlightData data = getFlightData();
                 //building the input structure for the soar agent
@@ -742,6 +763,8 @@ public class CopilotTakeoffAgent extends XPlaneAgent
                 initiatedLandingWme.update(syms.createString(UIobj.initiateLanding ? "yes":"no"));
                 InputWme abortLandingWme = builder.getWme("abort-landing");
                 abortLandingWme.update(syms.createString(UIobj.abortLanding ? "yes":"no"));
+                InputWme reroutedLandingZoneSelectedWme = builder.getWme("pilot-selected-landing-zone");
+                reroutedLandingZoneSelectedWme.update((syms.createString(UIobj.reroutedLandingZoneSelected ? "yes":"no")));
                 InputWme pilotWme = builder.getWme("pilot-decision");
                 pilotWme.update(syms.createString(UIobj.pilotDecision));
                 InputWme pilotChangeWme = builder.getWme("pilot-decision-to-change");

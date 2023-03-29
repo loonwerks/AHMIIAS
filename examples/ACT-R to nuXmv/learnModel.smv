@@ -1,0 +1,47 @@
+MODULE main
+VAR eval_sensor-state:{high,warn-low,do-not-warn-low,warn-high,do-not-warn-high,low};
+--VAR refer-value: integer;
+
+
+ASSIGN
+ init(eval_sensor-state):= high;
+ --init(refer-value):= 0;
+
+ VAR ACTR: Learn(eval_sensor-state);
+
+ -----------------------------------------------
+--LTLSPECS
+--LTLSPEC F (X eval_sensor-state = warn-low)
+--LTLSPEC F (X eval_sensor-state = do-not-warn-low)
+LTLSPEC F (X eval_sensor-state = do-not-warn-high)
+--LTLSPEC F (X eval_sensor-state= warn-high)
+--LTLSPEC F (G eval_sensor-state= do-not-warn-high )
+
+--------------------------------------------
+-- MODULE ReferInput
+  --  TRANS 
+    --   next(refer-value) = 
+     --   case
+       --     (refer-value=0): 50;
+         --   (refer-value=50): 100;
+           -- (refer-value=100): 0;
+       -- TRUE : refer-value;
+       -- esac;
+
+ MODULE Learn(eval_sensor-state)
+
+    TRANS 
+        next(eval_sensor-state) = 
+        case
+        -- refer-value=100
+            (eval_sensor-state= high): warn-high;
+        -- refer-value=50
+            (eval_sensor-state= high): do-not-warn-high;
+        -- refer-value=50
+            (eval_sensor-state= low): do-not-warn-low;
+        -- refer-value=0
+            (eval_sensor-state= low): warn-low;     
+
+        TRUE : eval_sensor-state;
+        esac;    
+
